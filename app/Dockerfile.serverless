@@ -1,0 +1,20 @@
+FROM public.ecr.aws/lambda/nodejs:20
+
+# Set environment variables
+ENV OBJECT_STORAGE_URL=http://minio:9000
+ENV OBJECT_STORAGE_ROOT_USER=minioadmin
+ENV OBJECT_STORAGE_ROOT_PASSWORD=minioadmin
+ENV OBJECT_STORAGE_PATH_STYLE=false
+
+WORKDIR ${LAMBDA_TASK_ROOT}
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+# Pass the name of the function handler as an argument to the runtime
+CMD ["dist/main.handler"]
