@@ -1,0 +1,52 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches:
+      - next
+      - master
+
+jobs:
+  e2e_tests:
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+    env:
+      APP_ENDPOINT: ${{ vars.APP_ENDPOINT }}
+      ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+      MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
+      MINIO_PORT: ${{ vars.MINIO_PORT }}
+      MINIO_USE_SSL: ${{ vars.MINIO_USE_SSL }}
+      MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+      MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+      MINIO_BUCKET_NAME: ${{ vars.MINIO_BUCKET_NAME }}
+      IDENTIFIER_PATH: ${{ vars.IDENTIFIER_PATH }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js and Cache Dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21' # install Node.js v21.x
+          cache: npm
+          cache-dependency-path: app/package-lock.json # cache dependencies for the app
+
+      # Install dependencies for running E2E tests
+      - name: Install dependencies
+        run: npm ci
+        working-directory: app
+
+      - name: Start docker compose
+        run: docker compose -f app/docker-compose.yaml up -d # Start docker compose in the background
+
+      # Run E2E tests and force exit after all tests have completed
+      - name: Run E2E tests
+        run: npm run test:e2e -- --forceExit
+        working-directory: app
+
+      - name: Stop docker compose
+        run: docker compose -f app/docker-compose.yaml down # Stop docker compose after all tests have completed

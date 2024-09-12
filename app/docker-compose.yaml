@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  identity-resolver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_USE_SSL=false
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET_NAME=idr-bucket
+      - IDENTIFIER_PATH=identifiers
+      - API_KEY=test123
+      - APP_ENDPOINT=http://localhost:3000
+      - APP_NAME=IDR
+      - RESOLVER_DOMAIN=http://localhost:3000
+      - LINK_TYPE_VOC_DOMAIN=http://localhost:3000/voc
+    depends_on:
+      - minio
+
+  minio:
+    hostname: minio
+    image: quay.io/minio/minio:RELEASE.2024-08-17T01-24-54Z-cpuv1
+    command: server /data --console-address ":9090"
+    ports:
+      - '9000:9000'
+      - '9090:9090'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+
+    volumes:
+      - ${MINIO_DATA_DIR:-./minio_data}:/data
