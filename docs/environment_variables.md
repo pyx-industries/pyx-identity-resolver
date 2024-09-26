@@ -39,3 +39,14 @@ The `NODE_ENV` variable is crucial for determining the environment variables use
 - `development`: Uses the environment variables in `.env.development.local` and `.env.development`.
 - `test`: Uses the environment variables in `.env.test.local` and `.env.test`.
 - `production`: Uses the environment variables in `.env.production.local` and `.env.production`.
+
+## Troubleshooting
+
+When setting up and testing the IDR in Swagger API docs there is an existing issue (due to the library used to set up the docs), where 404 error is received due to an encoding error when using special fields to create the path.
+Example: '/10/12345678901234567890' being used as a secondaryIdentifierPath will cause the '/' to be encoded into '%2F' and will not resolve the link.
+
+To fix this issue ensure that the following setting is turned ON depending on the web sever that is being used:
+| Environment        | Description            |
+| ------------------ | ---------------------- |
+| NGINX              | proxy_pass_request_uri |
+| Apache HTTP        | AllowEncodedSlashes    |

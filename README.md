@@ -1,4 +1,4 @@
-# Pyx Llink Resolver
+# Pyx Link Resolver
 
 This software enables users to resolve identifiers
 and retrieve relevant information
