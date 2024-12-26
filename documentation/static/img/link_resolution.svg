@@ -1,0 +1,20 @@
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="12" cy="12" r="11" fill="#f0f0f0" stroke="#673AB7" stroke-width="1.5"/>
+  
+  <!-- Search/resolution symbol -->
+  <circle cx="10" cy="10" r="5" fill="none" stroke="#673AB7" stroke-width="1.5"/>
+  <line x1="13.5" y1="13.5" x2="17" y2="17" stroke="#673AB7" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Data flow arrows -->
+  <path d="M6,15 C6,18 10,19 14,17" fill="none" stroke="#673AB7" stroke-width="1.5" 
+        stroke-dasharray="2,1" stroke-linecap="round"/>
+  
+  <!-- Target/destination marker -->
+  <circle cx="17" cy="17" r="2.5" fill="#673AB7"/>
+  <circle cx="17" cy="17" r="1" fill="white"/>
+  
+  <!-- Connected nodes -->
+  <circle cx="6" cy="15" r="1" fill="#673AB7"/>
+  <circle cx="14" cy="17" r="1" fill="#673AB7"/>
+</svg>
