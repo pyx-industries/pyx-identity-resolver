@@ -10,7 +10,41 @@ permissions:
   contents: write
 
 jobs:
+  test_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js and Cache Dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21' # install Node.js v21.x
+          cache: npm
+          cache-dependency-path: app/package-lock.json # cache dependencies for the app
+
+      - name: Install dependencies
+        run: npm ci # Install dependencies
+        working-directory: app
+
+      - name: Lint
+        run: npm run lint # Lint the application
+        working-directory: app
+
+      - name: Build
+        run: npm run build # Build the application
+        working-directory: app
+
+      - name: Run tests
+        # run tests only on changed files and generate coverage report in JSON format
+        run: npm run test
+        working-directory: app
+
   release:
+    needs: test_build
     runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.retrieve_version.outputs.new_version }}

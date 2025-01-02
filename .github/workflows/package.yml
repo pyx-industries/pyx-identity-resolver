@@ -3,7 +3,7 @@ name: Package
 on:
   push:
     tags:
-      - "v*.*.*" # vMAJOR.MINOR.PATCH | v0.0.1
+      - '*.*.*' # MAJOR.MINOR.PATCH | 0.0.1
 
   workflow_dispatch: # Manually run the workflow
 
