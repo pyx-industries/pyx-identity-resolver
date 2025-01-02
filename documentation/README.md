@@ -23,3 +23,16 @@ $ yarn build
 ```
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
+
+### Documentation Versioning
+
+The `scripts/release-doc.js` script automates the process of creating new documentation versions:
+
+- Reads the documentation version from `version.json`
+- Creates Docusaurus version using `docVersion` value from `version.json` file
+  To manually create a new documentation version:
+
+```bash
+# Run the release script
+yarn release:doc
+```

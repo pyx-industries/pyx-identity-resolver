@@ -60,6 +60,10 @@ const config: Config = {
     image: 'img/un-crm-social-card.png',
     navbar: {
       items: [
+        {
+          type: 'docsVersionDropdown',
+          position: 'right',
+        },
         { to: '/docs/introduction', label: 'Introduction', position: 'right' },
         {
           to: '/docs/getting-started',
