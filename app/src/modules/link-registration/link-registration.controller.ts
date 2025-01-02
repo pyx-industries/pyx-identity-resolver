@@ -25,7 +25,7 @@ import { LinkRegistrationTransformPipe } from './pipes/link-registration-transfo
 import { ValidateLinkTypePipe } from './pipes/validate-link-type.pipe';
 
 @ApiTags('Link Registration')
-@Controller('api/resolver')
+@Controller('resolver')
 @ApiBearerAuth()
 export class LinkRegistrationController {
   constructor(private linkRegistrationService: LinkRegistrationService) {}

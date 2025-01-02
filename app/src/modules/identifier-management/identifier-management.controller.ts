@@ -32,7 +32,7 @@ import { GeneralErrorException } from '../../common/exceptions/general-error.exc
 import { IdentifierTransformPipe } from './pipes/identifier-transform.pipe';
 
 @ApiTags('Identifiers')
-@Controller('api/identifiers')
+@Controller('identifiers')
 @ApiBearerAuth()
 export class IdentifierManagementController {
   constructor(

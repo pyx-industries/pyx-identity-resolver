@@ -1,8 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 import { IdentifierDto } from '../../src/modules/identifier-management/dto/identifier.dto';
 import request from 'supertest';
+import { APP_ROUTE_PREFIX } from '../../src/common/utils/config.utils';
 
-const baseUrl = process.env.RESOLVER_DOMAIN;
+const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
 const environment = process.env.NODE_ENV;
 
 // Define namespaces for e2e testing to avoid data pollution
@@ -55,7 +56,7 @@ describe('LinkResolutionController (e2e)', () => {
         ],
       };
       const res = await request(baseUrl)
-        .post('/api/identifiers')
+        .post('/identifiers')
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .send(identifierDto)
         .expect(HttpStatus.OK);
@@ -66,7 +67,7 @@ describe('LinkResolutionController (e2e)', () => {
 
       if (res.body) {
         await request(baseUrl)
-          .post('/api/resolver')
+          .post('/resolver')
           .send({
             namespace: gs1,
             identificationKeyType: 'gtin',
@@ -339,7 +340,7 @@ describe('LinkResolutionController (e2e)', () => {
   // Clean up
   it('delete namespace', async () => {
     await request(baseUrl)
-      .delete('/api/identifiers')
+      .delete('/identifiers')
       .set('Authorization', `Bearer ${process.env.API_KEY}`)
       .query({ namespace: gs1 })
       .expect(HttpStatus.OK);

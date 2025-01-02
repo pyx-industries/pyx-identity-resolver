@@ -1,8 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 import { IdentifierDto } from '../src/modules/identifier-management/dto/identifier.dto';
 import request from 'supertest';
+import { APP_ROUTE_PREFIX } from '../src/common/utils/config.utils';
 
-const baseUrl = process.env.RESOLVER_DOMAIN;
+const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
 const environment = process.env.NODE_ENV;
 const apiKey = process.env.API_KEY;
 
@@ -58,7 +59,7 @@ describe('Full flow (e2e)', () => {
     };
 
     const res = await request(baseUrl)
-      .post('/api/identifiers')
+      .post('/identifiers')
       .set('Authorization', `Bearer ${apiKey}`)
       .send(identifierGtinDto)
       .expect(HttpStatus.OK);
@@ -92,7 +93,7 @@ describe('Full flow (e2e)', () => {
     };
 
     const res2 = await request(baseUrl)
-      .post('/api/identifiers')
+      .post('/identifiers')
       .set('Authorization', `Bearer ${apiKey}`)
       .send(identifierNlisidDto2)
       .expect(HttpStatus.OK);
@@ -134,7 +135,7 @@ describe('Full flow (e2e)', () => {
     };
 
     const res3 = await request(baseUrl)
-      .post('/api/identifiers')
+      .post('/identifiers')
       .set('Authorization', `Bearer ${apiKey}`)
       .send(identifierGsrnpDto)
       .expect(HttpStatus.OK);
@@ -184,7 +185,7 @@ describe('Full flow (e2e)', () => {
       };
 
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .set('Authorization', `Bearer ${apiKey}`) // Use the API key
         .send(linkRegistrationDto)
         .expect(HttpStatus.CREATED);
@@ -257,7 +258,7 @@ describe('Full flow (e2e)', () => {
       };
 
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .set('Authorization', `Bearer ${apiKey}`) // Use the API key
         .send(linkRegistrationDto)
         .expect(HttpStatus.CREATED);
@@ -306,7 +307,7 @@ describe('Full flow (e2e)', () => {
       };
 
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .set('Authorization', `Bearer ${apiKey}`) // Use the API key
         .send(linkRegistrationDto)
         .expect(HttpStatus.CREATED);
@@ -356,7 +357,7 @@ describe('Full flow (e2e)', () => {
       };
 
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .set('Authorization', `Bearer ${apiKey}`) // Use the API key
         .send(linkRegistrationDto)
         .expect(HttpStatus.CREATED);
@@ -409,7 +410,7 @@ describe('Full flow (e2e)', () => {
       };
 
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .set('Authorization', `Bearer ${apiKey}`) // Use the API key
         .send(linkRegistrationDto)
         .expect(HttpStatus.CREATED);
@@ -460,7 +461,7 @@ describe('Full flow (e2e)', () => {
       };
 
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .set('Authorization', `Bearer ${apiKey}`) // Use the API key
         .send(linkRegistrationDto)
         .expect(HttpStatus.CREATED);
@@ -511,7 +512,7 @@ describe('Full flow (e2e)', () => {
       };
 
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .set('Authorization', `Bearer ${apiKey}`) // Use the API key
         .send(linkRegistrationDto)
         .expect(HttpStatus.CREATED);
@@ -562,7 +563,7 @@ describe('Full flow (e2e)', () => {
       };
 
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .set('Authorization', `Bearer ${apiKey}`) // Use the API key
         .send(linkRegistrationDto)
         .expect(HttpStatus.CREATED);
@@ -589,7 +590,7 @@ describe('Full flow (e2e)', () => {
 
   async function deleteNamespace(namespace: string) {
     await request(baseUrl)
-      .delete('/api/identifiers')
+      .delete('/identifiers')
       .set('Authorization', `Bearer ${process.env.API_KEY}`)
       .query({ namespace })
       .expect(HttpStatus.OK);
