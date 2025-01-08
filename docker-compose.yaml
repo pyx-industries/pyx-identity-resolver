@@ -15,7 +15,7 @@ services:
       - IDENTIFIER_PATH=identifiers
       - OBJECT_STORAGE_PATH_STYLE=true
       - API_KEY=test123
-      - RESOLVER_DOMAIN=http://localhost:3000
+      - RESOLVER_DOMAIN=http://localhost:3000/api/1.0.0
       - APP_NAME=IDR
       - NODE_ENV=development
       - PORT=3000

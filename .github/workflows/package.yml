@@ -58,8 +58,7 @@ jobs:
           push: ${{ env.PUSH_CONDITION }}
           tags: ${{ steps.meta.outputs.tags }}-local
           labels: ${{ steps.meta.outputs.labels }}
-          context: app
-          file: app/Dockerfile
+          file: Dockerfile
 
       - name: Build and Push Serverless Image
         uses: docker/build-push-action@v5
@@ -67,5 +66,4 @@ jobs:
           push: ${{ env.PUSH_CONDITION }}
           tags: ${{ steps.meta.outputs.tags }}-serverless
           labels: ${{ steps.meta.outputs.labels }}
-          context: app
-          file: app/Dockerfile.serverless
+          file: Dockerfile.serverless

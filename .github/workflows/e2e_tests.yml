@@ -24,6 +24,9 @@ jobs:
       IDENTIFIER_PATH: ${{ vars.IDENTIFIER_PATH }}
       API_KEY: ${{ secrets.API_KEY }}
       APP_NAME: ${{ vars.APP_NAME }}
+      LINK_TYPE_VOC_DOMAIN: ${{ vars.LINK_TYPE_VOC_DOMAIN }}
+      API_BASE_URL: ${{ vars.API_BASE_URL }}
+      APP_ROUTE_PREFIX: ${{ vars.APP_ROUTE_PREFIX }}
 
     steps:
       - name: Checkout
@@ -44,7 +47,7 @@ jobs:
         working-directory: app
 
       - name: Start docker compose
-        run: docker compose -f app/docker-compose.yaml up -d # Start docker compose in the background
+        run: docker compose up -d # Start docker compose in the background
 
       # Run E2E tests and force exit after all tests have completed
       - name: Run E2E tests
@@ -52,4 +55,4 @@ jobs:
         working-directory: app
 
       - name: Stop docker compose
-        run: docker compose -f app/docker-compose.yaml down # Stop docker compose after all tests have completed
+        run: docker compose down # Stop docker compose after all tests have completed

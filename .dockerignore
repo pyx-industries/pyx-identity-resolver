@@ -1,0 +1,15 @@
+**/*/.DS_Store
+**/*/minio_data
+**/*/object_storage_data
+**/*/coverage
+**/*/.env
+**/*/test
+**/*/.eslintrc.js
+**/*/.git
+**/*/.gitignore
+**/*/.prettierrc
+**/*/.github
+**/*/.vscode
+**/*/nodemon.json
+**/*/README.md
+**/*/report.json
