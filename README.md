@@ -26,8 +26,13 @@ It enables identity registry operators and identifier owners to register links t
 
 ## Quick Start
 
-To get the Identity Resolver up and running quickly, follow the [Quick Start Guide](./app/README.md).
+To quickly set up and run the Identity Resolver using the docker-compose.yaml file, execute the following command:
 
+```bash
+docker compose up -d;
+```
+
+For more detailed setup and configuration options, refer to the [Quick Start Guide](./app/README.md).
 
 ## Contributing
 
