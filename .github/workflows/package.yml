@@ -3,13 +3,13 @@ name: Package
 on:
   push:
     tags:
-      - '*.*.*' # MAJOR.MINOR.PATCH | 0.0.1
+      - '*.*.*'
 
   workflow_dispatch: # Manually run the workflow
 
-  # Run the workflow when the Release Tagging workflow completes
+  # Run the workflow when the Release workflow completes
   workflow_run:
-    workflows: ['Release Tagging']
+    workflows: ['Release']
     types:
       - completed
 
@@ -20,11 +20,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # Trigger the job only if the Release Tagging job was successful or manually triggered
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event.ref == 'refs/heads/master' }}
+    if: ${{ startsWith(github.ref, 'refs/tags/') || github.event.workflow_run.conclusion == 'success' || github.event.ref == 'refs/heads/master' }}
 
     env:
       # Only push the image if the new tag is pushed or manually triggered
-      PUSH_CONDITION: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' }}
+      PUSH_CONDITION: ${{ startsWith(github.ref, 'refs/tags/') || github.event.workflow_run.conclusion == 'success' || github.ref == 'refs/heads/master' }}
 
     steps:
       - name: Checkout
