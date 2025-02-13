@@ -7,6 +7,7 @@ import { Callback, Context, Handler } from 'aws-lambda';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { validationExceptionFactory } from './common/factories/validation-exception.factory';
+import { API_VERSION, APP_ROUTE_PREFIX } from './common/utils/config.utils';
 
 let server: Handler;
 
@@ -24,14 +25,29 @@ async function bootstrap() {
   );
   app.use(helmet());
 
+  app.setGlobalPrefix(APP_ROUTE_PREFIX);
+
   const config = new DocumentBuilder()
     .setTitle('Link resolver API')
     .setDescription('The link resolver API description')
-    .setVersion('1.0')
+    .setVersion(API_VERSION)
     .addBearerAuth()
+    .addServer(
+      `${process.env.API_BASE_URL || 'http://localhost:3000'}${APP_ROUTE_PREFIX}`,
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  // Optional: You can also transform the document to remove prefixes
+  document.paths = Object.entries(document.paths).reduce(
+    (acc, [path, value]) => {
+      const newPath = path.replace(`/api/${API_VERSION}`, '');
+      acc[newPath] = value;
+      return acc;
+    },
+    {},
+  );
+
+  SwaggerModule.setup('api-docs', app, document);
 
   if (process.env.NODE_ENV === 'production') {
     await app.init();

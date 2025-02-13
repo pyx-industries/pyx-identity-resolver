@@ -25,7 +25,7 @@ To get the Identity Resolver up and running quickly, follow these steps:
 3. Start the application using Docker Compose:
 
    ```bash
-   docker-compose up -d
+   docker compose -f ../docker-compose.yaml up -d;
    ```
 
 4. Access the API documentation at [http://localhost:3000/api](http://localhost:3000/api)
@@ -122,7 +122,7 @@ The Docker Compose configuration allows for flexible and persistent data storage
 
 #### Configuration Details
 
-In the `docker-compose.yml` file, MinIO's data storage is configured as follows:
+In the [docker-compose.yaml](../docker-compose.yaml) file, MinIO's data storage is configured as follows:
 
 ```yaml
 volumes:
@@ -137,27 +137,27 @@ To persist MinIO storage outside of the cloned repository, set the `OBJECT_STORA
 
   ```bash
   export OBJECT_STORAGE_DATA_DIR=~/minio/idr/data
-  docker-compose up -d
+  docker compose -f ../docker-compose.yaml up -d
   ```
 
 - Windows (PowerShell):
 
   ```powershell
   $env:OBJECT_STORAGE_DATA_DIR = "$HOME\minio\idr\data"
-  docker-compose up -d
+  docker compose -f ../docker-compose.yaml up -d
   ```
 
 - Windows (Command Prompt):
   ```cmd
   set OBJECT_STORAGE_DATA_DIR=%USERPROFILE%\minio\idr\data
-  docker-compose up -d
+  docker compose -f ../docker-compose.yaml up -d
   ```
 
 ## Running the App
 
 ```bash
 # Start MinIO container
-docker-compose up -d minio
+docker compose -f ../docker-compose.yaml up -d minio
 
 # Development mode
 npm run start
@@ -177,14 +177,14 @@ When using Docker Compose for development, keep the following points in mind:
    To see your changes, you need to rebuild and restart the container:
 
    ```bash
-   docker-compose up -d --build
+   docker compose -f ../docker-compose.yaml up -d --build
    ```
 
 2. For a more dynamic development experience, you can use the watch mode while keeping the MinIO container running:
 
    ```bash
    # Start MinIO container
-   docker-compose up -d minio
+   docker compose -f ../docker-compose.yaml up -d minio --build
 
    # Run the app in watch mode
    npm run start:dev
@@ -231,9 +231,10 @@ environment:
 ```
 
 3. Start the application in test mode:
-   ```bash
-   docker-compose up -d --build
-   ```
+
+```bash
+docker compose -f ../docker-compose.yaml up -d --build
+```
 
 Then run the E2E tests:
 

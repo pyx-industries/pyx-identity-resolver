@@ -1,7 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
+import { APP_ROUTE_PREFIX } from '../src/common/utils/config.utils';
 import request from 'supertest';
 
-const baseUrl = process.env.RESOLVER_DOMAIN;
+const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
 
 describe('AppController (e2e)', () => {
   it('/ (GET)', async () => {

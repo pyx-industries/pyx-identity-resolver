@@ -26,8 +26,13 @@ It enables identity registry operators and identifier owners to register links t
 
 ## Quick Start
 
-To get the Identity Resolver up and running quickly, follow the [Quick Start Guide](./app/README.md).
+To quickly set up and run the Identity Resolver using the docker-compose.yaml file, execute the following command:
 
+```bash
+docker compose up -d;
+```
+
+For more detailed setup and configuration options, refer to the [Quick Start Guide](./app/README.md).
 
 ## Contributing
 
@@ -43,3 +48,36 @@ This project uses two primary workflows:
 We follow [Semantic Versioning](https://semver.org/) with the format `vMAJOR.MINOR.PATCH`.
 
 For more detailed information, please refer to the [documentation](docs/index.md).
+
+### Release Guide
+
+To release a new version, ensure we have the `version.json` file updated with the new version number. Then, create a new release tag with the following steps:
+
+1. Create a new release branch from `next` with the version number as the branch name.
+2. Update the `version.json` file with the new version number.
+3. Generate new documentation version using the release script
+
+```bash
+cd documentation
+yarn release:doc
+```
+
+4. Check API documentation and update if necessary.
+5. Commit the changes and push the branch.
+6. Create a pull request from the release branch to `main`.
+7. Merge the pull request.
+8. Create a new release tag with the version number.
+9. Push the tag to the repository.
+
+(\*) With the `version.json` file, it contains the version number in the following format:
+
+```json
+{
+  "version": "MAJOR.MINOR.PATCH",
+  "apiVersion": "MAJOR.MINOR.PATCH",
+  "docVersion": "MAJOR.MINOR.PATCH",
+  "dependencies": {}
+}
+```
+
+We need to change manually the `version`, `apiVersion`, and `docVersion` fields.

@@ -1,8 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
+import { APP_ROUTE_PREFIX } from '../../src/common/utils/config.utils';
 import { IdentifierDto } from 'src/modules/identifier-management/dto/identifier.dto';
 import request from 'supertest';
 
-const baseUrl = process.env.RESOLVER_DOMAIN;
+const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
 const environment = process.env.NODE_ENV;
 const apiKey = process.env.API_KEY;
 
@@ -10,7 +11,7 @@ const apiKey = process.env.API_KEY;
 const gs1 = `e2e-${environment}-mock-gs1`;
 
 describe('LinkResolutionController (e2e)', () => {
-  describe('/api/resolver (POST)', () => {
+  describe('/resolver (POST)', () => {
     const createIdentifierDto = (): IdentifierDto => ({
       namespace: gs1,
       namespaceProfile: '',
@@ -57,7 +58,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     const registerIdentifier = async (identifierDto: IdentifierDto) => {
       const res = await request(baseUrl)
-        .post('/api/identifiers')
+        .post('/identifiers')
         .set('Authorization', `Bearer ${apiKey}`)
         .send(identifierDto)
         .expect(HttpStatus.OK);
@@ -80,7 +81,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should register a new link resolver with valid payload', async () => {
       request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -115,7 +116,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should register a new link resolver when missing the qualifierPath', async () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -191,7 +192,7 @@ describe('LinkResolutionController (e2e)', () => {
 
       // Register first link resolver
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send(
           resolverPayload(
             'certificationInfo',
@@ -207,7 +208,7 @@ describe('LinkResolutionController (e2e)', () => {
 
       // Register second link resolver with a different linkType
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send(
           resolverPayload(
             'epcis',
@@ -286,7 +287,7 @@ describe('LinkResolutionController (e2e)', () => {
 
       // Register the link resolver for the first time
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send(
           resolverPayload(
             'certificationInfo',
@@ -302,7 +303,7 @@ describe('LinkResolutionController (e2e)', () => {
 
       // Register the same link resolver for the second time (duplicate)
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send(
           resolverPayload(
             'certificationInfo',
@@ -330,7 +331,7 @@ describe('LinkResolutionController (e2e)', () => {
 
       // cleanup
       await request(baseUrl)
-        .delete('/api/identifiers')
+        .delete('/identifiers')
         .set('Authorization', `Bearer ${apiKey}`)
         .query({ namespace })
         .expect(HttpStatus.OK);
@@ -338,7 +339,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should throw an error if namespace is not found', async () => {
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           // missing namespace
           identificationKeyType: 'gtin',
@@ -367,7 +368,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             { field: 'namespace', message: 'namespace should not be empty' },
             { field: 'namespace', message: 'namespace must be a string' },
@@ -377,7 +378,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should throw an error if identificationKeyType is not found', async () => {
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           // missing identificationKeyType
@@ -406,7 +407,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'identificationKeyType',
@@ -422,7 +423,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should throw an error if identificationKey is not found', async () => {
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -451,7 +452,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'identificationKey',
@@ -467,7 +468,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should throw an error if itemDescription is not found', async () => {
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -496,7 +497,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'itemDescription',
@@ -512,7 +513,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should throw an error if active is not found', async () => {
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -541,7 +542,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'active',
@@ -553,7 +554,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should throw an error if responses is not found', async () => {
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -567,7 +568,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'responses',
@@ -583,7 +584,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should throw a bad request error for invalid active', async () => {
       await request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -612,7 +613,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'active',
@@ -627,7 +628,7 @@ describe('LinkResolutionController (e2e)', () => {
       await registerIdentifier(identifierDto);
 
       request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -656,7 +657,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(422)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'qualifierPath',
@@ -673,7 +674,7 @@ describe('LinkResolutionController (e2e)', () => {
       await registerIdentifier(identifierDto);
 
       request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -702,7 +703,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(422)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'qualifierPath',
@@ -719,7 +720,7 @@ describe('LinkResolutionController (e2e)', () => {
       await registerIdentifier(identifierDto);
 
       request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'invalid', // invalid identification key type
@@ -748,7 +749,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(422)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'identificationKeyType',
@@ -764,7 +765,7 @@ describe('LinkResolutionController (e2e)', () => {
       await registerIdentifier(identifierDto);
 
       request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -793,7 +794,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(422)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'identificationKey',
@@ -810,7 +811,7 @@ describe('LinkResolutionController (e2e)', () => {
       await registerIdentifier(identifierDto);
 
       request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -839,7 +840,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(422)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'qualifierPath',
@@ -851,7 +852,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it('should throw a bad request error for invalid responses', () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -865,7 +866,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'responses',
@@ -885,7 +886,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it("should throw a bad request error for invalid response's defaultLinkType", () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -914,7 +915,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'responses.0.defaultLinkType',
@@ -926,7 +927,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it("should throw a bad request error for invalid response's defaultMimeType", () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -955,7 +956,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'responses.0.defaultMimeType',
@@ -967,7 +968,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it("should throw a bad request error for invalid response's fwqs", () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -996,7 +997,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'responses.0.fwqs',
@@ -1008,7 +1009,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it("should throw a bad request error for invalid response's active", () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -1037,7 +1038,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'responses.0.active',
@@ -1049,7 +1050,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it("should throw a bad request error for invalid response's linkType", () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -1078,7 +1079,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(404)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'linkType',
@@ -1091,7 +1092,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it("should throw a bad request error for invalid response's linkTitle", () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -1120,7 +1121,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'responses.0.title',
@@ -1135,7 +1136,7 @@ describe('LinkResolutionController (e2e)', () => {
       await registerIdentifier(identifierDto);
 
       request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -1164,7 +1165,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             { field: 'targetUrl', message: 'errors.isUrl' },
           ]);
@@ -1173,7 +1174,7 @@ describe('LinkResolutionController (e2e)', () => {
 
     it("should throw a bad request error for invalid response's mimeType", () => {
       return request(baseUrl)
-        .post('/api/resolver')
+        .post('/resolver')
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
@@ -1202,7 +1203,7 @@ describe('LinkResolutionController (e2e)', () => {
         .set('Authorization', `Bearer ${process.env.API_KEY}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.path).toBe('/api/resolver');
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
               field: 'responses.0.mimeType',
@@ -1215,7 +1216,7 @@ describe('LinkResolutionController (e2e)', () => {
 
   it('delete namespace', async () => {
     await request(baseUrl)
-      .delete('/api/identifiers')
+      .delete('/identifiers')
       .set('Authorization', `Bearer ${apiKey}`)
       .query({ namespace: gs1 })
       .expect(HttpStatus.OK);

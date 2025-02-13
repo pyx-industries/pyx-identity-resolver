@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/nodejs:20
+FROM public.ecr.aws/lambda/nodejs:22
 
 # Set environment variables
 ENV OBJECT_STORAGE_URL=http://minio:9000
@@ -8,11 +8,15 @@ ENV OBJECT_STORAGE_PATH_STYLE=false
 
 WORKDIR ${LAMBDA_TASK_ROOT}
 
-COPY package*.json ./
+COPY version.json .
+
+RUN mv version.json $(dirname ${LAMBDA_TASK_ROOT})
+
+COPY app/package*.json .
 
 RUN npm ci
 
-COPY . .
+COPY app/ .
 
 RUN npm run build
 

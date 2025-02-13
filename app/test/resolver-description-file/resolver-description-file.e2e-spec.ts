@@ -3,8 +3,9 @@ import request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
 import { IdentifierDto } from '../../src/modules/identifier-management/dto/identifier.dto';
 import { defaultLinkTypes } from '../../src/modules/common/data/default-link-types';
+import { APP_ROUTE_PREFIX } from '../../src/common/utils/config.utils';
 
-const baseUrl = process.env.RESOLVER_DOMAIN;
+const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
 const appName = process.env.APP_NAME;
 const apiKey = process.env.API_KEY;
 
@@ -26,7 +27,7 @@ describe('CommonController (e2e)', () => {
 
     it('should create the namespace successfully', async () => {
       const res = await request(baseUrl)
-        .post('/api/identifiers')
+        .post('/identifiers')
         .set('Authorization', `Bearer ${apiKey}`)
         .send(identifierDto)
         .expect(HttpStatus.OK);
@@ -36,7 +37,7 @@ describe('CommonController (e2e)', () => {
       });
 
       const response = await request(baseUrl)
-        .get('/api/identifiers')
+        .get('/identifiers')
         .set('Authorization', `Bearer ${apiKey}`)
         .query({ namespace: identifierDto.namespace })
         .expect(HttpStatus.OK);
@@ -73,7 +74,7 @@ describe('CommonController (e2e)', () => {
       );
       // Cleanup
       await request(baseUrl)
-        .delete('/api/identifiers')
+        .delete('/identifiers')
         .set('Authorization', `Bearer ${apiKey}`)
         .query({ namespace: identifierDto.namespace })
         .expect(HttpStatus.OK);
@@ -115,7 +116,7 @@ describe('CommonController (e2e)', () => {
 
     it('should create the namespace successfully', async () => {
       const res = await request(baseUrl)
-        .post('/api/identifiers')
+        .post('/identifiers')
         .set('Authorization', `Bearer ${apiKey}`)
         .send(identifierDto)
         .expect(HttpStatus.OK);
@@ -125,7 +126,7 @@ describe('CommonController (e2e)', () => {
       });
 
       const response = await request(baseUrl)
-        .get('/api/identifiers')
+        .get('/identifiers')
         .set('Authorization', `Bearer ${apiKey}`)
         .query({ namespace: identifierDto.namespace })
         .expect(HttpStatus.OK);
