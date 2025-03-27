@@ -22,8 +22,8 @@ jobs:
         with:
           node-version: 20
           # Temporarily remove caching to test if that's the issue
-          # cache: yarn
-          # cache-dependency-path: './docs/yarn.lock'
+          cache: yarn
+          cache-dependency-path: './documentation/yarn.lock'
 
       # Debug step to check directory structure
       - name: Debug directory structure
@@ -55,4 +55,4 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-          cache-dependency-path: './docs/yarn.lock'  # Remove the './' prefix
+          cache-dependency-path: './documentation/yarn.lock'  # Remove the './' prefix
