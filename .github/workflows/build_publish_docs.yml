@@ -17,18 +17,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      # First try without caching
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: yarn
-          cache-dependency-path: './docs/yarn.lock'
+          # Temporarily remove caching to test if that's the issue
+          # cache: yarn
+          # cache-dependency-path: './docs/yarn.lock'
+
+      # Debug step to check directory structure
+      - name: Debug directory structure
+        run: |
+          pwd
+          ls -la
+          ls -la docs || echo "docs directory not found"
 
       - name: Install dependencies
-        working-directory: ./docs
-        run: yarn install --frozen-lockfile
+        working-directory: docs  # Remove the './' prefix
+        run: |
+          yarn install --frozen-lockfile
+          # Debug step to verify yarn.lock creation
+          ls -la
 
       - name: Build website
-        working-directory: ./docs
+        working-directory: docs  # Remove the './' prefix
         run: yarn build
         env:
           DOCS_BASE_URL: ${{ vars.DOCS_BASE_URL }}
@@ -38,8 +50,14 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build
+          publish_dir: docs/build  # Remove the './' prefix
           # The following lines assign commit authorship to the official
           # GH-Actions bot for deploys to `gh-pages` branch:
           # https://github.com/actions/checkout/issues/13#issuecomment-724415212
           # The GH actions bot is used by default if you didn't specify the two fields.
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: 'docs/yarn.lock'  # Remove the './' prefix
