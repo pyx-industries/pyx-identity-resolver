@@ -55,4 +55,4 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-          cache-dependency-path: 'docs/yarn.lock'  # Remove the './' prefix
+          cache-dependency-path: './docs/yarn.lock'  # Remove the './' prefix
