@@ -1,4 +1,15 @@
+---
+sidebar_position: 2
+title: Personas
+---
+
+import Disclaimer from './../\_disclaimer.mdx';
+
+<Disclaimer />
+
 # Personas
+
+The Pyx Identity Resolver (IDR) serves a diverse range of personas, each interacting with the service to manage, access, or resolve identifier-linked data.
 
 ## Registry operator
 
@@ -10,7 +21,7 @@ Some examples:
 - The Australian Tax Office (ATO)
   as the registry operator of the Australian Business Register (ABR)
   which manages Australian Business Numbers (ABN).
-- GS1 as ther registry operator of the global product register
+- GS1 as there registry operator of the global product register
   with manages Global Trade Identification Numbers (GTIN)
 
 ## Registered member
@@ -33,10 +44,10 @@ maintained in any register and uses that identifier
 to discover further information about the identifier.
 For example:
 
-- An anaoymous user may discoiver a barcode on a pack of pasta
+- An anonymous user may discover a barcode on a pack of pasta
   in a supermarket
   [8076802085738](https://www.gs1.org/services/verified-by-gs1/results?gtin=8076802085738#productInformation)
-- An anonymous user who knows a GS1 comnpany prefix or any GTIN
+- An anonymous user who knows a GS1 company prefix or any GTIN
   may guess another GTIN by incrementing a few numbers
   [8076802085776](https://www.gs1.org/services/verified-by-gs1/results?gtin=8076802085776#productInformation).
 
@@ -52,7 +63,7 @@ even if they have not be previously given the identifier.
 
 ## Authorised user
 
-An authoprised user is anyone who has found or been given
+An authorised user is anyone who has found or been given
 a registry identifier, but also has some kind of authorisation
 to access further data about the identified item or entity.
 This user is distinct from the registered member
@@ -63,7 +74,7 @@ For example:
 
 - A recycling plant that received an EV battery for recycling
   and requires access to bill-of-materials and disassembly instructions
-  that are not normnally public information.
+  that are not normally public information.
 - A competent authority such as a customs agency
   that requires access to value or compliance data for goods
   clearance that is not normally public.

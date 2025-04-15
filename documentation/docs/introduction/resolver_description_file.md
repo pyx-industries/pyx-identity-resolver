@@ -1,3 +1,12 @@
+---
+sidebar_position: 6
+title: Resolver Description File
+---
+
+import Disclaimer from './../\_disclaimer.mdx';
+
+<Disclaimer />
+
 # Resolver Description File
 
 The resolver description file provides information about the identity resolver service. It can be accessed via a GET request to the `/.well-known/resolver` endpoint.
@@ -45,7 +54,7 @@ For each supported link type:
 ## Example
 
 ```bash
-curl -X GET http://localhost:3000/.well-known/resolver
+curl -X GET http://localhost:3000/api/1.0.0/.well-known/resolver
 ```
 
 Example response:
@@ -53,7 +62,7 @@ Example response:
 ```json
 {
   "name": "The IDR",
-  "resolverRoot": "http://localhost:3000",
+  "resolverRoot": "http://localhost:3000/api/1.0.0",
   "supportedLinkType": [
     {
       "namespace": "http://gs1.org/voc/",
@@ -61,9 +70,9 @@ Example response:
       "profile": "https://www.gs1.org/voc/?show=linktypes"
     },
     {
-      "namespace": "http://localhost:3000/voc/",
+      "namespace": "http://localhost:3000/api/1.0.0/voc/",
       "prefix": "local:",
-      "profile": "http://localhost:3000/voc/?show=linktypes"
+      "profile": "http://localhost:3000/api/1.0.0/voc/?show=linktypes"
     }
   ],
   "supportedPrimaryKeys": ["all"]
@@ -75,22 +84,22 @@ Example response:
 - The `name` is derived from the `APP_NAME` environment variable.
 - The `resolverRoot` is derived from the `RESOLVER_DOMAIN` environment variable.
 - The `supportedLinkType` array is generated based on the identifiers registered in the system.
-- If an identifier doesn't have a specified `namespaceURI` or `namespaceProfile`, the default link types are used `http://localhost:3000/voc/`.
+- If an identifier doesn't have a specified `namespaceURI` or `namespaceProfile`, the default link types are used `http://localhost:3000/api/1.0.0/voc/`.
 
 ### Link Types
 
-The default link types are defined in a file within the codebase. These default link types are based on the GS1 link types, which are widely used in industry. You can view all available link types by making a GET request to `/voc?show=linktypes`.
+The default link types are defined in a file within the codebase. These default link types are based on the GS1 link types, which are widely used in industry. You can view all available link types by making a GET request to `/api/1.0.0/voc?show=linktypes`.
 
 ```bash
-curl -X GET http://localhost:3000/voc?show=linktypes
+curl -X GET http://localhost:3000/api/1.0.0/voc?show=linktypes
 ```
 
 This will return a JSON object containing all available link types configured in the IDR and their descriptions.
 
-To get details about a specific link type, you can make a GET request to `/voc/{linktype}`:
+To get details about a specific link type, you can make a GET request to `/api/1.0.0/voc/{linktype}`:
 
 ```bash
-curl -X GET http://localhost:3000/voc/productSustainabilityInfo
+curl -X GET http://localhost:3000/api/1.0.0/voc/productSustainabilityInfo
 ```
 
 This will return a JSON object with details about the specified link type, for example:

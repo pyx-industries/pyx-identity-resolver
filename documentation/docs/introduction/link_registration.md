@@ -1,3 +1,12 @@
+---
+sidebar_position: 7
+title: Link Registration
+---
+
+import Disclaimer from './../\_disclaimer.mdx';
+
+<Disclaimer />
+
 # Link Registration
 
 Authorized users can register identity resolvers through the API. The data will be constructed and stored in a JSON file, with the filename determined by the namespace, primary identifier and qualifier path.
@@ -70,16 +79,16 @@ The following diagram illustrates the flow of the link registration process, inc
 
 ```mermaid
 graph TD
-    A[Start] --> B[Receive Link Registration Request]
+    A[Start] --> B[Receive Link Registration <br> Request]
     B --> C{Validate Request}
-    C -->|Invalid| D[Return Validation Error - 400]
-    C -->|Valid| E[Validate Namespace and Identifiers]
+    C -->|Invalid| D[Return Validation <br>  Error - 400]
+    C -->|Valid| E{Validate Namespace <br>  and Identifiers}
     E -->|Invalid| D
     E -->|Valid| F[Generate File Name]
     F --> G{Check if File Exists}
     G -->|No| H[Construct New Link Set]
     G -->|Yes| I[Retrieve Existing Link Set]
-    I --> J[Merge New Data with Existing]
+    I --> J[Merge New Data <br> with Existing]
     J --> K[Construct Updated Link Set]
     H --> L[Store in MinIO]
     K --> L
@@ -146,4 +155,4 @@ The Link Registration API supports the following operations:
 
 1. Create or Upset a link registration
 
-See the [API specification](http://localhost:3000/api#/Link%20Registration) for details.
+See the [API specification](http://localhost:3000/api-docs#/Link%20Registration) for details.

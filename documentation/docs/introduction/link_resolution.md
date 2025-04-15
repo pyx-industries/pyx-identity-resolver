@@ -1,3 +1,12 @@
+---
+sidebar_position: 8
+title: Link resolution
+---
+
+import Disclaimer from './../\_disclaimer.mdx';
+
+<Disclaimer />
+
 # Link resolution
 
 Link resolution is generally a three-step process
@@ -108,7 +117,7 @@ where
   from the identifier string discovered by the client.
   For example to take the rightmost string
   from "urn:epc:id:sgtin:123456.23456.12345678".
-- resolverTemplate provides the resolver URL with a placeholder {id}
+- resolverTemplate provides the resolver URL with a placeholder `{id}`
   which should be substituted for the discovered
   (and optionally parsed) identifier.
 - linkTypes provides a vocabulary reference
@@ -133,7 +142,7 @@ flowchart
     D -- No --> E{redirection possible?}
     D -- Yes --> F{link type requested?}
     E -- No --> G[not found 404]
-    E -- Yes --> H[redirect to external resolver 307]
+    E -- Yes --> H[redirect to external <br>  resolver 307]
     F -- No --> I[redirect to default link 307]
     F -- Yes --> K{linktypes=all?}
     K -- Yes --> L[create/append list of links]
@@ -141,19 +150,19 @@ flowchart
     J -- Yes --> L
     J -- No --> X[return list of links 200]
     K -- No --> M{matching link available?}
-    M -- Yes --> N[redirect to matching link 307]
+    M -- Yes --> N[redirect to matching <br>  link 307]
     M -- No --> O{matching link at next level?}
-    O -- Yes --> P[redirect to requested link type at next level up 307]
+    O -- Yes --> P[redirect to requested link <br> type at next level up 307]
     O -- No --> Q[redirect to default 307]
 ```
 
 ### Link Types
 
-Link types should be drawn from a controlled vocabulary such as http://localhost:3000/voc/?show=linktypes. UNTP may define a catalog of controlled link type vocabularies.
+Link types should be drawn from a controlled vocabulary such as http://localhost:3000/api/1.0.0/voc/?show=linktypes. UNTP may define a catalog of controlled link type vocabularies.
 
 ResolverURLs may include the parameter `linkType` which can be set to any of the allowed link types for the given identifier scheme or can be set to "all". For example:
 
-`http://localhost:3000/gs1/01/12345678901234/10/12345678901234567890?linkType=gs1:certificationInfo`
+`http://localhost:3000/api/1.0.0/gs1/01/12345678901234/10/12345678901234567890?linkType=gs1:certificationInfo`
 
 This URLis requesting the resolver to redirect the query to a target that provides certification information about the GTIN 12345678901234 with the batch/lot number 12345678901234567890.
 
@@ -163,8 +172,8 @@ In the event that linkType is set to `all`, the resolver should return a linkset
 {
   "linkset": [
     {
-      "anchor": "http://localhost:3000/gs1/01/12345678901234/10/12345678901234567890",
-      "http://localhost:3000/voc/certificationInfo": [
+      "anchor": "http://localhost:3000/api/1.0.0/gs1/01/12345678901234/10/12345678901234567890",
+      "http://localhost:3000/api/1.0.0/voc/certificationInfo": [
         {
           "href": "https://example.com",
           "title": "Certification Information",
@@ -188,7 +197,7 @@ In the event that linkType is set to `all`, the resolver should return a linkset
 When the identity resolvers are registered, the anonymous user can make a query with the namespace, identifiers, mime type, accepted language and link type to resolve the identity resolver. For example, the user can query the identity resolver with the following URL:
 
 ```
-http://localhost:3000/gs1/01/12345678901234/10/12345678901234567890?linkType=gs1:certificationInfo
+http://localhost:3000/api/1.0.0/gs1/01/12345678901234/10/12345678901234567890?linkType=gs1:certificationInfo
 ```
 
 The response will be redirected to the target URL (e.g., https://example.com)
@@ -218,4 +227,4 @@ The Link Resolution endpoint supports the following operations:
 
 1. Resolve an identity resolver
 
-See the [API specification](http://localhost:3000/api#/Link%20Resolution) for details.
+See the [API specification](http://localhost:3000/api-docs#/Link%20Resolution) for details.

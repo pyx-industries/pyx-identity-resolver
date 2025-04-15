@@ -26,15 +26,6 @@ This system enables value chain actors to resolve and access this information ac
 
 ## Documentation
 
-- [Personas](./personas.md)
-- [Physical Data Model](./data_models.md)
-- [Resolver Description File](./features/resolver_description_file.md)
-- [Link Types](./features/link_types.md)
-- [Account Management](./features/account_management.md)
-- [Identifier Management](./features/identifier_management.md)
-- [Link Registration](./features/link_registration.md)
-- [Link Resolution](./features/link_resolution.md)
-- [Environment Variables](./environment_variables.md)
 - [CI](./ci/index.md)
 
 ## Contributing

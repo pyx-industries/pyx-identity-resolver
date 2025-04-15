@@ -1,6 +1,15 @@
+---
+sidebar_position: 4
+title: Identifier Management
+---
+
+import Disclaimer from './../\_disclaimer.mdx';
+
+<Disclaimer />
+
 # Identifier Management
 
-Authorized users can register identifier schemes using namespaces, and application identifiers that will be used in the Identity Digital Resolver (IDR) service. Each identifier scheme is represented by a single JSON object, stored in a separate file where the path is constructed as: `{OBJECT_STORAGE_BUCKET_NAME}/{IDENTIFIER_PATH}/{namespace}.json`.
+Authorized users can register identifier schemes using namespaces, and application identifiers that will be used in the Identity Digital Resolver (IDR) service.
 
 ## Identifier Structure
 
@@ -40,11 +49,57 @@ Here's an example of the structure for a single identifier scheme:
 
 Each identifier JSON object consists of the following top-level properties:
 
-- `id`: A unique identifier for the scheme, in the format "{IDENTIFIER_PATH}/{namespace}"
+- `id`: A unique identifier for the scheme, in the format `{IDENTIFIER_PATH}/{namespace}`
 - `namespace`: The namespace of the identifier scheme
-- `namespaceURI`: The base URI of the namespace link type vocabulary (if applicable). Defaults to internal URI `http://localhost:3000/voc/`.
-- `namespaceProfile`: The URI to the link type vocabulary profile of the namespace (if applicable). Defaults to internal URI `http://localhost:3000/voc/?show=linktypes`.
+- `namespaceURI`: The base URI of the namespace link type vocabulary (if applicable). Defaults to internal URI `http://localhost:3000/api/1.0.0/voc/`.
+- `namespaceProfile`: The URI to the link type vocabulary profile of the namespace (if applicable). Defaults to internal URI `http://localhost:3000/api/1.0.0/voc/?show=linktypes`.
 - `applicationIdentifiers`: An array of application identifiers associated with this namespace that can be registered with the IDR.
+
+### Create/Update Identifier Flow
+
+```mermaid
+graph TD
+    A[Start] --> B["Receive Create or <br> Update Request <br> (JSON Payload)"];
+    B --> C{Validate Request Structure};
+    C -->|Invalid| D[Return Validation <br> Error - 400];
+    C -->|Valid| E{Validate Identifier Rules};
+    E -->|Invalid| D;
+    E -->|Valid| F["Generate File Name: <br> {path}/{namespace}.json"];
+    F --> G[Construct Identifier JSON];
+    G --> H[Store/Overwrite in MinIO];
+    H --> I["Return Success <br> Response (200/201)"];
+    I --> J[End];
+```
+
+### Retrieve Identifier Flow
+
+```mermaid
+graph TD
+    K[Start] --> L["Receive Retrieve <br> Request (Namespace)"];
+    L --> M{Validate Namespace <br> Parameter};
+    M -->|Invalid| N[Return Validation <br> Error - 400];
+    M -->|Valid| O["Generate File Name: <br> {path}/{namespace}.json"];
+    O --> P{Check if File Exists in MinIO};
+    P -->|No| Q[Return Not Found <br> Error - 404];
+    P -->|Yes| R[Read Identifier <br> JSON from MinIO];
+    R --> S["Return Identifier Data <br> (200)"];
+    S --> T[End];
+```
+
+### Delete Identifier Flow
+
+```mermaid
+graph TD
+    U[Start] --> V["Receive Delete Request <br> (Namespace)"];
+    V --> W{Validate Namespace <br> Parameter};
+    W -->|Invalid| X[Return Validation <br> Error - 400];
+    W -->|Valid| Y["Generate File Name: <br> {path}/{namespace}.json"];
+    Y --> Z{Check if File Exists in MinIO};
+    Z -->|No| AA[Return Not Found <br> Error - 404];
+    Z -->|Yes| BB[Delete File from MinIO];
+    BB --> CC["Return Success Response <br> (204)"];
+    CC --> DD[End];
+```
 
 ## Application Identifier Properties
 
@@ -107,4 +162,4 @@ The Identifier Management API supports the following operations:
 2. Retrieve an identifier by namespace
 3. Delete an identifier by namespace
 
-See the [API specification](http://localhost:3000/api#/Identifiers) for details.
+See the [API specification](http://localhost:3000/api-docs#/Identifiers) for details.
