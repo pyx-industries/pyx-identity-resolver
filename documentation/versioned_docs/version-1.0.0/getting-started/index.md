@@ -7,25 +7,20 @@ import Disclaimer from './../\_disclaimer.mdx';
 
 <Disclaimer />
 
-## Quick Start
+# Getting Started
 
-To get the Identity Resolver up and running quickly, follow these steps:
+This section will help you quickly set up and understand the core components of the system.
 
-1. Clone the repository:
+## System Overview
 
-```bash
-git clone https://github.com/pyx-industries/pyx-identity-resolver.git
-cd pyx-identity-resolver
+The Pyx Identity Resolver uses Docker Compose to deploy two main services: a REST API (Identity Resolver Service) and a MinIO object store. The API handles identifier management, link registration, and resolution, while MinIO stores system data such as identifier schemes and link sets.
+
+Here’s a high-level architecture of the system you’ll stand up:
+
+```mermaid
+graph TD
+    A[Docker Compose] --> B[Identity Resolver Service - REST API]
+    A --> C[MinIO Object Store]
+    B -->|Stores/Retrieves Data| C
+    D[User/Client] -->|HTTP Requests| B
 ```
-
-2. Start the application using Docker Compose:
-
-```bash
-docker compose up -d
-```
-
-3. Access the API documentation at [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
-
-For more detailed setup and configuration options, refer to the sections below.
-
----

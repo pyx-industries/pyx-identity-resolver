@@ -1,3 +1,12 @@
+---
+sidebar_position: 5
+title: Link Types
+---
+
+import Disclaimer from './../\_disclaimer.mdx';
+
+<Disclaimer />
+
 # Link Types
 
 Link types play a crucial role in the Identity Digital Resolver (IDR) service by defining the nature and purpose of the links associated with identifiers. They provide a standardised way to categorise and describe the relationships between identifiers and their related resources.
@@ -38,6 +47,6 @@ When using link types in the IDR service, whether they are default or custom, th
 
 When using external link type vocabularies for an identifier scheme within the IDR service, the following guidelines should be followed:
 
-1. **Namespace Declaration**: The URI of the namespace vocabulary of the identifier scheme should be declared using the `"namespaceURI"` field when registering the identifier scheme within the identity resolver service. E.g. `"namespaceURI": "http://localhost:3000/voc/"`.
+1. **Namespace Declaration**: The URI of the namespace vocabulary of the identifier scheme should be declared using the `"namespaceURI"` field when registering the identifier scheme within the identity resolver service. E.g. `"namespaceURI": "http://localhost:3000/api/1.0.0/voc/"`.
 
-2. **Profile URL**: The profile URL should point to a resource that describes the link types in the vocabulary, in a machine-readable format (JSON). E.g. `"profileUrl": "http://localhost:3000/voc/?show=linktypes"`.
+2. **Profile URL**: The profile URL should point to a resource that describes the link types in the vocabulary, in a machine-readable format (JSON). E.g. `"profileUrl": "http://localhost:3000/api/1.0.0/voc/?show=linktypes"`.
