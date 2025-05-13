@@ -41,7 +41,7 @@ const processUriForSpecificLinkType = (
   uri: Uri,
   identifierParams: LinkResolutionDto,
 ): ResolvedLink | undefined => {
-  const responses = uri.responses.filter((res) => res.active);
+  const responses = uri.responses.filter((res) => res.active).reverse(); // Temporary fix so that IDR Link resolves to latest issued VC
   const {
     linkType,
     ianaLanguageContexts = [],
