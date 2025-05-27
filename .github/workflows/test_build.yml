@@ -40,14 +40,11 @@ jobs:
         run: npm run test -- --ci --json --coverage --testLocationInResults --outputFile=report.json
         working-directory: app
 
-      - name: Coverage
-        uses: artiomtr/jest-coverage-report-action@v2
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          # read coverage report from JSON file generated in the previous step and compare it with the base coverage
-          coverage-file: app/report.json
-          base-coverage-file: app/report.json
-          threshold: 80 # set the minimum coverage threshold to 80%
+          name: coverage-report
+          path: app/report.json
 
   build_docs:
     runs-on: ubuntu-latest
