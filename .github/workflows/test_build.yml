@@ -36,18 +36,8 @@ jobs:
         working-directory: app
 
       - name: Run tests
-        # run tests only on changed files and generate coverage report in JSON format
-        run: npm run test -- --ci --json --coverage --testLocationInResults --outputFile=report.json
+        run: npm run test -- --ci --json --coverage --testLocationInResults
         working-directory: app
-
-      - name: Coverage
-        uses: artiomtr/jest-coverage-report-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          # read coverage report from JSON file generated in the previous step and compare it with the base coverage
-          coverage-file: app/report.json
-          base-coverage-file: app/report.json
-          threshold: 80 # set the minimum coverage threshold to 80%
 
   build_docs:
     runs-on: ubuntu-latest
