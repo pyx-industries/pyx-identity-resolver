@@ -28,10 +28,32 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ github.event.workflow_run.id }}
 
+      - name: Get PR number from workflow run
+        id: pr
+        run: |
+          echo "Workflow run event:"
+          echo '${{ toJson(github.event.workflow_run) }}'
+
+          # Try to get PR number from the workflow run pull_requests array
+          PR_NUMBER="${{ github.event.workflow_run.pull_requests[0].number }}"
+
+          # If that doesn't work, try using the GitHub API
+          if [ "$PR_NUMBER" = "" ] || [ "$PR_NUMBER" = "null" ]; then
+            echo "Trying GitHub API fallback..."
+            PR_NUMBER=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }} --jq '.pull_requests[0].number // empty')
+          fi
+
+          echo "PR Number: $PR_NUMBER"
+          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Coverage Report
+        if: steps.pr.outputs.number != '' && steps.pr.outputs.number != 'null'
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           coverage-file: coverage/report.json
           base-coverage-file: coverage/report.json
           threshold: 80
+          prnumber: ${{ steps.pr.outputs.number }}
