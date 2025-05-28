@@ -43,8 +43,19 @@ jobs:
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-report-${{ github.event.number }}
           path: app/report.json
+
+      - name: Dispatch coverage report event
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: coverage-report
+          client-payload: |
+            {
+              "pr_number": ${{ github.event.number }},
+              "run_id": ${{ github.run_id }},
+              "artifact_name": "coverage-report-${{ github.event.number }}"
+            }
 
   build_docs:
     runs-on: ubuntu-latest
