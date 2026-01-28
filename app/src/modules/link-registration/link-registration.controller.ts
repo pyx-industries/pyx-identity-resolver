@@ -22,6 +22,7 @@ import { ISO639ValidationPipe } from './pipes/iso639-validation.pipe';
 import { FieldErrorsResponse } from '../../common/dto/errors.dto';
 import { Bcp47ValidationPipe } from './pipes/bcp47-validation.pipe';
 import { LinkRegistrationTransformPipe } from './pipes/link-registration-transform.pipe';
+import { DefaultFlagsTransformPipe } from './pipes/default-flags-transform.pipe';
 import { ValidateLinkTypePipe } from './pipes/validate-link-type.pipe';
 
 @ApiTags('Link Registration')
@@ -61,6 +62,7 @@ export class LinkRegistrationController {
     ISO639ValidationPipe,
     Bcp47ValidationPipe,
     LinkRegistrationTransformPipe,
+    DefaultFlagsTransformPipe,
     ValidateLinkTypePipe,
   )
   async create(@Body() createLinkRegistrationDto: CreateLinkRegistrationDto) {

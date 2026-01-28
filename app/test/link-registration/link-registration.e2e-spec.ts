@@ -1212,6 +1212,231 @@ describe('LinkResolutionController (e2e)', () => {
           ]);
         });
     });
+
+    it('should auto-unset existing defaults when new response sets same defaults', async () => {
+      // Create a unique namespace for this test
+      const namespace = `e2e-${environment}-mock-auto-unset`;
+      const identifierDto = createIdentifierDto();
+      identifierDto.namespace = namespace;
+      await registerIdentifier(identifierDto);
+
+      const identificationKeyType = 'gtin';
+      const identificationKey = '98765432109876';
+      const qualifierPath = '/';
+
+      const headers = {
+        Accept: 'application/json',
+        Authorization: `Bearer ${process.env.API_KEY}`,
+      };
+
+      // Register first response with all defaults true
+      await request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace,
+          identificationKeyType,
+          identificationKey,
+          itemDescription: 'Test Product',
+          qualifierPath,
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: `${namespace}:certificationInfo`,
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Response A - Original Default',
+              targetUrl: 'https://response-a.com',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set(headers)
+        .expect(201);
+
+      // Register second response with different linkType and defaultLinkType: true
+      // This should auto-unset the defaultLinkType on response A
+      await request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace,
+          identificationKeyType,
+          identificationKey,
+          itemDescription: 'Test Product',
+          qualifierPath,
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: `${namespace}:epcis`,
+              ianaLanguage: 'fr',
+              context: 'us',
+              title: 'Response B - New Default LinkType',
+              targetUrl: 'https://response-b.com',
+              mimeType: 'text/html',
+            },
+          ],
+        })
+        .set(headers)
+        .expect(201);
+
+      // Register third response with same linkType as A, defaultIanaLanguage: true
+      // This should auto-unset the defaultIanaLanguage on response A
+      await request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace,
+          identificationKeyType,
+          identificationKey,
+          itemDescription: 'Test Product',
+          qualifierPath,
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: `${namespace}:certificationInfo`,
+              ianaLanguage: 'fr',
+              context: 'ca',
+              title: 'Response C - New Default Language',
+              targetUrl: 'https://response-c.com',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set(headers)
+        .expect(201);
+
+      // Register fourth response with same linkType+language as A, defaultContext: true
+      // This should auto-unset the defaultContext on response A
+      await request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace,
+          identificationKeyType,
+          identificationKey,
+          itemDescription: 'Test Product',
+          qualifierPath,
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: true,
+              defaultIanaLanguage: false,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: `${namespace}:certificationInfo`,
+              ianaLanguage: 'en',
+              context: 'gb',
+              title: 'Response D - New Default Context',
+              targetUrl: 'https://response-d.com',
+              mimeType: 'text/html',
+            },
+          ],
+        })
+        .set(headers)
+        .expect(201);
+
+      // Register fifth response with same full scope as A, defaultMimeType: true
+      // This should auto-unset the defaultMimeType on response A
+      await request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace,
+          identificationKeyType,
+          identificationKey,
+          itemDescription: 'Test Product',
+          qualifierPath,
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: true,
+              defaultIanaLanguage: false,
+              defaultContext: false,
+              fwqs: false,
+              active: true,
+              linkType: `${namespace}:certificationInfo`,
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Response E - New Default MimeType',
+              targetUrl: 'https://response-e.com',
+              mimeType: 'text/html',
+            },
+          ],
+        })
+        .set(headers)
+        .expect(201);
+
+      // Verify by fetching with linkType=all to get the full linkset
+      const res = await request(baseUrl)
+        .get(
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=all`,
+        )
+        .expect(200);
+
+      const linkset = JSON.parse(res.text).linkset;
+      expect(linkset).not.toBeNull();
+      expect(linkset.length).toBeGreaterThan(0);
+
+      // 1. Verify defaultLinkType: when no linkType is provided, it defaults to response B
+      // (which has defaultLinkType: true)
+      await request(baseUrl)
+        .get(`/${namespace}/${identificationKeyType}/${identificationKey}`)
+        .expect(302)
+        .expect('Location', 'https://response-b.com');
+
+      // 2. Verify defaultIanaLanguage: when linkType=certificationInfo but no language header,
+      // it should resolve to response C (which has defaultIanaLanguage: true for certificationInfo)
+      await request(baseUrl)
+        .get(
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+        )
+        .expect(302)
+        .expect('Location', 'https://response-c.com');
+
+      // 3. Verify defaultContext: when linkType=certificationInfo and language=en (no region),
+      // it should resolve to response D (which has defaultContext: true for certificationInfo+en)
+      await request(baseUrl)
+        .get(
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+        )
+        .set('Accept-Language', 'en')
+        .expect(302)
+        .expect('Location', 'https://response-d.com');
+
+      // 4. Verify defaultMimeType: when linkType=certificationInfo, language=en-AU (full context),
+      // but no Accept header, it should resolve to response E (which has defaultMimeType: true for certificationInfo+en+au)
+      await request(baseUrl)
+        .get(
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+        )
+        .set('Accept-Language', 'en-AU')
+        .expect(302)
+        .expect('Location', 'https://response-e.com');
+
+      // cleanup
+      await request(baseUrl)
+        .delete('/identifiers')
+        .set('Authorization', `Bearer ${apiKey}`)
+        .query({ namespace })
+        .expect(HttpStatus.OK);
+    });
   });
 
   it('delete namespace', async () => {

@@ -73,6 +73,33 @@ Each response object within the `responses` array consists of the following prop
 
 The response is used to construct the link type of link set that follows the [RFC 9264](https://datatracker.ietf.org/doc/html/rfc9264).
 
+## Default Flag Behavior
+
+Only **one response** can have each default flag set to `true` within its defined scope. The scopes for each default flag are:
+
+| Default Flag | Scope |
+|--------------|-------|
+| `defaultLinkType` | Entire registration (global) |
+| `defaultIanaLanguage` | Per `linkType` |
+| `defaultContext` | Per `linkType` + `ianaLanguage` |
+| `defaultMimeType` | Per `linkType` + `ianaLanguage` + `context` |
+
+### Auto-Unset Behavior
+
+When registering a new response with a default flag set to `true`, the system automatically sets that flag to `false` on any existing responses in the same scope. This ensures that only the most recently registered response serves as the default for that scope.
+
+**Example:**
+
+1. Register Response A with `defaultLinkType: true` for linkType `gs1:certificationInfo`
+2. Register Response B with `defaultLinkType: true` for linkType `gs1:epcis`
+3. Result: Response A's `defaultLinkType` is automatically set to `false`, and Response B becomes the default link type
+
+This behavior simplifies updates where you want a new response to become the default - simply register it with the appropriate default flag set to `true`, and the system handles unsetting the previous default.
+
+:::note
+The scope matching for `ianaLanguage` and `context` is case-insensitive. For example, `en` and `EN` are treated as the same language scope.
+:::
+
 ## Link Registration Flow
 
 The following diagram illustrates the flow of the link registration process, including validation, link set construction, and storage for both new registrations and updates (upserts):
