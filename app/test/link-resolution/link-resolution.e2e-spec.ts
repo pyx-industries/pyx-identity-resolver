@@ -88,7 +88,7 @@ describe('LinkResolutionController (e2e)', () => {
                 context: 'us',
                 title: 'Certification Information',
                 targetUrl: 'https://example-json.com',
-                mimeType: 'application/json'
+                mimeType: 'application/json',
               },
               {
                 defaultLinkType: false,
@@ -102,7 +102,7 @@ describe('LinkResolutionController (e2e)', () => {
                 context: 'us',
                 title: 'Certification Information',
                 targetUrl: 'https://example-html.com',
-                mimeType: 'text/html'
+                mimeType: 'text/html',
               },
               {
                 defaultLinkType: false,
@@ -116,7 +116,7 @@ describe('LinkResolutionController (e2e)', () => {
                 context: 'au',
                 title: 'Certification Information',
                 targetUrl: 'https://example-json.com',
-                mimeType: 'application/json'
+                mimeType: 'application/json',
               },
               {
                 defaultLinkType: false,
@@ -130,7 +130,7 @@ describe('LinkResolutionController (e2e)', () => {
                 context: 'au',
                 title: 'Certification Information',
                 targetUrl: 'https://example-html.com',
-                mimeType: 'text/html'
+                mimeType: 'text/html',
               },
               {
                 defaultLinkType: false,
@@ -144,8 +144,8 @@ describe('LinkResolutionController (e2e)', () => {
                 context: 'gb',
                 title: 'Certification Information',
                 targetUrl: 'https://example-html.com',
-                mimeType: 'text/html'
-              }
+                mimeType: 'text/html',
+              },
             ],
           })
           .set('Accept', 'application/json')
