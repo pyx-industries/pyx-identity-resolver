@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.3](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.1.2...v1.1.3) (2026-01-29)
+
+
+### Bug Fixes
+
+* **ci:** Use proper tag suffixes for Docker images ([#46](https://github.com/pyx-industries/pyx-identity-resolver/issues/46)) ([c94c936](https://github.com/pyx-industries/pyx-identity-resolver/commit/c94c9364227d8587f6e3c61591ba0911f0708ebb))
+
+
+### Miscellaneous
+
+* **release:** Prepare release 1.1.3 ([b7a63aa](https://github.com/pyx-industries/pyx-identity-resolver/commit/b7a63aaf2a8d6c2e665f7159b7768d965240290b))
+
 ## [1.1.2](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.1.1...v1.1.2) (2026-01-29)
 
 
