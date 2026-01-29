@@ -34,6 +34,29 @@ docker compose up -d
 
 For more detailed setup and configuration options, refer to the [documentation site](https://pyx-industries.github.io/pyx-identity-resolver/).
 
+## Docker Images
+
+Pre-built Docker images are available on [GitHub Container Registry](https://github.com/pyx-industries/pyx-identity-resolver/pkgs/container/pyx-identity-resolver). Two variants are provided:
+
+| Image | Use Case |
+|-------|----------|
+| Default (no suffix) | Standard deployment, local development |
+| `-serverless` | AWS Lambda / serverless deployments |
+
+Both images support `linux/amd64` and `linux/arm64` architectures.
+
+### Pulling Images
+
+```bash
+# Standard image (default)
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:1.1.2
+
+# Serverless image (Lambda deployment)
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:1.1.2-serverless
+```
+
+For more details on available tags, see the [Package workflow documentation](./docs/ci/package.md).
+
 ## Contributing
 
 We use [Semantic Line Breaks](https://sembr.org/) in our documentation. Please follow this convention when contributing to the project.

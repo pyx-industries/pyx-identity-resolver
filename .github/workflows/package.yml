@@ -37,13 +37,29 @@ jobs:
           VERSION=$(jq -r '.version' version.json)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: docker meta details
-        id: meta
+      # Metadata for standard image (no suffix - this is the default)
+      - name: Docker meta for standard image
+        id: meta-standard
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{github.repository}}
           flavor: |
             latest=auto
+          tags: |
+            type=edge,branch=master
+            type=semver,pattern={{version}}
+            type=sha
+            type=raw,value=${{ steps.get_version.outputs.version }},enable=${{ github.event_name == 'workflow_run' }}
+
+      # Metadata for serverless image (with -serverless suffix)
+      - name: Docker meta for serverless image
+        id: meta-serverless
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{github.repository}}
+          flavor: |
+            latest=false
+            suffix=-serverless
           tags: |
             type=edge,branch=master
             type=semver,pattern={{version}}
@@ -64,13 +80,13 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push Local Image
+      - name: Build and Push Standard Image
         uses: docker/build-push-action@v5
         with:
           push: ${{ env.PUSH_CONDITION }}
           platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}-local
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-standard.outputs.tags }}
+          labels: ${{ steps.meta-standard.outputs.labels }}
           file: Dockerfile
 
       - name: Build and Push Serverless Image
@@ -78,6 +94,6 @@ jobs:
         with:
           push: ${{ env.PUSH_CONDITION }}
           platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}-serverless
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-serverless.outputs.tags }}
+          labels: ${{ steps.meta-serverless.outputs.labels }}
           file: Dockerfile.serverless
