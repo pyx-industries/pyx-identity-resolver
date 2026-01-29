@@ -9,7 +9,7 @@
     "node": ">=21.0.0"
   },
   "scripts": {
-    "postinstall": "cd .. && npm install",
+    "postinstall": "test -f ../package.json && cd .. && npm install || true",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "doc": "npx @compodoc/compodoc -p tsconfig.json -s",
