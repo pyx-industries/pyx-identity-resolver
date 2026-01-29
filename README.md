@@ -42,34 +42,23 @@ We use [Semantic Line Breaks](https://sembr.org/) in our documentation. Please f
 
 This project uses two primary workflows:
 
-1. [Release Tagging](./.github/workflows/release-tagging.yml): Creates version tags based on `app/package.json`.
+1. [Release](./.github/workflows/release.yml): Creates version tags and GitHub releases when merging to `master`.
 2. [Package](./.github/workflows/package.yml): Builds and pushes Docker images to the GitHub Container Registry.
 
-We follow [Semantic Versioning](https://semver.org/) with the format `vMAJOR.MINOR.PATCH`.
+We follow [Semantic Versioning](https://semver.org/) with the format `MAJOR.MINOR.PATCH`.
 
-For more detailed information, please refer to the [documentation](docs/index.md).
+For more detailed information, please refer to the [Release Guide](./RELEASE_GUIDE.md) and [Release Management Guide](./RELEASE_MANAGEMENT_GUIDE.md).
 
-### Release Guide
+### Quick Release Guide
 
-To release a new version, ensure we have the `version.json` file updated with the new version number. Then, create a new release tag with the following steps:
+1. Create a `release/*` branch from `master` (e.g., `release/1.2.0`).
+2. Update version in `app/package.json` and `version.json`.
+3. If documentation changed, generate new version: `cd documentation && yarn release:doc`.
+4. Merge the auto-generated changelog PR into the release branch.
+5. Create a PR from the release branch to `master`.
+6. Merge the PR - the release pipeline will automatically create tags and GitHub releases.
 
-1. Create a new release branch from `next` with the version number as the branch name.
-2. Update the `version.json` file with the new version number.
-3. Generate new documentation version using the release script
-
-```bash
-cd documentation
-yarn release:doc
-```
-
-4. Check API documentation and update if necessary.
-5. Commit the changes and push the branch.
-6. Create a pull request from the release branch to `main`.
-7. Merge the pull request.
-8. Create a new release tag with the version number.
-9. Push the tag to the repository.
-
-(\*) With the `version.json` file, it contains the version number in the following format:
+The `version.json` file contains version metadata:
 
 ```json
 {
@@ -80,4 +69,6 @@ yarn release:doc
 }
 ```
 
-We need to change manually the `version`, `apiVersion`, and `docVersion` fields.
+- `version`: Always update to match the release version.
+- `apiVersion`: Only update if the API contract changes.
+- `docVersion`: Only update if documentation changed.
