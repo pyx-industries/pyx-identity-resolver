@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.2](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.1.1...v1.1.2) (2026-01-29)
+
+
+### Bug Fixes
+
+* **ci:** Add multi-platform builds and version tags for workflow_run ([#43](https://github.com/pyx-industries/pyx-identity-resolver/issues/43)) ([d19e578](https://github.com/pyx-industries/pyx-identity-resolver/commit/d19e578598e391a5d1b569694670996bdd3598ce))
+
+
+### Miscellaneous
+
+* **release:** Prepare release 1.1.2 ([00d99f5](https://github.com/pyx-industries/pyx-identity-resolver/commit/00d99f5592fe696dc7ccf9eda12c01275c207f2b))
+
 ## [1.1.1](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.1.0...v1.1.1) (2026-01-29)
 
 
