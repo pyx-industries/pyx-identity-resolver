@@ -64,8 +64,22 @@ jobs:
           fi
           echo "new_version=$new_version" >> "$GITHUB_OUTPUT"
 
+      # Check if the tag already exists
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          new_version=${{ steps.retrieve_version.outputs.new_version }}
+          if git ls-remote --tags origin | grep -q "refs/tags/$new_version$"; then
+            echo "Tag $new_version already exists, skipping release"
+            echo "tag_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag $new_version does not exist, proceeding with release"
+            echo "tag_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # Create tag to the repository by using the version from the output file
       - name: Create tag
+        if: steps.check_tag.outputs.tag_exists == 'false'
         id: create-tag
         run: |
           new_version=${{ steps.retrieve_version.outputs.new_version }}
@@ -79,6 +93,7 @@ jobs:
 
       # Create GitHub release
       - name: Create GitHub Release
+        if: steps.check_tag.outputs.tag_exists == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
