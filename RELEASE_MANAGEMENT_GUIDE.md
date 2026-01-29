@@ -115,7 +115,7 @@ The version.json file serves as a central metadata file to define the versioning
 
 - version: The version of the current service. Must align with the Git tag.
 - apiVersion: The API version exposed by the service, the field is optional.
-- docVersion: The version of the documentation. Only update if documentation changed.
+- docVersion: The version of the documentation. Only update if documentation changed. When updating, also update `documentation/package.json` to match.
 - dependencies: A list of dependent services with their repositories and compatible version list, the field is optional.
 - repoUrl: URL of the repository for the dependent service.
 - versions: Specifies compatible versions.
@@ -129,7 +129,7 @@ The version.json file serves as a central metadata file to define the versioning
 1. Verify all feature branches have been merged into the `master` branch. The merged features must include all relevant unit tests, integration tests, end-to-end tests, and comprehensive documentation.
 2. Create a `release/*` branch from the `master` branch.
    - Special Case: For cherry-picking specific commits, create the branch from the last release tag and cherry-pick the required commits.
-3. Update version numbers in `app/package.json` and `version.json` as per Versioning Strategy.
+3. Update version numbers in `app/package.json`, `version.json`, and `documentation/package.json` (if docs changed) as per Versioning Strategy.
 4. Run tests (unit, integration, and end-to-end) and ensure they all pass.
 5. If documentation was updated, generate the documentation for the new version using the release script:
    ```bash
