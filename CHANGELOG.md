@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.1](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.1.0...v1.1.1) (2026-01-29)
+
+
+### Bug Fixes
+
+* **ci:** Skip release if tag already exists ([#40](https://github.com/pyx-industries/pyx-identity-resolver/issues/40)) ([8122a98](https://github.com/pyx-industries/pyx-identity-resolver/commit/8122a9823d7c6ac2cb9c505c362252eef9ae9208))
+* Update release workflow and documentation ([#39](https://github.com/pyx-industries/pyx-identity-resolver/issues/39)) ([8b22794](https://github.com/pyx-industries/pyx-identity-resolver/commit/8b227941a49c1b47ec1a18c8dfe7714ce9362b4e))
+
+
+### Miscellaneous
+
+* **release:** Prepare release 1.1.1 ([975bd1b](https://github.com/pyx-industries/pyx-identity-resolver/commit/975bd1b15692d12fa64afa542a773962424426e3))
+
 ## [1.1.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.0.0...v1.1.0) (2026-01-29)
 
 
