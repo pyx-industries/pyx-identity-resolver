@@ -1,5 +1,7 @@
 FROM node:22-alpine
 
+LABEL org.opencontainers.image.source="https://github.com/pyx-industries/pyx-identity-resolver"
+
 # Set environment variables
 ENV OBJECT_STORAGE_URL=http://minio:9000
 ENV OBJECT_STORAGE_ROOT_USER=minioadmin
