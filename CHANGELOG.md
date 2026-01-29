@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.1.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.0.0...v1.1.0) (2026-01-29)
+
+
+### Features
+
+* **link-registration:** Validate unique default flags per scope ([#36](https://github.com/pyx-industries/pyx-identity-resolver/issues/36)) ([6152eb1](https://github.com/pyx-industries/pyx-identity-resolver/commit/6152eb10ac924ce575c3ef3a20c5c7d241cc41f5))
+
+
+### Bug Fixes
+
+* **ci:** Remove redundant release commit from changelog workflow ([eb2ae79](https://github.com/pyx-industries/pyx-identity-resolver/commit/eb2ae7998114f86b3115a8396ae0abd413ec57f3))
+
+
+### Tests
+
+* Add coverage threshold ([#32](https://github.com/pyx-industries/pyx-identity-resolver/issues/32)) ([83558c9](https://github.com/pyx-industries/pyx-identity-resolver/commit/83558c9574e598c73c46fd270bb7566571851515))
+
+
+### Miscellaneous
+
+* Release 1.1.0 ([150d925](https://github.com/pyx-industries/pyx-identity-resolver/commit/150d925791acb912b88f07deec53516ab867b93f))
+* **release:** Prepare release 1.1.0 ([91ceabd](https://github.com/pyx-industries/pyx-identity-resolver/commit/91ceabdf04f9b281c24a9ec4e0d8fb72df9f5fa7))
+
 ## [1.0.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/v1.0.0...v1.0.0) (2025-04-16)
 
 
