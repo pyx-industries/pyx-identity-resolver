@@ -48,6 +48,7 @@ Before starting the release process, ensure:
      - `version` - always update to match the release version.
      - `apiVersion` - only update if the API contract changes.
      - `docVersion` - only update if documentation was changed.
+   - `documentation/package.json` - update to match `docVersion` if documentation was changed.
    - Make sure all dependencies in `package.json` are up-to-date and compatible with the new version.
 
 ---
