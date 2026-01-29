@@ -221,6 +221,19 @@ For example, if a request specifies a linkType, ianaLanguage, context, and mimeT
 
 This process ensures that users receive the most relevant information based on their specific request parameters, while also providing fallback options when exact matches are not available.
 
+### Default Flag Scopes
+
+Each default flag operates within a specific scope, ensuring deterministic resolution:
+
+| Default Flag | Scope | Used When |
+|--------------|-------|-----------|
+| `defaultLinkType` | Entire registration | No linkType specified in request |
+| `defaultIanaLanguage` | Per linkType | linkType specified, but no language header |
+| `defaultContext` | Per linkType + language | linkType and language specified, but no region/context |
+| `defaultMimeType` | Per linkType + language + context | Full context specified, but no Accept header or unknown mimeType |
+
+Only one response can have each default flag set to `true` within its scope. This is enforced during [link registration](./link_registration.md#default-flag-behavior) to ensure consistent and predictable resolution behavior.
+
 ## API Operations
 
 The Link Resolution endpoint supports the following operations:
