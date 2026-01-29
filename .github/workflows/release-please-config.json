@@ -8,6 +8,11 @@
   "packages": {
     ".": {
       "release-type": "simple",
+      "exclude-commits-from-changelog": [
+        {
+          "scope": "release"
+        }
+      ],
       "changelog-sections": [
         {
           "type": "feat",
