@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsString,
   IsNotEmpty,
   IsOptional,
@@ -9,6 +10,12 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { mockMimeTypes } from '../constants/link-registration.constants';
+import {
+  EncryptionMethod,
+  ENCRYPTION_METHODS,
+  UntpAccessRole,
+  UNTP_ACCESS_ROLES,
+} from '../constants/untp-enums';
 
 /**
  * Query DTO for listing all links for an identifier.
@@ -181,6 +188,37 @@ export class LinkResponseDto {
   @IsOptional()
   @IsBoolean()
   defaultMimeType?: boolean = false;
+
+  @ApiPropertyOptional({
+    description:
+      'Encryption method applied to the target resource (UNTP IDR-10)',
+    enum: ENCRYPTION_METHODS,
+    example: EncryptionMethod.None,
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(ENCRYPTION_METHODS)
+  encryptionMethod?: EncryptionMethod;
+
+  @ApiPropertyOptional({
+    description: 'UNTP access roles that may retrieve this link variant',
+    enum: UNTP_ACCESS_ROLES,
+    example: [UntpAccessRole.Anonymous],
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @IsIn(UNTP_ACCESS_ROLES, { each: true })
+  accessRole?: UntpAccessRole[];
+
+  @ApiPropertyOptional({
+    description: 'HTTP method for accessing the target (UNTP IDR-10)',
+    example: 'POST',
+  })
+  @IsOptional()
+  @IsString()
+  method?: string;
 }
 
 /**
@@ -277,4 +315,35 @@ export class UpdateLinkDto {
   @IsOptional()
   @IsBoolean()
   defaultMimeType?: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'Encryption method applied to the target resource (UNTP IDR-10)',
+    enum: ENCRYPTION_METHODS,
+    example: EncryptionMethod.None,
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(ENCRYPTION_METHODS)
+  encryptionMethod?: EncryptionMethod;
+
+  @ApiPropertyOptional({
+    description: 'UNTP access roles that may retrieve this link variant',
+    enum: UNTP_ACCESS_ROLES,
+    example: [UntpAccessRole.Anonymous],
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @IsIn(UNTP_ACCESS_ROLES, { each: true })
+  accessRole?: UntpAccessRole[];
+
+  @ApiPropertyOptional({
+    description: 'HTTP method for accessing the target (UNTP IDR-10)',
+    example: 'POST',
+  })
+  @IsOptional()
+  @IsString()
+  method?: string;
 }

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
@@ -13,6 +13,12 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { mockMimeTypes } from '../constants/link-registration.constants';
+import {
+  EncryptionMethod,
+  ENCRYPTION_METHODS,
+  UntpAccessRole,
+  UNTP_ACCESS_ROLES,
+} from '../constants/untp-enums';
 
 export class Response {
   @ApiProperty({
@@ -115,6 +121,37 @@ export class Response {
   })
   @IsBoolean()
   defaultIanaLanguage: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'Encryption method applied to the target resource (UNTP IDR-10)',
+    enum: ENCRYPTION_METHODS,
+    example: EncryptionMethod.None,
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(ENCRYPTION_METHODS)
+  encryptionMethod?: EncryptionMethod;
+
+  @ApiPropertyOptional({
+    description: 'UNTP access roles that may retrieve this link variant',
+    enum: UNTP_ACCESS_ROLES,
+    example: [UntpAccessRole.Anonymous],
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @IsIn(UNTP_ACCESS_ROLES, { each: true })
+  accessRole?: UntpAccessRole[];
+
+  @ApiPropertyOptional({
+    description: 'HTTP method for accessing the target (UNTP IDR-10)',
+    example: 'POST',
+  })
+  @IsOptional()
+  @IsString()
+  method?: string;
 }
 
 export class CreateLinkRegistrationDto {
@@ -182,6 +219,9 @@ export class CreateLinkRegistrationDto {
         title: 'Certification Information',
         targetUrl: 'https://example.com',
         mimeType: 'application/json',
+        encryptionMethod: 'none',
+        accessRole: ['untp:accessRole#Anonymous'],
+        method: 'POST',
       },
     ],
   })
