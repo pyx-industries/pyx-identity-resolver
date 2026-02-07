@@ -1,59 +1,123 @@
-import { appendOrOverrideForArrayChanges } from '../../shared/utils/upsert-mechanism.utils';
-import { CreateLinkRegistrationDto } from '../dto/link-registration.dto';
+import { ConflictException } from '@nestjs/common';
+import {
+  CreateLinkRegistrationDto,
+  Response,
+} from '../dto/link-registration.dto';
+import { VersionHistoryEntry } from '../interfaces/versioned-uri.interface';
 
 /**
- * Builds the unique key for a response used during merge comparisons.
- * The key is a composite of targetUrl, linkType, mimeType, ianaLanguage, and context.
+ * Builds a composite key for duplicate detection.
+ * Two responses are considered duplicates when they share the same
+ * targetUrl, linkType, mimeType, ianaLanguage, and context.
  */
-const buildResponseKey = (response: any): string => {
-  return `${response.targetUrl}-${response.linkType}-${response.mimeType}-${response.ianaLanguage}-${response.context}`;
+export const buildResponseKey = (response: Response): string =>
+  `${response.targetUrl}|${response.linkType}|${response.mimeType}|${response.ianaLanguage}|${response.context}`;
+
+/**
+ * Formats a response's identifying fields for use in error messages.
+ */
+export const formatResponseIdentity = (response: Response): string =>
+  `linkType='${response.linkType}', mimeType='${response.mimeType}', ` +
+  `ianaLanguage='${response.ianaLanguage}', context='${response.context}', ` +
+  `targetUrl='${response.targetUrl}'`;
+
+/**
+ * Builds composite keys from version history entries by combining
+ * previous* fields with the current response's values for fields
+ * that weren't changed. Triggers when any previous* field is present.
+ */
+export const buildHistoricalKeys = (
+  responses: Response[],
+  versionHistory: VersionHistoryEntry[],
+): Set<string> => {
+  const keys = new Set<string>();
+  const responsesByLinkId = new Map<string, Response>();
+
+  for (const response of responses) {
+    if (response.linkId) {
+      responsesByLinkId.set(response.linkId, response);
+    }
+  }
+
+  for (const entry of versionHistory) {
+    for (const change of entry.changes) {
+      if (
+        !change.previousTargetUrl &&
+        !change.previousLinkType &&
+        !change.previousMimeType &&
+        !change.previousIanaLanguage &&
+        !change.previousContext
+      )
+        continue;
+
+      const currentResponse = responsesByLinkId.get(change.linkId);
+      if (!currentResponse) continue;
+
+      const key =
+        `${change.previousTargetUrl ?? currentResponse.targetUrl}|` +
+        `${change.previousLinkType ?? currentResponse.linkType}|` +
+        `${change.previousMimeType ?? currentResponse.mimeType}|` +
+        `${change.previousIanaLanguage ?? currentResponse.ianaLanguage}|` +
+        `${change.previousContext ?? currentResponse.context}`;
+      keys.add(key);
+    }
+  }
+
+  return keys;
 };
 
 /**
  * Process the incoming data with the existing data.
- * When merging responses, existing linkIds and createdAt timestamps are preserved
- * so that previously assigned identifiers survive an upsert operation.
+ * When an existing document is present, incoming responses are appended
+ * to the existing responses (append-only). Throws ConflictException if
+ * any incoming response duplicates an existing response or a previous
+ * version of a response by composite key
+ * (targetUrl + linkType + mimeType + ianaLanguage + context).
  * @param currentLinkRegistration - The current link registration data.
  * @param entryLinkRegistration - The incoming link registration data.
+ * @param versionHistory - Version history from the stored document (optional).
  * @returns The updated link registration data.
  */
 export const processEntryLinkRegistrationData = (
   currentLinkRegistration: CreateLinkRegistrationDto | undefined,
   entryLinkRegistration: CreateLinkRegistrationDto,
+  versionHistory?: VersionHistoryEntry[],
 ): CreateLinkRegistrationDto => {
   if (!currentLinkRegistration) {
     return entryLinkRegistration;
   }
 
-  // Build a map of existing responses by their unique key to preserve linkIds
-  const existingResponseMap = new Map<string, any>();
-  currentLinkRegistration.responses.forEach((response: any) => {
-    const key = buildResponseKey(response);
-    existingResponseMap.set(key, response);
-  });
-
-  const updatedResponses = appendOrOverrideForArrayChanges(
-    currentLinkRegistration.responses,
-    entryLinkRegistration.responses,
-    buildResponseKey,
+  const existingKeys = new Set(
+    currentLinkRegistration.responses.map(buildResponseKey),
   );
 
-  // Preserve linkIds and createdAt from existing responses
-  const responsesWithLinkIds = updatedResponses.map((response: any) => {
-    const key = buildResponseKey(response);
-    const existing = existingResponseMap.get(key);
-    if (existing?.linkId && !response.linkId) {
-      return {
-        ...response,
-        linkId: existing.linkId,
-        createdAt: existing.createdAt,
-      };
+  // Also check against previous versions of existing responses
+  if (versionHistory?.length) {
+    const historicalKeys = buildHistoricalKeys(
+      currentLinkRegistration.responses,
+      versionHistory,
+    );
+    for (const key of historicalKeys) {
+      existingKeys.add(key);
     }
-    return response;
-  });
+  }
+
+  const duplicates = entryLinkRegistration.responses.filter((response) =>
+    existingKeys.has(buildResponseKey(response)),
+  );
+
+  if (duplicates.length > 0) {
+    const descriptions = duplicates.map(formatResponseIdentity).join('; ');
+    throw new ConflictException(
+      `Duplicate responses already exist: ${descriptions}`,
+    );
+  }
 
   return {
     ...entryLinkRegistration,
-    responses: responsesWithLinkIds,
+    responses: [
+      ...currentLinkRegistration.responses,
+      ...entryLinkRegistration.responses,
+    ],
   };
 };

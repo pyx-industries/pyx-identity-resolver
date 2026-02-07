@@ -10,8 +10,11 @@ import { IdentifierManagementService } from '../identifier-management/identifier
 import { convertAICode } from '../shared/utils/uri.utils';
 import { ConfigService } from '@nestjs/config';
 import { getObjectName } from './utils/link-registration.utils';
-import { generateLinkId } from './utils/version.utils';
-import { writeLinkIndex, deleteLinkIndex } from './utils/link-index.utils';
+import {
+  generateLinkId,
+  createVersionHistoryEntry,
+} from './utils/version.utils';
+import { writeLinkIndex } from './utils/link-index.utils';
 
 @Injectable()
 /**
@@ -55,30 +58,30 @@ export class LinkRegistrationService {
     const version = existingDoc?.version != null ? existingDoc.version + 1 : 1;
     const createdAt = existingDoc?.createdAt || now;
 
-    // Clean up old link index entries when overwriting an existing document
-    if (existingDoc?.responses?.length) {
-      for (const response of existingDoc.responses) {
-        if (response.linkId) {
-          try {
-            await deleteLinkIndex(this.repositoryProvider, response.linkId);
-          } catch (error) {
-            this.logger.warn(
-              `Failed to clean up old link index for linkId=${response.linkId}. Orphaned entry may remain.`,
-              error instanceof Error ? error.stack : error,
-            );
-          }
-        }
-      }
-    }
-
-    // Always assign server-generated linkIds to prevent client-set ID collisions
+    // Only assign linkIds to NEW responses (those without one)
+    const newLinkIds: string[] = [];
     payload.responses.forEach((response: any) => {
-      response.linkId = generateLinkId();
-      if (!response.createdAt) {
+      if (!response.linkId) {
+        response.linkId = generateLinkId();
         response.createdAt = now;
+        newLinkIds.push(response.linkId);
       }
       response.updatedAt = now;
     });
+
+    // Record version history for additive operations
+    const versionHistory = existingDoc?.versionHistory || [];
+    if (existingDoc) {
+      const changes = newLinkIds.map((linkId) => ({
+        linkId,
+        action: 'created' as const,
+      }));
+      if (changes.length > 0) {
+        versionHistory.unshift(
+          createVersionHistoryEntry(version, changes, now),
+        );
+      }
+    }
 
     // Construct link set and link header text
     const resolverDomain = this.configService.get<string>('RESOLVER_DOMAIN');
@@ -93,11 +96,15 @@ export class LinkRegistrationService {
     if (!linkTypeVocDomain) {
       throw new Error('Missing configuration for LINK_TYPE_VOC_DOMAIN');
     }
-    const linkset = constructLinkSetJson(payload, aiCode, {
+    const activePayload = {
+      ...payload,
+      responses: payload.responses.filter((r) => r.active !== false),
+    };
+    const linkset = constructLinkSetJson(activePayload, aiCode, {
       resolverDomain,
       linkTypeVocDomain,
     });
-    const linkHeaderText = constructHTTPLink(payload, aiCode, {
+    const linkHeaderText = constructHTTPLink(activePayload, aiCode, {
       resolverDomain,
       linkTypeVocDomain,
     });
@@ -108,17 +115,20 @@ export class LinkRegistrationService {
       createdAt,
       updatedAt: now,
       version,
+      versionHistory,
       linkset,
       linkHeaderText,
     });
 
-    // Write linkId index entries for all responses
+    // Write linkId index entries only for NEW responses
     for (const response of payload.responses) {
-      await writeLinkIndex(
-        this.repositoryProvider,
-        response.linkId,
-        objectName,
-      );
+      if (newLinkIds.includes(response.linkId)) {
+        await writeLinkIndex(
+          this.repositoryProvider,
+          response.linkId,
+          objectName,
+        );
+      }
     }
 
     const translatedMessage = this.i18n.translate(

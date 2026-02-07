@@ -5,6 +5,7 @@ import { getObjectName } from '../utils/link-registration.utils';
 import { convertAICode } from '../../shared/utils/uri.utils';
 import { IdentifierManagementService } from '../../identifier-management/identifier-management.service';
 import { processEntryLinkRegistrationData } from '../utils/upsert.utils';
+import { VersionHistoryEntry } from '../../link-resolution/interfaces/uri.interface';
 
 /**
  * Pipe used to combine the incoming data with the existing data.
@@ -36,12 +37,18 @@ export class LinkRegistrationTransformPipe
     );
 
     const objectName = getObjectName(value, aiCode);
-    const existingLinkRegistration =
-      await this.linkRegistrationService.one(objectName);
+    const existingDocument = await this.linkRegistrationService.one(objectName);
+
+    type StoredDocument = CreateLinkRegistrationDto & {
+      versionHistory?: VersionHistoryEntry[];
+    };
+    const stored = existingDocument as StoredDocument;
+    const versionHistory = stored?.versionHistory;
 
     const updatedLinkRegistration = processEntryLinkRegistrationData(
-      existingLinkRegistration,
+      existingDocument,
       value,
+      versionHistory,
     );
 
     return updatedLinkRegistration;
