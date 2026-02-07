@@ -28,7 +28,6 @@ describe('LinkManagementController', () => {
           useValue: {
             listLinks: jest.fn(),
             getLink: jest.fn(),
-            addLink: jest.fn(),
             updateLink: jest.fn(),
             softDeleteLink: jest.fn(),
             hardDeleteLink: jest.fn(),
@@ -91,43 +90,6 @@ describe('LinkManagementController', () => {
       const result = await controller.getLink(linkId);
 
       expect(linkManagementService.getLink).toHaveBeenCalledWith(linkId);
-      expect(result).toEqual(mockResult);
-    });
-  });
-
-  describe('addLink', () => {
-    it('should call service.addLink with the DTO and return the result', async () => {
-      const dto = {
-        namespace: 'gs1',
-        identificationKeyType: 'gtin',
-        identificationKey: '09359502000010',
-        qualifierPath: '/',
-        response: {
-          targetUrl: 'https://example.com/product/123',
-          linkType: 'gs1:pip',
-          title: 'Product Information Page',
-          mimeType: 'text/html',
-          ianaLanguage: 'en',
-          context: 'us',
-          active: true,
-          fwqs: false,
-          defaultLinkType: false,
-          defaultIanaLanguage: false,
-          defaultContext: false,
-          defaultMimeType: false,
-        },
-      };
-      const mockResult = {
-        message: 'Link added successfully',
-        linkId: 'new-link-id',
-      };
-      jest
-        .spyOn(linkManagementService, 'addLink')
-        .mockResolvedValue(mockResult);
-
-      const result = await controller.addLink(dto as any);
-
-      expect(linkManagementService.addLink).toHaveBeenCalledWith(dto);
       expect(result).toEqual(mockResult);
     });
   });

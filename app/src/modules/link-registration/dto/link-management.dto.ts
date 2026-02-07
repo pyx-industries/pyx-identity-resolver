@@ -5,10 +5,8 @@ import {
   IsBoolean,
   IsUrl,
   IsIn,
-  ValidateNested,
   Matches,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { mockMimeTypes } from '../constants/link-registration.constants';
 
@@ -159,55 +157,6 @@ export class LinkResponseDto {
   @IsOptional()
   @IsBoolean()
   defaultMimeType?: boolean = false;
-}
-
-/**
- * DTO for adding a new link to an existing identifier.
- * Used on POST /resolver/links
- */
-export class AddLinkDto {
-  @ApiProperty({
-    description: 'The namespace of the identifier scheme',
-    example: 'example-identifier-scheme',
-  })
-  @IsString()
-  @IsNotEmpty()
-  namespace: string;
-
-  @ApiProperty({
-    description: 'The identification key type',
-    example: 'gtin',
-  })
-  @IsString()
-  @IsNotEmpty()
-  identificationKeyType: string;
-
-  @ApiProperty({
-    description: 'The identification key value',
-    example: '12345678901234',
-  })
-  @IsString()
-  @IsNotEmpty()
-  identificationKey: string;
-
-  @ApiPropertyOptional({
-    description: 'The qualifier path',
-    example: '/10/12345678901234567890',
-    default: '/',
-  })
-  @IsOptional()
-  @IsString()
-  @Matches(/^\/(\d+\/[\w\d]+(\/\d+\/[\w\d]+)*)?$/, {
-    message:
-      'qualifierPath must match the pattern /aiCode/value or /aiCode/value/aiCode/value...',
-  })
-  qualifierPath?: string = '/';
-
-  @ApiProperty({ description: 'The link response to add' })
-  @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => LinkResponseDto)
-  response: LinkResponseDto;
 }
 
 /**

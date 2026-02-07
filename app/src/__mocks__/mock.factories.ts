@@ -19,7 +19,6 @@ export const i18nServiceMockFactory: () => MockType<I18nService> = jest.fn(
 export const linkManagementServiceMockFactory = jest.fn(() => ({
   listLinks: jest.fn(),
   getLink: jest.fn(),
-  addLink: jest.fn(),
   updateLink: jest.fn(),
   softDeleteLink: jest.fn(),
   hardDeleteLink: jest.fn(),

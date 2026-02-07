@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  Post,
   Put,
   Query,
   UsePipes,
@@ -14,7 +13,6 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
-  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -24,11 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { LinkManagementService } from './link-management.service';
-import {
-  AddLinkDto,
-  ListLinksQueryDto,
-  UpdateLinkDto,
-} from './dto/link-management.dto';
+import { ListLinksQueryDto, UpdateLinkDto } from './dto/link-management.dto';
 import { FieldErrorsResponse } from '../../common/dto/errors.dto';
 
 @ApiTags('Link Management')
@@ -107,37 +101,6 @@ export class LinkManagementController {
   })
   async getLink(@Param('linkId') linkId: string) {
     return this.linkManagementService.getLink(linkId);
-  }
-
-  @Post()
-  @ApiOperation({ summary: 'Add a new link to an existing identifier' })
-  @ApiBody({ type: AddLinkDto })
-  @ApiCreatedResponse({
-    status: 201,
-    description: 'Link added successfully',
-    schema: {
-      example: {
-        message: 'Link added successfully',
-        linkId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-      },
-    },
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: 'Bad Request',
-    type: FieldErrorsResponse,
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'Identifier document not found',
-  })
-  @ApiInternalServerErrorResponse({
-    status: 500,
-    description: 'Internal Server Error',
-  })
-  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async addLink(@Body() dto: AddLinkDto) {
-    return this.linkManagementService.addLink(dto);
   }
 
   @Put(':linkId')

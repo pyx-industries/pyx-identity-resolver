@@ -130,7 +130,7 @@ describe('LinkManagementController (e2e)', () => {
   });
 
   describe('GET /resolver/links (List Links)', () => {
-    it('should list all active links for an identifier', async () => {
+    it('should list all links for an identifier', async () => {
       const res = await request(baseUrl)
         .get('/resolver/links')
         .set(headers)
@@ -142,7 +142,6 @@ describe('LinkManagementController (e2e)', () => {
       res.body.forEach((link: any) => {
         expect(link.linkId).toBeDefined();
         expect(typeof link.linkId).toBe('string');
-        expect(link.active).not.toBe(false);
       });
     });
 
@@ -210,8 +209,8 @@ describe('LinkManagementController (e2e)', () => {
     });
   });
 
-  describe('POST /resolver/links (Add a New Link)', () => {
-    it('should add a new link to an existing identifier', async () => {
+  describe('Additive Registration via POST /resolver', () => {
+    it('should add new links to an existing identifier', async () => {
       // Count links before adding
       const beforeRes = await request(baseUrl)
         .get('/resolver/links')
@@ -221,37 +220,37 @@ describe('LinkManagementController (e2e)', () => {
 
       const countBefore = beforeRes.body.length;
 
-      // Add a new link
-      const addRes = await request(baseUrl)
-        .post('/resolver/links')
+      // Add a new link via POST /resolver
+      await request(baseUrl)
+        .post('/resolver')
         .set(headers)
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
+          itemDescription: 'Test Product',
           qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/new-link',
-            linkType: `${gs1}:epcis`,
-            title: 'EPCIS Information',
-            mimeType: 'application/json',
-            ianaLanguage: 'en',
-            context: 'au',
-            active: true,
-            fwqs: false,
-            defaultLinkType: false,
-            defaultMimeType: false,
-            defaultIanaLanguage: false,
-            defaultContext: false,
-          },
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: false,
+              defaultIanaLanguage: false,
+              defaultContext: false,
+              fwqs: false,
+              active: true,
+              linkType: `${gs1}:epcis`,
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'EPCIS Information',
+              targetUrl: 'https://example.com/new-link',
+              mimeType: 'application/json',
+            },
+          ],
         })
         .expect(HttpStatus.CREATED);
 
-      expect(addRes.body.message).toBe('Link added successfully');
-      expect(addRes.body.linkId).toBeDefined();
-      expect(typeof addRes.body.linkId).toBe('string');
-
-      // Verify the link count increased by one
+      // Verify the link count increased
       const afterRes = await request(baseUrl)
         .get('/resolver/links')
         .set(headers)
@@ -259,36 +258,66 @@ describe('LinkManagementController (e2e)', () => {
         .expect(HttpStatus.OK);
 
       expect(afterRes.body.length).toBe(countBefore + 1);
+
+      // Verify the new link can be found
+      const newLink = afterRes.body.find(
+        (link: any) => link.targetUrl === 'https://example.com/new-link',
+      );
+      expect(newLink).toBeDefined();
+      expect(newLink.linkId).toBeDefined();
+      expect(newLink.title).toBe('EPCIS Information');
     });
 
-    it('should return the newly added link when fetched by linkId', async () => {
-      const addRes = await request(baseUrl)
-        .post('/resolver/links')
+    it('should return the additively-added link when fetched by linkId', async () => {
+      // Add a link with a unique URL
+      await request(baseUrl)
+        .post('/resolver')
         .set(headers)
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
+          itemDescription: 'Test Product',
           qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/fetchable-link',
-            linkType: `${gs1}:recipeInfo`,
-            title: 'Recipe Information',
-            mimeType: 'text/html',
-            ianaLanguage: 'en',
-            context: 'au',
-          },
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: false,
+              defaultIanaLanguage: false,
+              defaultContext: false,
+              fwqs: false,
+              active: true,
+              linkType: `${gs1}:recipeInfo`,
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Recipe Information',
+              targetUrl: 'https://example.com/fetchable-link',
+              mimeType: 'text/html',
+            },
+          ],
         })
         .expect(HttpStatus.CREATED);
 
-      const linkId = addRes.body.linkId;
+      // Find the link by targetUrl
+      const listRes = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query(listLinksQuery)
+        .expect(HttpStatus.OK);
 
+      const addedLink = listRes.body.find(
+        (link: any) => link.targetUrl === 'https://example.com/fetchable-link',
+      );
+      expect(addedLink).toBeDefined();
+
+      // Fetch by linkId
       const getRes = await request(baseUrl)
-        .get(`/resolver/links/${linkId}`)
+        .get(`/resolver/links/${addedLink.linkId}`)
         .set(headers)
         .expect(HttpStatus.OK);
 
-      expect(getRes.body.linkId).toBe(linkId);
+      expect(getRes.body.linkId).toBe(addedLink.linkId);
       expect(getRes.body.targetUrl).toBe('https://example.com/fetchable-link');
       expect(getRes.body.title).toBe('Recipe Information');
     });
@@ -298,27 +327,52 @@ describe('LinkManagementController (e2e)', () => {
     let targetLinkId: string;
 
     beforeAll(async () => {
-      // Add a link specifically for update tests
-      const addRes = await request(baseUrl)
-        .post('/resolver/links')
+      // Add a link via POST /resolver specifically for update tests
+      await request(baseUrl)
+        .post('/resolver')
         .set(headers)
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
+          itemDescription: 'Test Product',
           qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/to-update',
-            linkType: `${gs1}:hasRetailers`,
-            title: 'Original Title',
-            mimeType: 'text/html',
-            ianaLanguage: 'en',
-            context: 'au',
-          },
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: false,
+              defaultIanaLanguage: false,
+              defaultContext: false,
+              fwqs: false,
+              active: true,
+              targetUrl: 'https://example.com/to-update',
+              linkType: `${gs1}:hasRetailers`,
+              title: 'Original Title',
+              mimeType: 'text/html',
+              ianaLanguage: 'en',
+              context: 'au',
+            },
+          ],
         })
         .expect(HttpStatus.CREATED);
 
-      targetLinkId = addRes.body.linkId;
+      // Find the linkId by listing links and matching the unique targetUrl
+      const listRes = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '09359502000010',
+          qualifierPath: '/',
+        })
+        .expect(HttpStatus.OK);
+
+      const addedLink = listRes.body.find(
+        (link: any) => link.targetUrl === 'https://example.com/to-update',
+      );
+      targetLinkId = addedLink.linkId;
     });
 
     it('should update the title of an existing link', async () => {
@@ -393,27 +447,52 @@ describe('LinkManagementController (e2e)', () => {
     let softDeleteLinkId: string;
 
     beforeAll(async () => {
-      // Add a link specifically for soft-delete testing
-      const addRes = await request(baseUrl)
-        .post('/resolver/links')
+      // Add a link via POST /resolver specifically for soft-delete testing
+      await request(baseUrl)
+        .post('/resolver')
         .set(headers)
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
+          itemDescription: 'Test Product',
           qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/to-soft-delete',
-            linkType: `${gs1}:masterData`,
-            title: 'Soft Delete Target',
-            mimeType: 'text/html',
-            ianaLanguage: 'en',
-            context: 'au',
-          },
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: false,
+              defaultIanaLanguage: false,
+              defaultContext: false,
+              fwqs: false,
+              active: true,
+              targetUrl: 'https://example.com/to-soft-delete',
+              linkType: `${gs1}:masterData`,
+              title: 'Soft Delete Target',
+              mimeType: 'text/html',
+              ianaLanguage: 'en',
+              context: 'au',
+            },
+          ],
         })
         .expect(HttpStatus.CREATED);
 
-      softDeleteLinkId = addRes.body.linkId;
+      // Find the linkId by listing links and matching the unique targetUrl
+      const listRes = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '09359502000010',
+          qualifierPath: '/',
+        })
+        .expect(HttpStatus.OK);
+
+      const addedLink = listRes.body.find(
+        (link: any) => link.targetUrl === 'https://example.com/to-soft-delete',
+      );
+      softDeleteLinkId = addedLink.linkId;
     });
 
     it('should soft-delete a link (set active to false)', async () => {
@@ -425,7 +504,7 @@ describe('LinkManagementController (e2e)', () => {
       expect(deleteRes.body.message).toBe('Link deleted successfully');
     });
 
-    it('should not include soft-deleted link in the active links listing', async () => {
+    it('should include soft-deleted link in listing with active=false', async () => {
       const listRes = await request(baseUrl)
         .get('/resolver/links')
         .set(headers)
@@ -435,7 +514,8 @@ describe('LinkManagementController (e2e)', () => {
       const deletedLink = listRes.body.find(
         (link: any) => link.linkId === softDeleteLinkId,
       );
-      expect(deletedLink).toBeUndefined();
+      expect(deletedLink).toBeDefined();
+      expect(deletedLink.active).toBe(false);
     });
 
     it('should still return the soft-deleted link when fetched directly by linkId', async () => {
@@ -453,27 +533,52 @@ describe('LinkManagementController (e2e)', () => {
     let hardDeleteLinkId: string;
 
     beforeAll(async () => {
-      // Add a link specifically for hard-delete testing
-      const addRes = await request(baseUrl)
-        .post('/resolver/links')
+      // Add a link via POST /resolver specifically for hard-delete testing
+      await request(baseUrl)
+        .post('/resolver')
         .set(headers)
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
+          itemDescription: 'Test Product',
           qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/to-hard-delete',
-            linkType: `${gs1}:quickStartGuide`,
-            title: 'Hard Delete Target',
-            mimeType: 'text/html',
-            ianaLanguage: 'en',
-            context: 'au',
-          },
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: false,
+              defaultIanaLanguage: false,
+              defaultContext: false,
+              fwqs: false,
+              active: true,
+              targetUrl: 'https://example.com/to-hard-delete',
+              linkType: `${gs1}:quickStartGuide`,
+              title: 'Hard Delete Target',
+              mimeType: 'text/html',
+              ianaLanguage: 'en',
+              context: 'au',
+            },
+          ],
         })
         .expect(HttpStatus.CREATED);
 
-      hardDeleteLinkId = addRes.body.linkId;
+      // Find the linkId by listing links and matching the unique targetUrl
+      const listRes = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '09359502000010',
+          qualifierPath: '/',
+        })
+        .expect(HttpStatus.OK);
+
+      const addedLink = listRes.body.find(
+        (link: any) => link.targetUrl === 'https://example.com/to-hard-delete',
+      );
+      hardDeleteLinkId = addedLink.linkId;
     });
 
     it('should hard-delete a link permanently', async () => {
@@ -496,27 +601,52 @@ describe('LinkManagementController (e2e)', () => {
 
   describe('Version Tracking', () => {
     it('should set updatedAt on a link after an update', async () => {
-      // Add a link to update
-      const addRes = await request(baseUrl)
-        .post('/resolver/links')
+      // Add a link via POST /resolver to update
+      await request(baseUrl)
+        .post('/resolver')
         .set(headers)
         .send({
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
+          itemDescription: 'Test Product',
           qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/version-track',
-            linkType: `${gs1}:traceability`,
-            title: 'Version Track Test',
-            mimeType: 'text/html',
-            ianaLanguage: 'en',
-            context: 'au',
-          },
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: false,
+              defaultIanaLanguage: false,
+              defaultContext: false,
+              fwqs: false,
+              active: true,
+              targetUrl: 'https://example.com/version-track',
+              linkType: `${gs1}:traceability`,
+              title: 'Version Track Test',
+              mimeType: 'text/html',
+              ianaLanguage: 'en',
+              context: 'au',
+            },
+          ],
         })
         .expect(HttpStatus.CREATED);
 
-      const linkId = addRes.body.linkId;
+      // Find the linkId by listing links and matching the unique targetUrl
+      const listRes = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '09359502000010',
+          qualifierPath: '/',
+        })
+        .expect(HttpStatus.OK);
+
+      const addedLink = listRes.body.find(
+        (link: any) => link.targetUrl === 'https://example.com/version-track',
+      );
+      const linkId = addedLink.linkId;
 
       // Fetch before update
       const beforeRes = await request(baseUrl)
@@ -634,23 +764,6 @@ describe('LinkManagementController (e2e)', () => {
     it('should return 401 when getting a link by ID without an auth token', async () => {
       await request(baseUrl)
         .get('/resolver/links/some-link-id')
-        .expect(HttpStatus.UNAUTHORIZED);
-    });
-
-    it('should return 401 when adding a link without an auth token', async () => {
-      await request(baseUrl)
-        .post('/resolver/links')
-        .send({
-          namespace: gs1,
-          identificationKeyType: 'gtin',
-          identificationKey: '09359502000010',
-          qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/no-auth',
-            linkType: `${gs1}:pip`,
-            title: 'No Auth Test',
-          },
-        })
         .expect(HttpStatus.UNAUTHORIZED);
     });
 

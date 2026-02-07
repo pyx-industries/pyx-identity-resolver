@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LinkManagementService } from './link-management.service';
 import { IRepositoryProvider } from 'src/repository/providers/provider.repository.interface';
 import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
+import { ConflictException } from '@nestjs/common';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
 
 describe('LinkManagementService', () => {
@@ -112,7 +113,7 @@ describe('LinkManagementService', () => {
   });
 
   describe('listLinks', () => {
-    it('should return active responses for a valid identifier', async () => {
+    it('should return all responses for a valid identifier', async () => {
       repositoryProvider.one.mockResolvedValue({ ...mockDocument });
 
       const result = await service.listLinks({
@@ -132,7 +133,7 @@ describe('LinkManagementService', () => {
       );
     });
 
-    it('should filter out inactive responses', async () => {
+    it('should include inactive responses', async () => {
       const docWithInactive = {
         ...mockDocument,
         responses: [
@@ -165,8 +166,8 @@ describe('LinkManagementService', () => {
         qualifierPath: '/',
       });
 
-      expect(result).toHaveLength(1);
-      expect(result.every((r) => r.active !== false)).toBe(true);
+      expect(result).toHaveLength(2);
+      expect(result.some((r) => r.active === false)).toBe(true);
     });
 
     it('should throw 404 when document not found', async () => {
@@ -222,207 +223,12 @@ describe('LinkManagementService', () => {
     });
   });
 
-  describe('addLink', () => {
-    it('should add a new response and return a linkId', async () => {
-      repositoryProvider.one.mockResolvedValue({ ...mockDocument });
-      repositoryProvider.save.mockResolvedValue(undefined);
-
-      const result = await service.addLink({
-        namespace: 'gs1',
-        identificationKeyType: 'gtin',
-        identificationKey: '09359502000010',
-        qualifierPath: '/',
-        response: {
-          targetUrl: 'https://example.com/new',
-          linkType: 'gs1:certificationInfo',
-          title: 'Certification Info',
-          mimeType: 'text/html',
-          ianaLanguage: 'en',
-          context: 'us',
-          active: true,
-          fwqs: false,
-          defaultLinkType: false,
-          defaultIanaLanguage: false,
-          defaultContext: false,
-          defaultMimeType: false,
-        },
-      });
-
-      expect(result).toHaveProperty('linkId');
-      expect(result.linkId).toBeDefined();
-      expect(typeof result.linkId).toBe('string');
-      expect(result).toHaveProperty('message');
-    });
-
-    it('should increment the document version', async () => {
-      repositoryProvider.one.mockResolvedValue({ ...mockDocument });
-      repositoryProvider.save.mockResolvedValue(undefined);
-
-      await service.addLink({
-        namespace: 'gs1',
-        identificationKeyType: 'gtin',
-        identificationKey: '09359502000010',
-        qualifierPath: '/',
-        response: {
-          targetUrl: 'https://example.com/new',
-          linkType: 'gs1:certificationInfo',
-          title: 'Certification Info',
-          mimeType: 'text/html',
-          ianaLanguage: 'en',
-          context: 'us',
-          active: true,
-          fwqs: false,
-          defaultLinkType: false,
-          defaultIanaLanguage: false,
-          defaultContext: false,
-          defaultMimeType: false,
-        },
-      });
-
-      expect(repositoryProvider.save).toHaveBeenCalledWith(
-        expect.objectContaining({
-          version: 2,
-        }),
-      );
-    });
-
-    it('should record a version history entry with action created', async () => {
-      repositoryProvider.one.mockResolvedValue({ ...mockDocument });
-      repositoryProvider.save.mockResolvedValue(undefined);
-
-      await service.addLink({
-        namespace: 'gs1',
-        identificationKeyType: 'gtin',
-        identificationKey: '09359502000010',
-        qualifierPath: '/',
-        response: {
-          targetUrl: 'https://example.com/new',
-          linkType: 'gs1:certificationInfo',
-          title: 'Certification Info',
-          mimeType: 'text/html',
-          ianaLanguage: 'en',
-          context: 'us',
-          active: true,
-          fwqs: false,
-          defaultLinkType: false,
-          defaultIanaLanguage: false,
-          defaultContext: false,
-          defaultMimeType: false,
-        },
-      });
-
-      const savedDoc = repositoryProvider.save.mock.calls[0][0];
-      expect(savedDoc.versionHistory).toBeDefined();
-      expect(savedDoc.versionHistory.length).toBeGreaterThanOrEqual(1);
-      expect(savedDoc.versionHistory[0].changes[0]).toEqual(
-        expect.objectContaining({
-          action: 'created',
-        }),
-      );
-    });
-
-    it('should call writeLinkIndex with the new linkId', async () => {
-      repositoryProvider.one.mockResolvedValue({ ...mockDocument });
-      repositoryProvider.save.mockResolvedValue(undefined);
-
-      const result = await service.addLink({
-        namespace: 'gs1',
-        identificationKeyType: 'gtin',
-        identificationKey: '09359502000010',
-        qualifierPath: '/',
-        response: {
-          targetUrl: 'https://example.com/new',
-          linkType: 'gs1:certificationInfo',
-          title: 'Certification Info',
-          mimeType: 'text/html',
-          ianaLanguage: 'en',
-          context: 'us',
-          active: true,
-          fwqs: false,
-          defaultLinkType: false,
-          defaultIanaLanguage: false,
-          defaultContext: false,
-          defaultMimeType: false,
-        },
-      });
-
-      // writeLinkIndex calls repositoryProvider.save with the index path
-      const saveCalls = repositoryProvider.save.mock.calls;
-      const indexSaveCall = saveCalls.find((call) =>
-        call[0].id.includes('_index/links/'),
-      );
-      expect(indexSaveCall).toBeDefined();
-      expect(indexSaveCall[0].id).toContain(result.linkId);
-      expect(indexSaveCall[0].documentPath).toBe('gs1/01/09359502000010.json');
-    });
-
-    it('should throw 404 when identifier document not found', async () => {
-      repositoryProvider.one.mockResolvedValue(null);
-
-      await expect(
-        service.addLink({
-          namespace: 'gs1',
-          identificationKeyType: 'gtin',
-          identificationKey: '09359502000010',
-          qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/new',
-            linkType: 'gs1:certificationInfo',
-            title: 'Certification Info',
-          },
-        }),
-      ).rejects.toThrow(GeneralErrorException);
-    });
-
-    it('should throw when writeLinkIndex fails after document save', async () => {
-      repositoryProvider.one.mockResolvedValue({ ...mockDocument });
-      let saveCallCount = 0;
-      repositoryProvider.save.mockImplementation(() => {
-        saveCallCount++;
-        // First save is the document commit, second save is the link index write
-        if (saveCallCount >= 2) {
-          return Promise.reject(new Error('Index write failed'));
-        }
-        return Promise.resolve(undefined);
-      });
-
-      await expect(
-        service.addLink({
-          namespace: 'gs1',
-          identificationKeyType: 'gtin',
-          identificationKey: '09359502000010',
-          qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/new',
-            linkType: 'gs1:certificationInfo',
-            title: 'Certification Info',
-            mimeType: 'text/html',
-            ianaLanguage: 'en',
-            context: 'us',
-            active: true,
-            fwqs: false,
-            defaultLinkType: false,
-            defaultIanaLanguage: false,
-            defaultContext: false,
-            defaultMimeType: false,
-          },
-        }),
-      ).rejects.toThrow('Index write failed');
-
-      // Verify the document was saved (first call) even though index failed
-      expect(repositoryProvider.save).toHaveBeenCalled();
-    });
-  });
-
   describe('updateLink', () => {
     it('should update response fields', async () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')
           ? Promise.resolve(mockIndex as any)
-          : Promise.resolve({
-              ...mockDocument,
-              responses: mockDocument.responses.map((r) => ({ ...r })),
-            } as any),
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
       );
       repositoryProvider.save.mockResolvedValue(undefined);
 
@@ -443,10 +249,7 @@ describe('LinkManagementService', () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')
           ? Promise.resolve(mockIndex as any)
-          : Promise.resolve({
-              ...mockDocument,
-              responses: mockDocument.responses.map((r) => ({ ...r })),
-            } as any),
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
       );
       repositoryProvider.save.mockResolvedValue(undefined);
 
@@ -465,10 +268,7 @@ describe('LinkManagementService', () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')
           ? Promise.resolve(mockIndex as any)
-          : Promise.resolve({
-              ...mockDocument,
-              responses: mockDocument.responses.map((r) => ({ ...r })),
-            } as any),
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
       );
       repositoryProvider.save.mockResolvedValue(undefined);
 
@@ -490,10 +290,7 @@ describe('LinkManagementService', () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')
           ? Promise.resolve(mockIndex as any)
-          : Promise.resolve({
-              ...mockDocument,
-              responses: mockDocument.responses.map((r) => ({ ...r })),
-            } as any),
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
       );
       repositoryProvider.save.mockResolvedValue(undefined);
 
@@ -515,10 +312,7 @@ describe('LinkManagementService', () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')
           ? Promise.resolve(mockIndex as any)
-          : Promise.resolve({
-              ...mockDocument,
-              responses: mockDocument.responses.map((r) => ({ ...r })),
-            } as any),
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
       );
 
       await expect(
@@ -530,15 +324,208 @@ describe('LinkManagementService', () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')
           ? Promise.resolve(mockIndex as any)
-          : Promise.resolve({
-              ...mockDocument,
-              responses: mockDocument.responses.map((r) => ({ ...r })),
-            } as any),
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
       );
 
       await expect(service.updateLink('abc12345', {})).rejects.toThrow(
         GeneralErrorException,
       );
+    });
+
+    it('should throw ConflictException when update would duplicate another response', async () => {
+      const docWithTwoLinks = {
+        ...mockDocument,
+        responses: [
+          {
+            ...mockDocument.responses[0],
+            linkId: 'abc12345',
+            targetUrl: 'https://example.com/product',
+            linkType: 'gs1:pip',
+            mimeType: 'text/html',
+            ianaLanguage: 'en',
+            context: 'us',
+          },
+          {
+            ...mockDocument.responses[0],
+            linkId: 'def67890',
+            targetUrl: 'https://example.com/cert',
+            linkType: 'gs1:certificationInfo',
+            mimeType: 'application/json',
+            ianaLanguage: 'en',
+            context: 'us',
+          },
+        ],
+      };
+
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(docWithTwoLinks)) as any),
+      );
+
+      // Updating abc12345's targetUrl + linkType + mimeType to match def67890
+      await expect(
+        service.updateLink('abc12345', {
+          targetUrl: 'https://example.com/cert',
+          linkType: 'gs1:certificationInfo',
+          mimeType: 'application/json',
+        }),
+      ).rejects.toThrow('conflict');
+    });
+
+    it('should throw ConflictException when update would duplicate a historical version', async () => {
+      const docWithHistory = {
+        ...mockDocument,
+        responses: [
+          {
+            ...mockDocument.responses[0],
+            linkId: 'abc12345',
+            targetUrl: 'https://example.com/product-v2',
+          },
+          {
+            ...mockDocument.responses[0],
+            linkId: 'def67890',
+            targetUrl: 'https://example.com/cert',
+            linkType: 'gs1:certificationInfo',
+            mimeType: 'application/json',
+          },
+        ],
+        versionHistory: [
+          {
+            version: 2,
+            updatedAt: '2024-06-01T00:00:00.000Z',
+            changes: [
+              {
+                linkId: 'def67890',
+                action: 'updated',
+                previousTargetUrl: 'https://example.com/old-cert',
+              },
+            ],
+          },
+        ],
+      };
+
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(docWithHistory)) as any),
+      );
+
+      // Updating abc12345 to match def67890's PREVIOUS targetUrl + current other fields
+      await expect(
+        service.updateLink('abc12345', {
+          targetUrl: 'https://example.com/old-cert',
+          linkType: 'gs1:certificationInfo',
+          mimeType: 'application/json',
+        }),
+      ).rejects.toThrow('conflict');
+    });
+
+    it('should record previousMimeType in version history when mimeType changes', async () => {
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
+      );
+      repositoryProvider.save.mockResolvedValue(undefined);
+
+      await service.updateLink('abc12345', {
+        mimeType: 'application/json',
+      });
+
+      const savedDoc = repositoryProvider.save.mock.calls[0][0];
+      expect(savedDoc.versionHistory[0].changes[0]).toEqual(
+        expect.objectContaining({
+          linkId: 'abc12345',
+          action: 'updated',
+          previousMimeType: 'text/html',
+        }),
+      );
+    });
+
+    it('should record previousIanaLanguage in version history when ianaLanguage changes', async () => {
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
+      );
+      repositoryProvider.save.mockResolvedValue(undefined);
+
+      await service.updateLink('abc12345', {
+        ianaLanguage: 'fr',
+      });
+
+      const savedDoc = repositoryProvider.save.mock.calls[0][0];
+      expect(savedDoc.versionHistory[0].changes[0]).toEqual(
+        expect.objectContaining({
+          linkId: 'abc12345',
+          action: 'updated',
+          previousIanaLanguage: 'en',
+        }),
+      );
+    });
+
+    it('should record previousContext in version history when context changes', async () => {
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
+      );
+      repositoryProvider.save.mockResolvedValue(undefined);
+
+      await service.updateLink('abc12345', {
+        context: 'au',
+      });
+
+      const savedDoc = repositoryProvider.save.mock.calls[0][0];
+      expect(savedDoc.versionHistory[0].changes[0]).toEqual(
+        expect.objectContaining({
+          linkId: 'abc12345',
+          action: 'updated',
+          previousContext: 'us',
+        }),
+      );
+    });
+
+    it('should throw ConflictException when update would revert to link own previous composite key', async () => {
+      const docWithOwnHistory = {
+        ...mockDocument,
+        responses: [
+          {
+            ...mockDocument.responses[0],
+            linkId: 'abc12345',
+            targetUrl: 'https://example.com/product-v2',
+          },
+        ],
+        versionHistory: [
+          {
+            version: 2,
+            updatedAt: '2024-06-01T00:00:00.000Z',
+            changes: [
+              {
+                linkId: 'abc12345',
+                action: 'updated',
+                previousTargetUrl: 'https://example.com/product-v1',
+              },
+            ],
+          },
+        ],
+      };
+
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(
+              JSON.parse(JSON.stringify(docWithOwnHistory)) as any,
+            ),
+      );
+
+      // Reverting abc12345 back to its own previous targetUrl should conflict
+      await expect(
+        service.updateLink('abc12345', {
+          targetUrl: 'https://example.com/product-v1',
+        }),
+      ).rejects.toThrow(ConflictException);
     });
   });
 
@@ -953,98 +940,14 @@ describe('LinkManagementService', () => {
       ],
     };
 
-    describe('addLink', () => {
-      it('should unset existing default when adding a link with defaultLinkType true', async () => {
-        repositoryProvider.one.mockResolvedValue({
-          ...mockDocument,
-          responses: mockDocument.responses.map((r) => ({ ...r })),
-        } as any);
-        repositoryProvider.save.mockResolvedValue(undefined);
-
-        await service.addLink({
-          namespace: 'gs1',
-          identificationKeyType: 'gtin',
-          identificationKey: '09359502000010',
-          qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/new',
-            linkType: 'gs1:certificationInfo',
-            title: 'Certification Info',
-            mimeType: 'text/html',
-            ianaLanguage: 'en',
-            context: 'us',
-            active: true,
-            fwqs: false,
-            defaultLinkType: true,
-            defaultIanaLanguage: false,
-            defaultContext: false,
-            defaultMimeType: false,
-          },
-        });
-
-        const savedDoc = repositoryProvider.save.mock.calls[0][0];
-        const oldLink = savedDoc.responses.find(
-          (r: any) => r.linkId === 'abc12345',
-        );
-        const newLink = savedDoc.responses.find(
-          (r: any) => r.linkId !== 'abc12345',
-        );
-
-        expect(oldLink.defaultLinkType).toBe(false);
-        expect(newLink.defaultLinkType).toBe(true);
-      });
-
-      it('should promote new link to default when it is the first active response', async () => {
-        const emptyResponseDoc = {
-          ...mockDocument,
-          responses: [],
-        };
-        repositoryProvider.one.mockResolvedValue({
-          ...emptyResponseDoc,
-        } as any);
-        repositoryProvider.save.mockResolvedValue(undefined);
-
-        await service.addLink({
-          namespace: 'gs1',
-          identificationKeyType: 'gtin',
-          identificationKey: '09359502000010',
-          qualifierPath: '/',
-          response: {
-            targetUrl: 'https://example.com/new',
-            linkType: 'gs1:certificationInfo',
-            title: 'Certification Info',
-            mimeType: 'text/html',
-            ianaLanguage: 'en',
-            context: 'us',
-            active: true,
-            fwqs: false,
-            defaultLinkType: false,
-            defaultIanaLanguage: false,
-            defaultContext: false,
-            defaultMimeType: false,
-          },
-        });
-
-        const savedDoc = repositoryProvider.save.mock.calls[0][0];
-        const newLink = savedDoc.responses[0];
-
-        // First active link should be promoted to default
-        expect(newLink.defaultLinkType).toBe(true);
-        expect(newLink.defaultIanaLanguage).toBe(true);
-        expect(newLink.defaultContext).toBe(true);
-        expect(newLink.defaultMimeType).toBe(true);
-      });
-    });
-
     describe('updateLink', () => {
       it('should unset other defaults when setting defaultLinkType to true', async () => {
         repositoryProvider.one.mockImplementation((id: string) =>
           id.includes('_index')
             ? Promise.resolve(mockIndex as any)
-            : Promise.resolve({
-                ...twoResponseDoc,
-                responses: twoResponseDoc.responses.map((r) => ({ ...r })),
-              } as any),
+            : Promise.resolve(
+                JSON.parse(JSON.stringify(twoResponseDoc)) as any,
+              ),
         );
         repositoryProvider.save.mockResolvedValue(undefined);
 
@@ -1066,10 +969,9 @@ describe('LinkManagementService', () => {
         repositoryProvider.one.mockImplementation((id: string) =>
           id.includes('_index')
             ? Promise.resolve(mockIndex as any)
-            : Promise.resolve({
-                ...twoResponseDoc,
-                responses: twoResponseDoc.responses.map((r) => ({ ...r })),
-              } as any),
+            : Promise.resolve(
+                JSON.parse(JSON.stringify(twoResponseDoc)) as any,
+              ),
         );
         repositoryProvider.save.mockResolvedValue(undefined);
 
@@ -1091,6 +993,7 @@ describe('LinkManagementService', () => {
       it('should recalculate both scopes when linkType changes', async () => {
         const twoLinkTypeDoc = {
           ...mockDocument,
+          versionHistory: [],
           responses: [
             {
               linkId: 'abc12345',
@@ -1132,10 +1035,9 @@ describe('LinkManagementService', () => {
         repositoryProvider.one.mockImplementation((id: string) =>
           id.includes('_index')
             ? Promise.resolve(mockIndex as any)
-            : Promise.resolve({
-                ...twoLinkTypeDoc,
-                responses: twoLinkTypeDoc.responses.map((r) => ({ ...r })),
-              } as any),
+            : Promise.resolve(
+                JSON.parse(JSON.stringify(twoLinkTypeDoc)) as any,
+              ),
         );
         repositoryProvider.save.mockResolvedValue(undefined);
 
@@ -1160,6 +1062,7 @@ describe('LinkManagementService', () => {
       it('should recalculate defaults when reactivating a soft-deleted link', async () => {
         const docWithInactive = {
           ...mockDocument,
+          versionHistory: [],
           responses: [
             {
               linkId: 'abc12345',
@@ -1184,10 +1087,9 @@ describe('LinkManagementService', () => {
         repositoryProvider.one.mockImplementation((id: string) =>
           id.includes('_index')
             ? Promise.resolve(mockIndex as any)
-            : Promise.resolve({
-                ...docWithInactive,
-                responses: docWithInactive.responses.map((r) => ({ ...r })),
-              } as any),
+            : Promise.resolve(
+                JSON.parse(JSON.stringify(docWithInactive)) as any,
+              ),
         );
         repositoryProvider.save.mockResolvedValue(undefined);
 
@@ -1210,10 +1112,9 @@ describe('LinkManagementService', () => {
         repositoryProvider.one.mockImplementation((id: string) =>
           id.includes('_index')
             ? Promise.resolve(mockIndex as any)
-            : Promise.resolve({
-                ...twoResponseDoc,
-                responses: twoResponseDoc.responses.map((r) => ({ ...r })),
-              } as any),
+            : Promise.resolve(
+                JSON.parse(JSON.stringify(twoResponseDoc)) as any,
+              ),
         );
         repositoryProvider.save.mockResolvedValue(undefined);
 

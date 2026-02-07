@@ -1,4 +1,10 @@
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ConfigService } from '@nestjs/config';
 import { IRepositoryProvider } from '../../repository/providers/provider.repository.interface';
@@ -8,11 +14,7 @@ import {
   CreateLinkRegistrationDto,
   Response,
 } from './dto/link-registration.dto';
-import {
-  ListLinksQueryDto,
-  AddLinkDto,
-  UpdateLinkDto,
-} from './dto/link-management.dto';
+import { ListLinksQueryDto, UpdateLinkDto } from './dto/link-management.dto';
 import { VersionedUri, LinkChange } from './interfaces/versioned-uri.interface';
 import { LinkResponse } from '../link-resolution/interfaces/uri.interface';
 import {
@@ -22,7 +24,6 @@ import {
 import { getObjectName } from './utils/link-registration.utils';
 import { convertAICode } from '../shared/utils/uri.utils';
 import {
-  generateLinkId,
   createVersionHistoryEntry,
   normaliseDocument,
 } from './utils/version.utils';
@@ -32,6 +33,11 @@ import {
   deleteLinkIndex,
 } from './utils/link-index.utils';
 import { recalculateDefaultFlags } from './utils/default-flags.utils';
+import {
+  buildResponseKey,
+  buildHistoricalKeys,
+  formatResponseIdentity,
+} from './utils/upsert.utils';
 
 /**
  * Service responsible for managing individual links within existing identifier documents.
@@ -101,6 +107,7 @@ export class LinkManagementService {
     aiCode: string,
     attrs: { resolverDomain: string; linkTypeVocDomain: string },
   ): void {
+    const activeResponses = doc.responses.filter((r) => r.active !== false);
     const payload: CreateLinkRegistrationDto = {
       namespace: doc.namespace,
       identificationKeyType: doc.identificationKeyType,
@@ -108,7 +115,7 @@ export class LinkManagementService {
       itemDescription: doc.itemDescription,
       qualifierPath: doc.qualifierPath,
       active: doc.active,
-      responses: doc.responses as Response[],
+      responses: activeResponses as Response[],
     };
     doc.linkset = constructLinkSetJson(payload, aiCode, attrs);
     doc.linkHeaderText = constructHTTPLink(payload, aiCode, attrs);
@@ -231,7 +238,7 @@ export class LinkManagementService {
   }
 
   /**
-   * Lists all active links for an identifier.
+   * Lists all links for an identifier.
    */
   async listLinks(query: ListLinksQueryDto): Promise<LinkResponse[]> {
     const { aiCode } = await this.resolveIdentifierConfig(
@@ -240,7 +247,7 @@ export class LinkManagementService {
     );
     const objectName = getObjectName(query as any, aiCode);
     const doc = await this.fetchDocument(objectName);
-    return doc.responses.filter((r) => r.active !== false);
+    return doc.responses;
   }
 
   /**
@@ -250,48 +257,6 @@ export class LinkManagementService {
     const documentPath = await this.resolveDocumentPath(linkId);
     const doc = await this.fetchDocument(documentPath);
     return this.findResponseOrThrow(doc, linkId);
-  }
-
-  /**
-   * Adds a new link to an existing identifier.
-   */
-  async addLink(dto: AddLinkDto): Promise<{ message: string; linkId: string }> {
-    const { aiCode } = await this.resolveIdentifierConfig(
-      dto.namespace,
-      dto.identificationKeyType,
-    );
-    const objectName = getObjectName(dto as any, aiCode);
-    const doc = await this.fetchDocument(objectName);
-
-    const now = new Date().toISOString();
-    const linkId = generateLinkId();
-    const newResponse = {
-      ...dto.response,
-      linkId,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    doc.responses.push(newResponse as any);
-    await this.commitDocumentChanges(doc, objectName, [
-      { linkId, action: 'created' },
-    ]);
-
-    try {
-      await writeLinkIndex(this.repositoryProvider, linkId, objectName);
-    } catch (error) {
-      this.logger.error(
-        `Failed to write link index for linkId=${linkId}, document=${objectName}. Index is out of sync.`,
-        error instanceof Error ? error.stack : error,
-      );
-      throw error;
-    }
-
-    this.logger.log(`Link added: linkId=${linkId}, document=${objectName}`);
-    return {
-      ...this.translateSuccess('link_added_successfully'),
-      linkId,
-    };
   }
 
   /**
@@ -321,6 +286,18 @@ export class LinkManagementService {
     if (dto.linkType && dto.linkType !== existingResponse.linkType) {
       change.previousLinkType = existingResponse.linkType;
     }
+    if (dto.mimeType && dto.mimeType !== existingResponse.mimeType) {
+      change.previousMimeType = existingResponse.mimeType;
+    }
+    if (
+      dto.ianaLanguage &&
+      dto.ianaLanguage !== existingResponse.ianaLanguage
+    ) {
+      change.previousIanaLanguage = existingResponse.ianaLanguage;
+    }
+    if (dto.context && dto.context !== existingResponse.context) {
+      change.previousContext = existingResponse.context;
+    }
 
     // Apply updates — only override fields that are provided in the request body
     const PROTECTED_FIELDS = new Set(['linkId', 'createdAt', 'updatedAt']);
@@ -330,6 +307,28 @@ export class LinkManagementService {
       }
     }
     existingResponse.updatedAt = new Date().toISOString();
+
+    // Check the updated response doesn't conflict with other responses or history
+    const updatedKey = buildResponseKey(existingResponse as Response);
+    const otherResponses = doc.responses.filter((r) => r.linkId !== linkId);
+    const conflictingKeys = new Set(
+      otherResponses.map((r) => buildResponseKey(r as Response)),
+    );
+
+    // Use ALL responses for historical key lookup — includes own history
+    const historicalKeys = buildHistoricalKeys(
+      doc.responses as Response[],
+      doc.versionHistory,
+    );
+    for (const key of historicalKeys) {
+      conflictingKeys.add(key);
+    }
+
+    if (conflictingKeys.has(updatedKey)) {
+      throw new ConflictException(
+        `Update would conflict with an existing response: ${formatResponseIdentity(existingResponse as Response)}`,
+      );
+    }
 
     await this.commitDocumentChanges(doc, documentPath, [change]);
     this.logger.log(

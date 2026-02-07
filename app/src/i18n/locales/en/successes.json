@@ -3,6 +3,5 @@
   "identifiers_deleted": "Application identifier deleted successfully",
   "register_link_resolver_successfully": "Link resolver registered successfully",
   "link_updated_successfully": "Link updated successfully",
-  "link_deleted_successfully": "Link deleted successfully",
-  "link_added_successfully": "Link added successfully"
+  "link_deleted_successfully": "Link deleted successfully"
 }
