@@ -13,6 +13,25 @@ export interface LinkResponse {
   defaultIanaLanguage: boolean;
   defaultContext: boolean;
   defaultMimeType: boolean;
+  linkId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface LinkChange {
+  linkId: string;
+  action: 'created' | 'updated' | 'soft_deleted' | 'hard_deleted';
+  previousTargetUrl?: string;
+  previousLinkType?: string;
+  previousMimeType?: string;
+  previousIanaLanguage?: string;
+  previousContext?: string;
+}
+
+export interface VersionHistoryEntry {
+  version: number;
+  updatedAt: string;
+  changes: LinkChange[];
 }
 
 export interface Uri {
@@ -26,4 +45,8 @@ export interface Uri {
   responses: LinkResponse[];
   linkset?: LinkContextObject;
   linkHeaderText?: string;
+  version?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  versionHistory?: VersionHistoryEntry[];
 }

@@ -49,7 +49,8 @@
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@compodoc/compodoc": "^1.1.25",
@@ -62,6 +63,7 @@
     "@types/negotiator": "^0.6.3",
     "@types/node": "^20.3.1",
     "@types/supertest": "^6.0.0",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.42.0",
@@ -87,7 +89,14 @@
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "allowJs": true
+          }
+        }
+      ]
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
@@ -96,6 +105,9 @@
       "./__mocks__/jest-setup-file.ts"
     ],
     "coverageDirectory": "../coverage",
+    "transformIgnorePatterns": [
+      "node_modules/(?!uuid)"
+    ],
     "testEnvironment": "node",
     "coverageThreshold": {
       "global": {
