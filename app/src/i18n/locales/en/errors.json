@@ -36,5 +36,12 @@
   "invalid_link_type": "Invalid link type '{linkType}'",
   "invalid_namespace_prefix": "Invalid namespace prefix: '{prefix}'. Expected: '{namespace}'",
   "invalid_voc_linktype": "Link type not found",
-  "invalid_value": "Invalid value"
+  "invalid_value": "Invalid value",
+  "link_not_found": "Link with ID '{linkId}' not found",
+  "link_index_not_found": "Link index entry for ID '{linkId}' not found",
+  "identifier_document_not_found": "No link registration found for the specified identifier",
+  "resolver_domain_not_configured": "RESOLVER_DOMAIN environment variable is not configured",
+  "ai_code_not_found": "Could not resolve AI code for identification key type '{identificationKeyType}'",
+  "empty_update_body": "Update request must include at least one field to update",
+  "duplicate_responses": "Duplicate responses already exist: {descriptions}"
 }

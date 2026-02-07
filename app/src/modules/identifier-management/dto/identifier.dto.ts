@@ -83,7 +83,7 @@ export class ApplicationIdentifier {
 export class NamespaceDto {
   @ApiProperty({
     description: 'The namespace of the identifier',
-    example: 'gs1',
+    example: 'example-identifier-scheme',
   })
   @IsString()
   @IsNotEmpty()

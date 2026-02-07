@@ -97,7 +97,7 @@ export const GetIdentifierResponse = ApiResponse({
         oneNamespace: {
           summary: 'Single Namespace Response',
           value: {
-            namespace: 'gs1',
+            namespace: 'example-identifier-scheme',
             applicationIdentifiers: [
               {
                 title: 'Global Trade Item Number (GTIN)',
@@ -124,7 +124,7 @@ export const GetIdentifierResponse = ApiResponse({
           summary: 'All Namespaces Response',
           value: [
             {
-              namespace: 'gs1',
+              namespace: 'example-identifier-scheme',
               applicationIdentifiers: [
                 {
                   title: 'Global Trade Item Number (GTIN)',
@@ -168,7 +168,7 @@ export const NamespaceQueryDelete = ApiQuery({
   description: 'The namespace of the identifier to delete',
   schema: {
     type: 'string',
-    example: 'example-namespace',
+    example: 'example-identifier-scheme',
   },
 });
 
@@ -184,6 +184,6 @@ export const NamespaceQueryGet = ApiQuery({
     'The namespace of the identifier to retrieve. If not provided, all identifiers are returned.',
   schema: {
     type: 'string',
-    example: 'example-namespace',
+    example: 'example-identifier-scheme',
   },
 });
