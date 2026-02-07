@@ -302,6 +302,7 @@ describe('LinkResolutionController (e2e)', () => {
         });
 
       // Register the same link resolver for the second time (duplicate)
+      // Should return 409 Conflict due to duplicate response detection
       await request(baseUrl)
         .post('/resolver')
         .send(
@@ -312,9 +313,13 @@ describe('LinkResolutionController (e2e)', () => {
           ),
         )
         .set(headers)
-        .expect(201)
-        .expect({
-          message: 'Link resolver registered successfully',
+        .expect(409)
+        .expect((res) => {
+          expect(res.body.statusCode).toBe(409);
+          expect(res.body.message).toContain(
+            'Duplicate responses already exist',
+          );
+          expect(res.body.error).toBe('Conflict');
         });
 
       // Verify that only one link exists after duplicate registration
