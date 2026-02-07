@@ -31,7 +31,7 @@ export class LinkResolutionController {
     type: String,
     name: 'namespace',
     description: 'Namespace',
-    example: 'gs1',
+    example: 'example-identifier-scheme',
   })
   @ApiParam({
     type: String,

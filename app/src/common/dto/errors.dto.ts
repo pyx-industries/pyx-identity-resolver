@@ -11,7 +11,7 @@ export class FieldError {
 
   @ApiProperty({
     example:
-      "Identification key type 'invalid_key_type' is not registered with the namespace 'gs1'",
+      "Identification key type 'invalid_key_type' is not registered with the namespace 'example-identifier-scheme'",
   })
   message?: string;
 
