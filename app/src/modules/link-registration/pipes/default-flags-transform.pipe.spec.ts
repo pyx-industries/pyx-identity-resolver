@@ -38,7 +38,7 @@ describe('DefaultFlagsTransformPipe', () => {
   });
 
   describe('payload with no duplicate defaults', () => {
-    it('should pass unchanged when no defaults are set', () => {
+    it('should promote first active response when no defaults are set', () => {
       const dto = createDto([
         createResponse(),
         createResponse({ linkType: 'gs1:epcis' }),
@@ -46,8 +46,17 @@ describe('DefaultFlagsTransformPipe', () => {
 
       const result = pipe.transform(dto);
 
-      expect(result.responses[0].defaultLinkType).toBe(false);
+      // First active response promoted as default in its scope
+      expect(result.responses[0].defaultLinkType).toBe(true);
+      expect(result.responses[0].defaultIanaLanguage).toBe(true);
+      expect(result.responses[0].defaultContext).toBe(true);
+      expect(result.responses[0].defaultMimeType).toBe(true);
+
+      // Second response promoted in its own linkType scope
       expect(result.responses[1].defaultLinkType).toBe(false);
+      expect(result.responses[1].defaultIanaLanguage).toBe(true);
+      expect(result.responses[1].defaultContext).toBe(true);
+      expect(result.responses[1].defaultMimeType).toBe(true);
     });
 
     it('should pass unchanged when only one response has defaults', () => {
