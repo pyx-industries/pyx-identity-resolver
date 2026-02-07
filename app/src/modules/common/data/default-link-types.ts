@@ -1,3 +1,5 @@
+import { untpLinkTypes } from '../../link-registration/constants/untp-link-types';
+
 export const defaultLinkTypes = {
   activityIdeas: {
     title: 'Activity Ideas',
@@ -267,4 +269,5 @@ export const defaultLinkTypes = {
     description:
       'A link to a description of all the individual items in a packaged item.',
   },
+  ...untpLinkTypes,
 };

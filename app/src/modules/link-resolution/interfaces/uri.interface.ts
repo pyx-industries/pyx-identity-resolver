@@ -1,4 +1,8 @@
 import { LinkContextObject } from '../../link-registration/interfaces/link-set.interface';
+import {
+  EncryptionMethod,
+  UntpAccessRole,
+} from '../../link-registration/constants/untp-enums';
 
 export interface LinkResponse {
   targetUrl: string;
@@ -16,6 +20,9 @@ export interface LinkResponse {
   linkId?: string;
   createdAt?: string;
   updatedAt?: string;
+  encryptionMethod?: EncryptionMethod;
+  accessRole?: UntpAccessRole[];
+  method?: string;
 }
 
 export interface LinkChange {
