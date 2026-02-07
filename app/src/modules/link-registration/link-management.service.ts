@@ -117,7 +117,12 @@ export class LinkManagementService {
       active: doc.active,
       responses: activeResponses as Response[],
     };
-    doc.linkset = constructLinkSetJson(payload, aiCode, attrs);
+    doc.linkset = constructLinkSetJson(
+      payload,
+      aiCode,
+      attrs,
+      doc.versionHistory,
+    );
     doc.linkHeaderText = constructHTTPLink(payload, aiCode, attrs);
   }
 

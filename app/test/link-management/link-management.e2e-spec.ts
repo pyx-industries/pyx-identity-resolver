@@ -1,7 +1,11 @@
 import { HttpStatus } from '@nestjs/common';
+import request from 'supertest';
 import { APP_ROUTE_PREFIX } from '../../src/common/utils/config.utils';
 import { IdentifierDto } from '../../src/modules/identifier-management/dto/identifier.dto';
-import request from 'supertest';
+import {
+  EncryptionMethod,
+  UntpAccessRole,
+} from '../../src/modules/link-registration/constants/untp-enums';
 
 const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
 const environment = process.env.NODE_ENV;
@@ -822,6 +826,149 @@ describe('LinkManagementController (e2e)', () => {
         .set('Authorization', `Bearer ${apiKey}`)
         .query({ namespace: bcNamespace })
         .expect(HttpStatus.OK);
+    });
+  });
+
+  describe('UNTP Linkset Extensions', () => {
+    let dppLinkId: string;
+
+    it('should register a link with UNTP properties', async () => {
+      await request(baseUrl)
+        .post('/resolver')
+        .set(headers)
+        .send({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '09359502000010',
+          itemDescription: 'Test Product',
+          qualifierPath: '/',
+          active: true,
+          responses: [
+            {
+              defaultLinkType: false,
+              defaultMimeType: false,
+              defaultIanaLanguage: false,
+              defaultContext: false,
+              fwqs: false,
+              active: true,
+              linkType: `${gs1}:dpp`,
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Digital Product Passport',
+              targetUrl: 'https://example.com/dpp',
+              mimeType: 'application/json',
+              encryptionMethod: EncryptionMethod.AES256,
+              accessRole: [UntpAccessRole.Customer, UntpAccessRole.Regulator],
+              method: 'POST',
+            },
+          ],
+        })
+        .expect(HttpStatus.CREATED);
+    });
+
+    it('should return UNTP properties when listing links', async () => {
+      const res = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query(listLinksQuery)
+        .expect(HttpStatus.OK);
+
+      const dppLink = res.body.find(
+        (link: any) => link.targetUrl === 'https://example.com/dpp',
+      );
+      expect(dppLink).toBeDefined();
+      expect(dppLink.encryptionMethod).toBe(EncryptionMethod.AES256);
+      expect(dppLink.accessRole).toContain(UntpAccessRole.Customer);
+      expect(dppLink.accessRole).toContain(UntpAccessRole.Regulator);
+      expect(dppLink.method).toBe('POST');
+
+      // Store the linkId for subsequent tests
+      dppLinkId = dppLink.linkId;
+    });
+
+    it('should include UNTP properties in linkset JSON when resolving with linkType=all', async () => {
+      const res = await request(baseUrl)
+        .get(`/${gs1}/01/09359502000010?linkType=all`)
+        .expect(200);
+
+      const linkset = JSON.parse(res.text);
+      expect(linkset.linkset).toBeDefined();
+      expect(Array.isArray(linkset.linkset)).toBe(true);
+
+      const linksetEntry = linkset.linkset[0];
+      const dppKey = Object.keys(linksetEntry).find((key) =>
+        key.includes('dpp'),
+      );
+      expect(dppKey).toBeDefined();
+
+      const dppTargets = linksetEntry[dppKey!];
+      expect(Array.isArray(dppTargets)).toBe(true);
+
+      const dppTarget = dppTargets.find(
+        (target: any) => target.href === 'https://example.com/dpp',
+      );
+      expect(dppTarget).toBeDefined();
+      expect(dppTarget.encryptionMethod).toBe(EncryptionMethod.AES256);
+      expect(dppTarget.accessRole).toEqual([
+        UntpAccessRole.Customer,
+        UntpAccessRole.Regulator,
+      ]);
+      expect(dppTarget.method).toBe('POST');
+    });
+
+    it('should update UNTP properties on a link', async () => {
+      // Update the encryptionMethod
+      await request(baseUrl)
+        .put(`/resolver/links/${dppLinkId}`)
+        .set(headers)
+        .send({ encryptionMethod: EncryptionMethod.None })
+        .expect(HttpStatus.OK);
+
+      // Verify the update
+      const getRes = await request(baseUrl)
+        .get(`/resolver/links/${dppLinkId}`)
+        .set(headers)
+        .expect(HttpStatus.OK);
+
+      expect(getRes.body.encryptionMethod).toBe(EncryptionMethod.None);
+    });
+
+    it('should include predecessor-version in linkset after targetUrl update', async () => {
+      // Update the targetUrl to a new version
+      await request(baseUrl)
+        .put(`/resolver/links/${dppLinkId}`)
+        .set(headers)
+        .send({ targetUrl: 'https://example.com/dpp-v2' })
+        .expect(HttpStatus.OK);
+
+      // Resolve with linkType=all and check for predecessor-version
+      const res = await request(baseUrl)
+        .get(`/${gs1}/01/09359502000010?linkType=all`)
+        .expect(200);
+
+      const linkset = JSON.parse(res.text);
+      const linksetEntry = linkset.linkset[0];
+
+      // Find the dpp link type key
+      const dppKey = Object.keys(linksetEntry).find((key) =>
+        key.includes('dpp'),
+      );
+      expect(dppKey).toBeDefined();
+
+      const dppTargets = linksetEntry[dppKey!];
+      expect(Array.isArray(dppTargets)).toBe(true);
+
+      // Find predecessor entries inside the dpp link type array
+      const predecessors = dppTargets.filter(
+        (entry: any) => entry.rel && entry.rel.includes('predecessor-version'),
+      );
+      expect(predecessors.length).toBeGreaterThanOrEqual(1);
+
+      const oldVersionEntry = predecessors.find(
+        (entry: any) => entry.href === 'https://example.com/dpp',
+      );
+      expect(oldVersionEntry).toBeDefined();
+      expect(oldVersionEntry.rel).toContain('predecessor-version');
     });
   });
 

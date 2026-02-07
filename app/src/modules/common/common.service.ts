@@ -62,7 +62,7 @@ export class CommonService {
 
   private async mapSupportedLinkTypes(): Promise<SupportedLinkType[]> {
     const identifiers = await this.identifierService.getIdentifiers();
-    return Object.keys(identifiers).map((key) => {
+    const identifierLinkTypes = Object.keys(identifiers).map((key) => {
       return {
         namespace:
           identifiers[key].namespaceURI && identifiers[key].namespaceURI !== ''
@@ -76,6 +76,15 @@ export class CommonService {
             : `${this.configService.get('RESOLVER_DOMAIN')}/voc/?show=linktypes`,
       };
     });
+
+    // Include the UNTP link type namespace as a built-in entry
+    identifierLinkTypes.push({
+      namespace: 'https://test.uncefact.org/untp/linkType#',
+      prefix: 'untp:',
+      profile: 'https://untp.unece.org/docs/specification/IdentityResolver',
+    });
+
+    return identifierLinkTypes;
   }
 
   // Get the content of the JSON file
