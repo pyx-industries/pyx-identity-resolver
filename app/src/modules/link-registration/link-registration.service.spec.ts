@@ -22,6 +22,7 @@ describe('LinkRegistrationService', () => {
           useValue: {
             one: jest.fn(),
             save: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
@@ -163,6 +164,215 @@ describe('LinkRegistrationService', () => {
       await expect(service.create(payload)).rejects.toThrow(
         'Missing configuration for RESOLVER_DOMAIN',
       );
+    });
+
+    it('should generate linkIds for each response', async () => {
+      const payload = {
+        namespace: 'testNamespace',
+        identificationKeyType: '01',
+        identificationKey: 'testKey',
+        itemDescription: 'testDescription',
+        qualifierPath: '',
+        active: true,
+        responses: [
+          {
+            targetUrl: 'https://example.com/product',
+            linkType: 'gs1:pip',
+            title: 'Product Info',
+            mimeType: 'text/html',
+            ianaLanguage: 'en',
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultMimeType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+          },
+          {
+            targetUrl: 'https://example.com/safety',
+            linkType: 'gs1:safety',
+            title: 'Safety Info',
+            mimeType: 'text/html',
+            ianaLanguage: 'en',
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: false,
+            defaultMimeType: false,
+            defaultIanaLanguage: false,
+            defaultContext: false,
+          },
+        ],
+      };
+
+      jest
+        .spyOn(service['configService'], 'get')
+        .mockReturnValue('testResolverDomain');
+
+      await service.create(payload);
+
+      const saveCall = (repositoryProvider.save as jest.Mock).mock.calls[0][0];
+      expect(saveCall.responses).toHaveLength(2);
+      expect(saveCall.responses[0].linkId).toBeDefined();
+      expect(saveCall.responses[1].linkId).toBeDefined();
+      expect(saveCall.responses[0].linkId).not.toBe(
+        saveCall.responses[1].linkId,
+      );
+    });
+
+    it('should call writeLinkIndex for each response', async () => {
+      const payload = {
+        namespace: 'testNamespace',
+        identificationKeyType: '01',
+        identificationKey: 'testKey',
+        itemDescription: 'testDescription',
+        qualifierPath: '',
+        active: true,
+        responses: [
+          {
+            targetUrl: 'https://example.com/product',
+            linkType: 'gs1:pip',
+            title: 'Product Info',
+            mimeType: 'text/html',
+            ianaLanguage: 'en',
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultMimeType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+          },
+          {
+            targetUrl: 'https://example.com/safety',
+            linkType: 'gs1:safety',
+            title: 'Safety Info',
+            mimeType: 'text/html',
+            ianaLanguage: 'en',
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: false,
+            defaultMimeType: false,
+            defaultIanaLanguage: false,
+            defaultContext: false,
+          },
+        ],
+      };
+
+      jest
+        .spyOn(service['configService'], 'get')
+        .mockReturnValue('testResolverDomain');
+
+      await service.create(payload);
+
+      // save is called once for the main document + once per response for index entries
+      const saveCalls = (repositoryProvider.save as jest.Mock).mock.calls;
+      const indexCalls = saveCalls.filter(
+        (call) =>
+          typeof call[0].id === 'string' &&
+          call[0].id.includes('_index/links/'),
+      );
+      expect(indexCalls).toHaveLength(2);
+    });
+
+    it('should increment version for existing documents', async () => {
+      const payload = {
+        namespace: 'testNamespace',
+        identificationKeyType: '01',
+        identificationKey: 'testKey',
+        itemDescription: 'testDescription',
+        qualifierPath: '',
+        active: true,
+        responses: [],
+      };
+
+      jest
+        .spyOn(service['configService'], 'get')
+        .mockReturnValue('testResolverDomain');
+
+      jest.spyOn(repositoryProvider, 'one').mockResolvedValue({
+        version: 3,
+        createdAt: '2020-01-01T00:00:00.000Z',
+        responses: [],
+      });
+
+      await service.create(payload);
+
+      const saveCall = (repositoryProvider.save as jest.Mock).mock.calls[0][0];
+      expect(saveCall.version).toBe(4);
+    });
+
+    it('should preserve createdAt from existing documents', async () => {
+      const payload = {
+        namespace: 'testNamespace',
+        identificationKeyType: '01',
+        identificationKey: 'testKey',
+        itemDescription: 'testDescription',
+        qualifierPath: '',
+        active: true,
+        responses: [],
+      };
+
+      jest
+        .spyOn(service['configService'], 'get')
+        .mockReturnValue('testResolverDomain');
+
+      jest.spyOn(repositoryProvider, 'one').mockResolvedValue({
+        version: 1,
+        createdAt: '2020-01-01T00:00:00.000Z',
+        responses: [],
+      });
+
+      await service.create(payload);
+
+      const saveCall = (repositoryProvider.save as jest.Mock).mock.calls[0][0];
+      expect(saveCall.createdAt).toBe('2020-01-01T00:00:00.000Z');
+    });
+
+    it('should clean up old link index entries on upsert', async () => {
+      const payload = {
+        namespace: 'testNamespace',
+        identificationKeyType: '01',
+        identificationKey: 'testKey',
+        itemDescription: 'testDescription',
+        qualifierPath: '',
+        active: true,
+        responses: [
+          {
+            targetUrl: 'https://example.com/product',
+            linkType: 'gs1:pip',
+            title: 'Product Info',
+            mimeType: 'text/html',
+            ianaLanguage: 'en',
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultMimeType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+          },
+        ],
+      };
+
+      jest
+        .spyOn(service['configService'], 'get')
+        .mockReturnValue('testResolverDomain');
+
+      jest.spyOn(repositoryProvider, 'one').mockResolvedValue({
+        version: 1,
+        createdAt: '2020-01-01T00:00:00.000Z',
+        responses: [{ linkId: 'old-link-id-1' }, { linkId: 'old-link-id-2' }],
+      });
+
+      await service.create(payload);
+
+      const deleteCalls = (repositoryProvider.delete as jest.Mock).mock.calls;
+      expect(deleteCalls).toHaveLength(2);
+      expect(deleteCalls[0][0]).toBe('_index/links/old-link-id-1');
+      expect(deleteCalls[1][0]).toBe('_index/links/old-link-id-2');
     });
   });
 });

@@ -6,6 +6,7 @@ import {
   IsBoolean,
   IsIn,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsUrl,
   Matches,
@@ -14,6 +15,16 @@ import {
 import { mockMimeTypes } from '../constants/link-registration.constants';
 
 export class Response {
+  @ApiProperty({
+    description: 'Unique link identifier (server-generated, read-only)',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    readOnly: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  linkId?: string;
+
   @ApiProperty({
     description: 'Default link type',
     example: true,
@@ -44,7 +55,7 @@ export class Response {
 
   @ApiProperty({
     description: 'Link type',
-    example: 'gs1:certificationInfo',
+    example: 'example-identifier-scheme:certificationInfo',
   })
   @IsString()
   linkType: string;
@@ -109,7 +120,7 @@ export class Response {
 export class CreateLinkRegistrationDto {
   @ApiProperty({
     description: 'Namespace',
-    example: 'gs1',
+    example: 'example-identifier-scheme',
   })
   @IsString()
   @IsNotEmpty()
@@ -165,7 +176,7 @@ export class CreateLinkRegistrationDto {
         defaultContext: true,
         fwqs: false,
         active: true,
-        linkType: 'gs1:certificationInfo',
+        linkType: 'example-identifier-scheme:certificationInfo',
         ianaLanguage: 'en',
         context: 'au',
         title: 'Certification Information',
