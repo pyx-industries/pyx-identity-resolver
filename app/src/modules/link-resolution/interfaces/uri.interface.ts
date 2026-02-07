@@ -23,6 +23,9 @@ export interface LinkChange {
   action: 'created' | 'updated' | 'soft_deleted' | 'hard_deleted';
   previousTargetUrl?: string;
   previousLinkType?: string;
+  previousMimeType?: string;
+  previousIanaLanguage?: string;
+  previousContext?: string;
 }
 
 export interface VersionHistoryEntry {
