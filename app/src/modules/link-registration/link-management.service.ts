@@ -247,7 +247,20 @@ export class LinkManagementService {
     );
     const objectName = getObjectName(query as any, aiCode);
     const doc = await this.fetchDocument(objectName);
-    return doc.responses;
+
+    let responses = doc.responses;
+    if (query.linkType) {
+      responses = responses.filter((r) => r.linkType === query.linkType);
+    }
+    if (query.mimeType) {
+      responses = responses.filter((r) => r.mimeType === query.mimeType);
+    }
+    if (query.ianaLanguage) {
+      responses = responses.filter(
+        (r) => r.ianaLanguage === query.ianaLanguage,
+      );
+    }
+    return responses;
   }
 
   /**

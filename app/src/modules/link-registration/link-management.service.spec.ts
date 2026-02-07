@@ -182,6 +182,157 @@ describe('LinkManagementService', () => {
         }),
       ).rejects.toThrow(GeneralErrorException);
     });
+
+    describe('filter support', () => {
+      const multiResponseDoc = {
+        ...mockDocument,
+        responses: [
+          {
+            linkId: 'resp1',
+            targetUrl: 'https://example.com/product',
+            linkType: 'gs1:pip',
+            title: 'Product Information',
+            mimeType: 'text/html',
+            ianaLanguage: 'en',
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+            defaultMimeType: true,
+            createdAt: '2024-01-01T00:00:00.000Z',
+            updatedAt: '2024-01-01T00:00:00.000Z',
+          },
+          {
+            linkId: 'resp2',
+            targetUrl: 'https://example.com/product.json',
+            linkType: 'gs1:pip',
+            title: 'Product Information (JSON)',
+            mimeType: 'application/json',
+            ianaLanguage: 'en',
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: false,
+            defaultIanaLanguage: false,
+            defaultContext: false,
+            defaultMimeType: false,
+            createdAt: '2024-01-01T00:00:00.000Z',
+            updatedAt: '2024-01-01T00:00:00.000Z',
+          },
+          {
+            linkId: 'resp3',
+            targetUrl: 'https://example.com/certification',
+            linkType: 'gs1:certificationInfo',
+            title: 'Certification Info',
+            mimeType: 'text/html',
+            ianaLanguage: 'fr',
+            context: 'fr',
+            active: true,
+            fwqs: false,
+            defaultLinkType: false,
+            defaultIanaLanguage: false,
+            defaultContext: false,
+            defaultMimeType: false,
+            createdAt: '2024-01-01T00:00:00.000Z',
+            updatedAt: '2024-01-01T00:00:00.000Z',
+          },
+        ],
+      };
+
+      const baseQuery = {
+        namespace: 'gs1',
+        identificationKeyType: 'gtin',
+        identificationKey: '09359502000010',
+        qualifierPath: '/',
+      };
+
+      it('should filter responses by linkType', async () => {
+        repositoryProvider.one.mockResolvedValue({
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
+        });
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          linkType: 'gs1:pip',
+        });
+
+        expect(result).toHaveLength(2);
+        expect(result.every((r) => r.linkType === 'gs1:pip')).toBe(true);
+        expect(result.map((r) => r.linkId).sort()).toEqual(
+          ['resp1', 'resp2'].sort(),
+        );
+      });
+
+      it('should filter responses by mimeType', async () => {
+        repositoryProvider.one.mockResolvedValue({
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
+        });
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          mimeType: 'text/html',
+        });
+
+        expect(result).toHaveLength(2);
+        expect(result.every((r) => r.mimeType === 'text/html')).toBe(true);
+        expect(result.map((r) => r.linkId).sort()).toEqual(
+          ['resp1', 'resp3'].sort(),
+        );
+      });
+
+      it('should filter responses by ianaLanguage', async () => {
+        repositoryProvider.one.mockResolvedValue({
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
+        });
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          ianaLanguage: 'fr',
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0].linkId).toBe('resp3');
+        expect(result[0].ianaLanguage).toBe('fr');
+      });
+
+      it('should apply multiple filters simultaneously', async () => {
+        repositoryProvider.one.mockResolvedValue({
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
+        });
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          linkType: 'gs1:pip',
+          mimeType: 'text/html',
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0].linkId).toBe('resp1');
+        expect(result[0].linkType).toBe('gs1:pip');
+        expect(result[0].mimeType).toBe('text/html');
+      });
+
+      it('should return empty array when no responses match filter', async () => {
+        repositoryProvider.one.mockResolvedValue({
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
+        });
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          linkType: 'gs1:nonexistent',
+        });
+
+        expect(result).toHaveLength(0);
+        expect(result).toEqual([]);
+      });
+    });
   });
 
   describe('getLink', () => {

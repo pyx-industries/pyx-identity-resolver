@@ -163,6 +163,78 @@ describe('LinkManagementController (e2e)', () => {
       expect(link).toHaveProperty('active');
     });
 
+    it('should filter responses by linkType', async () => {
+      const res = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({ ...listLinksQuery, linkType: `${gs1}:certificationInfo` })
+        .expect(HttpStatus.OK);
+
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThanOrEqual(1);
+      res.body.forEach((link: any) => {
+        expect(link.linkType).toBe(`${gs1}:certificationInfo`);
+      });
+    });
+
+    it('should filter responses by mimeType', async () => {
+      const res = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({ ...listLinksQuery, mimeType: 'text/html' })
+        .expect(HttpStatus.OK);
+
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThanOrEqual(1);
+      res.body.forEach((link: any) => {
+        expect(link.mimeType).toBe('text/html');
+      });
+    });
+
+    it('should filter responses by ianaLanguage', async () => {
+      const res = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({ ...listLinksQuery, ianaLanguage: 'en' })
+        .expect(HttpStatus.OK);
+
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThanOrEqual(1);
+      res.body.forEach((link: any) => {
+        expect(link.ianaLanguage).toBe('en');
+      });
+    });
+
+    it('should return narrowed results when multiple filters are applied', async () => {
+      const res = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({
+          ...listLinksQuery,
+          linkType: `${gs1}:certificationInfo`,
+          mimeType: 'application/json',
+        })
+        .expect(HttpStatus.OK);
+
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThanOrEqual(1);
+      res.body.forEach((link: any) => {
+        expect(link.linkType).toBe(`${gs1}:certificationInfo`);
+        expect(link.mimeType).toBe('application/json');
+      });
+    });
+
+    it('should return empty array when filter matches no responses', async () => {
+      const res = await request(baseUrl)
+        .get('/resolver/links')
+        .set(headers)
+        .query({ ...listLinksQuery, linkType: 'nonexistent:linkType' })
+        .expect(HttpStatus.OK);
+
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(0);
+    });
+
     it('should default qualifierPath to / when not provided', async () => {
       const res = await request(baseUrl)
         .get('/resolver/links')

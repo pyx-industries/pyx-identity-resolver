@@ -57,6 +57,27 @@ export class LinkManagementController {
     type: String,
     example: '/10/12345678901234567890',
   })
+  @ApiQuery({
+    name: 'linkType',
+    required: false,
+    type: String,
+    description: 'Filter by link type',
+    example: 'example-identifier-scheme:certificationInfo',
+  })
+  @ApiQuery({
+    name: 'mimeType',
+    required: false,
+    type: String,
+    description: 'Filter by MIME type',
+    example: 'application/json',
+  })
+  @ApiQuery({
+    name: 'ianaLanguage',
+    required: false,
+    type: String,
+    description: 'Filter by IANA language tag',
+    example: 'en',
+  })
   @ApiOkResponse({
     status: 200,
     description: 'Links retrieved successfully',

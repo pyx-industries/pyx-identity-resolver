@@ -51,6 +51,30 @@ export class ListLinksQueryDto {
       'qualifierPath must match the pattern /aiCode/value or /aiCode/value/aiCode/value...',
   })
   qualifierPath?: string = '/';
+
+  @ApiPropertyOptional({
+    description: 'Filter responses by link type',
+    example: 'example-identifier-scheme:certificationInfo',
+  })
+  @IsOptional()
+  @IsString()
+  linkType?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter responses by MIME type',
+    example: 'application/json',
+  })
+  @IsOptional()
+  @IsString()
+  mimeType?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter responses by IANA language tag',
+    example: 'en',
+  })
+  @IsOptional()
+  @IsString()
+  ianaLanguage?: string;
 }
 
 /**
