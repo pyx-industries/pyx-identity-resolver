@@ -169,7 +169,7 @@ describe('LinkResolutionController (e2e)', () => {
         )
         .expect(
           'Link',
-          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
+          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
         );
     });
 
@@ -214,7 +214,7 @@ describe('LinkResolutionController (e2e)', () => {
         )
         .expect(
           'Link',
-          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
+          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
         );
     });
 
@@ -229,7 +229,7 @@ describe('LinkResolutionController (e2e)', () => {
         )
         .expect(
           'Link',
-          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
+          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
         );
     });
 
@@ -243,7 +243,7 @@ describe('LinkResolutionController (e2e)', () => {
         )
         .expect(
           'Link',
-          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
+          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
         );
     });
 
@@ -257,7 +257,7 @@ describe('LinkResolutionController (e2e)', () => {
         )
         .expect(
           'Link',
-          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
+          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
         );
     });
 
@@ -267,7 +267,7 @@ describe('LinkResolutionController (e2e)', () => {
         .expect(200)
         .expect(
           'Link',
-          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
+          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
         );
 
       expect(JSON.parse(res.text).linkset).not.toBeNull();
@@ -299,7 +299,7 @@ describe('LinkResolutionController (e2e)', () => {
         )
         .expect(
           'Link',
-          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
+          `<https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <https://example-json.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="e2e-test-mock-gs1:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/e2e-test-mock-gs1/01/09359502000041>; rel="owl:sameAs"`,
         );
     });
   });
