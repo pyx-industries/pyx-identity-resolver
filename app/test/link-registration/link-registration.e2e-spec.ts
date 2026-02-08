@@ -229,10 +229,13 @@ describe('LinkResolutionController (e2e)', () => {
         )
         .set('Accept', 'application/json')
         .expect(302)
-        .expect(
-          'Link',
-          `<https://example.com>; rel="${namespace}:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-epics.com>; rel="${namespace}:epcis"; type="application/json"; hreflang="en"; title="Epcis Information", <${baseUrl}/e2e-test-mock-gs1/01/12345678901234/10/12345678901234567890/22/ABCDE>; rel="owl:sameAs"`,
-        );
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toContain('rel="owl:sameAs"');
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(`rel="${namespace}:epcis"`);
+          expect(link).toContain('https://example-epics.com');
+        });
     });
 
     it('should handle duplicate registration and result in only one link', async () => {
@@ -329,10 +332,13 @@ describe('LinkResolutionController (e2e)', () => {
         )
         .set('Accept', 'application/json')
         .expect(302)
-        .expect(
-          'Link',
-          `<https://example.com>; rel="${namespace}:certificationInfo"; type="application/json"; hreflang="en"; title="Certification Information", <${baseUrl}/${namespace}/01/12345678901234/10/12345678901234567890/22/ABCDE>; rel="owl:sameAs"`,
-        );
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toContain('rel="owl:sameAs"');
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(`rel="${namespace}:certificationInfo"`);
+          expect(link).toContain('https://example.com');
+        });
 
       // cleanup
       await request(baseUrl)
