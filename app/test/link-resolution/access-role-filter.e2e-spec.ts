@@ -268,7 +268,9 @@ describe('AccessRoleFilter (e2e)', () => {
 
     it('linkType=all with full URI accessRole returns public and customer only', async () => {
       const res = await request(baseUrl)
-        .get(`/${ns}/01/09520000000014?linkType=all&accessRole=untp:accessRole%23Customer`)
+        .get(
+          `/${ns}/01/09520000000014?linkType=all&accessRole=untp:accessRole%23Customer`,
+        )
         .expect(200);
 
       const linkset = JSON.parse(res.text).linkset;
