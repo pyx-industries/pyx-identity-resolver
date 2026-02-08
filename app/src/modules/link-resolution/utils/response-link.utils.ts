@@ -16,6 +16,7 @@ export const responseResolvedLink = (
   } else if (checkRequestAccepts(req, 'linkset')) {
     res
       .type('application/linkset+json')
+      .set('X-Content-Type-Options', 'nosniff')
       .status(200)
       .send(resolvedLink.linkHeaderTextFull);
   } else if (resolvedLink.targetUrl) {

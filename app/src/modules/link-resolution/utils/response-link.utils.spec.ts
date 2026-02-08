@@ -11,6 +11,7 @@ describe('responseResolvedLink', () => {
       status: jest.fn().mockReturnThis(),
       redirect: jest.fn(),
       setHeader: jest.fn(),
+      set: jest.fn().mockReturnThis(),
       json: jest.fn(),
       type: jest.fn().mockReturnThis(),
     };
@@ -180,6 +181,10 @@ describe('responseResolvedLink', () => {
     responseResolvedLink(mockResponse, mockRequest, resolvedLink);
 
     expect(mockResponse.type).toHaveBeenCalledWith('application/linkset+json');
+    expect(mockResponse.set).toHaveBeenCalledWith(
+      'X-Content-Type-Options',
+      'nosniff',
+    );
     expect(mockResponse.status).toHaveBeenCalledWith(200);
     expect(mockResponse.send).toHaveBeenCalledWith('full-unbounded-header');
   });
