@@ -38,6 +38,11 @@ describe('LinkResolutionService', () => {
                 return 'http://localhost:3002/api/1.0.0';
               return undefined;
             }),
+            getOrThrow: jest.fn((key: string) => {
+              if (key === 'RESOLVER_DOMAIN')
+                return 'http://localhost:3002/api/1.0.0';
+              throw new Error(`Missing config key: ${key}`);
+            }),
           },
         },
         {
@@ -346,6 +351,67 @@ describe('LinkResolutionService', () => {
         identifiers: { primary: { id: '123', qualifier: '01' } },
         descriptiveAttributes: {
           linkType: 'idr:dpp',
+          accessRole: 'customer',
+        },
+      };
+
+      mockRepository.one.mockReturnValue(
+        JSON.parse(JSON.stringify(noPublicUri)),
+      );
+
+      await expect(service.resolve(identifierParams)).rejects.toThrow(
+        'General Error Exception',
+      );
+    });
+
+    it('should return filtered linkset when linkType is all with accessRole', async () => {
+      const identifierParams: LinkResolutionDto = {
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {
+          linkType: 'all',
+          accessRole: 'customer',
+        },
+      };
+
+      mockRepository.one.mockReturnValue(
+        JSON.parse(JSON.stringify(baseMockUri)),
+      );
+      const result = await service.resolve(identifierParams);
+
+      // linkType=all returns a rebuilt linkset with only public + customer responses
+      expect(result.data.linkset[0]).toBeDefined();
+      expect(result.data.linkset[0].anchor).toBeDefined();
+      expect(result.mimeType).toBe('application/json');
+    });
+
+    it('should throw when linkType is all and accessRole filters all responses', async () => {
+      const noPublicUri: Uri = {
+        ...baseMockUri,
+        responses: [
+          {
+            targetUrl: 'http://regulator.com',
+            title: 'Regulator Only',
+            linkType: 'idr:dpp',
+            ianaLanguage: 'en',
+            context: 'us',
+            mimeType: 'application/json',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+            defaultMimeType: true,
+            accessRole: ['untp:accessRole#Regulator'],
+          },
+        ],
+      };
+
+      const identifierParams: LinkResolutionDto = {
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {
+          linkType: 'all',
           accessRole: 'customer',
         },
       };

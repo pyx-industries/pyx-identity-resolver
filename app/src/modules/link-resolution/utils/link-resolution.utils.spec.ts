@@ -1,5 +1,9 @@
-import { processUri } from './link-resolution.utils';
+import {
+  processUri,
+  LinksetReconstructionContext,
+} from './link-resolution.utils';
 import { LinkResolutionDto } from '../dto/link-resolution.dto';
+import { ResolvedLink } from '../interfaces/link-resolution.interface';
 import { Uri } from '../interfaces/uri.interface';
 
 describe('Link Resolution Utils', () => {
@@ -336,6 +340,118 @@ describe('Link Resolution Utils', () => {
       const result = processUri(uri, identifierParams);
 
       expect(result).toBeUndefined();
+    });
+
+    describe('processUri with reconstructionContext', () => {
+      const reconstructionContext: LinksetReconstructionContext = {
+        identificationKeyCode: '01',
+        resolverDomain: 'http://localhost:3002/api/1.0.0',
+        linkTypeVocDomain: 'http://localhost:3002/api/1.0.0/voc',
+      };
+
+      const expectedRebuiltAnchor =
+        'http://localhost:3002/api/1.0.0/idr/01/9359502000041';
+
+      it('should rebuild linkset from responses when linkType is all', () => {
+        const identifierParams: LinkResolutionDto = {
+          namespace: 'idr',
+          identifiers: {
+            primary: {
+              id: '9359502000041',
+              qualifier: 'gtin',
+            },
+          },
+          descriptiveAttributes: {
+            linkType: 'all',
+          },
+        };
+
+        const result = processUri(uri, identifierParams, reconstructionContext);
+
+        expect(result).toBeDefined();
+        expect(result.mimeType).toBe('application/json');
+        expect(result.data.linkset[0].anchor).toBe(expectedRebuiltAnchor);
+        // The rebuilt anchor should differ from the pre-stored one
+        expect(result.data.linkset[0].anchor).not.toBe(uri.linkset.anchor);
+      });
+
+      it('should return resolved link with rebuilt linkset for a specific linkType', () => {
+        const identifierParams: LinkResolutionDto = {
+          namespace: 'idr',
+          identifiers: {
+            primary: {
+              id: '9359502000041',
+              qualifier: 'gtin',
+            },
+          },
+          descriptiveAttributes: {
+            linkType: 'idr:certificationInfo',
+            mimeTypes: ['application/json'],
+            ianaLanguageContexts: [
+              {
+                ianaLanguage: 'en',
+                context: 'au',
+              },
+            ],
+          },
+        };
+
+        const result = processUri(
+          uri,
+          identifierParams,
+          reconstructionContext,
+        ) as ResolvedLink;
+
+        expect(result).toBeDefined();
+        expect(result.targetUrl).toBe(uri.responses[0].targetUrl);
+        expect(result.mimeType).toBe(uri.responses[0].mimeType);
+        expect(result.data.linkset[0].anchor).toBe(expectedRebuiltAnchor);
+        // The rebuilt anchor should differ from the pre-stored one
+        expect(result.data.linkset[0].anchor).not.toBe(uri.linkset.anchor);
+      });
+
+      it('should return undefined when linkType is all and responses are empty', () => {
+        uri.responses = [];
+        const identifierParams: LinkResolutionDto = {
+          namespace: 'idr',
+          identifiers: {
+            primary: {
+              id: '9359502000041',
+              qualifier: 'gtin',
+            },
+          },
+          descriptiveAttributes: {
+            linkType: 'all',
+          },
+        };
+
+        const result = processUri(uri, identifierParams, reconstructionContext);
+
+        expect(result).toBeUndefined();
+      });
+
+      it('should return undefined when linkType is all and all responses are inactive', () => {
+        uri.responses = uri.responses.map((response) => ({
+          ...response,
+          active: false,
+        }));
+        const identifierParams: LinkResolutionDto = {
+          namespace: 'idr',
+          identifiers: {
+            primary: {
+              id: '9359502000041',
+              qualifier: 'gtin',
+            },
+          },
+          descriptiveAttributes: {
+            linkType: 'all',
+          },
+        };
+
+        const result = processUri(uri, identifierParams, reconstructionContext);
+
+        expect(result).toBeUndefined();
+      });
     });
   });
 });

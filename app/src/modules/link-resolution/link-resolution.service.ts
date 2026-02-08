@@ -53,7 +53,7 @@ export class LinkResolutionService {
         };
 
         const resolverDomain =
-          this.configService.get<string>('RESOLVER_DOMAIN');
+          this.configService.getOrThrow<string>('RESOLVER_DOMAIN');
         const linkTypeVocDomain =
           identifier.namespaceURI && identifier.namespaceURI !== ''
             ? identifier.namespaceURI

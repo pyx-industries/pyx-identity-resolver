@@ -49,12 +49,12 @@ const buildLinksetFromResponses = (
 /**
  * Process the URI and return the appropriate response or linkset.
  *
- * @param uri
- * @param identifierParams
+ * @param uri - the URI document containing responses and pre-built linkset
+ * @param identifierParams - request parameters including linkType and descriptive attributes
  * @param reconstructionContext - when provided, the linkset and Link header are
  *   rebuilt from the URI's responses rather than using the pre-stored values.
  *   This is necessary after access-role filtering has narrowed the response set.
- * @returns LinkResponse | LinkContextObject | undefined
+ * @returns ResolvedLink or undefined if no matching response is found
  */
 export const processUri = (
   uri: Uri,
@@ -84,9 +84,10 @@ export const processUri = (
  * 7. linkType
  * 8. defaultLinkType
  *
- * @param uri
- * @param identifierParams
- * @returns LinkResponse | undefined
+ * @param uri - the URI document containing responses and pre-built linkset
+ * @param identifierParams - request parameters including linkType and descriptive attributes
+ * @param reconstructionContext - when provided, the linkset is rebuilt from responses
+ * @returns ResolvedLink or undefined if no matching response is found
  */
 const processUriForSpecificLinkType = (
   uri: Uri,
@@ -150,15 +151,19 @@ const processUriForSpecificLinkType = (
 /**
  * Process the URI when request linkType=all.
  *
- * @param uri
- * @param identifierParams
- * @returns LinkSet
+ * @param uri - the URI document containing responses and pre-built linkset
+ * @param reconstructionContext - when provided, the linkset is rebuilt from responses
+ * @returns ResolvedLink or undefined if no responses or linkset available
  */
 const processUriForLinkTypeAll = (
   uri: Uri,
   reconstructionContext?: LinksetReconstructionContext,
 ) => {
   if (reconstructionContext) {
+    const activeResponses = uri.responses.filter((r) => r.active);
+    if (activeResponses.length === 0) {
+      return undefined;
+    }
     const { linkset, linkHeaderText } = buildLinksetFromResponses(
       uri,
       reconstructionContext,
