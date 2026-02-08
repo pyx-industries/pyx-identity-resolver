@@ -100,10 +100,12 @@ export class LinkRegistrationService {
       ...payload,
       responses: payload.responses.filter((r) => r.active !== false),
     };
-    const linkset = constructLinkSetJson(activePayload, aiCode, {
-      resolverDomain,
-      linkTypeVocDomain,
-    });
+    const linkset = constructLinkSetJson(
+      activePayload,
+      aiCode,
+      { resolverDomain, linkTypeVocDomain },
+      versionHistory,
+    );
     const linkHeaderText = constructHTTPLink(activePayload, aiCode, {
       resolverDomain,
       linkTypeVocDomain,

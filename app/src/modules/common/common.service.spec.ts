@@ -83,6 +83,11 @@ describe('CommonService Success Cases', () => {
           prefix: 'example:',
           profile: `${RESOLVER_DOMAIN}/voc/?show=linktypes`,
         },
+        {
+          namespace: 'https://test.uncefact.org/untp/linkType#',
+          prefix: 'untp:',
+          profile: 'https://untp.unece.org/docs/specification/IdentityResolver',
+        },
       ],
       supportedPrimaryKeys: ['all'],
     });
@@ -129,6 +134,11 @@ describe('CommonService Success Cases', () => {
           namespace: 'http://integrity-system.org/',
           prefix: 'integrity-system:',
           profile: 'http://integrity-system.org/?show=linktypes',
+        },
+        {
+          namespace: 'https://test.uncefact.org/untp/linkType#',
+          prefix: 'untp:',
+          profile: 'https://untp.unece.org/docs/specification/IdentityResolver',
         },
       ],
       supportedPrimaryKeys: ['all'],

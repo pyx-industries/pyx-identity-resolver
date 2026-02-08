@@ -7,6 +7,7 @@ import {
   LinkContextObject,
   LinkTargetObject,
 } from '../interfaces/link-set.interface';
+import { VersionHistoryEntry } from '../interfaces/versioned-uri.interface';
 
 export const constructHTTPLink = (
   uri: CreateLinkRegistrationDto,
@@ -24,11 +25,13 @@ export const constructLinkSetJson = (
   uri: CreateLinkRegistrationDto,
   identificationKeyCode: string,
   attrs: { resolverDomain: string; linkTypeVocDomain: string },
+  versionHistory?: VersionHistoryEntry[],
 ): LinkContextObject => {
   const linkContextObject = constructLinkContextObject(
     uri,
     identificationKeyCode,
     attrs,
+    versionHistory,
   );
   return linkContextObject;
 };
@@ -39,12 +42,14 @@ export const constructLinkSetJson = (
  * @param uri
  * @param identificationKeyCode
  * @param attrs { resolverDomain: string; linkTypeVocDomain: string }
+ * @param versionHistory Optional version history for predecessor-version entries
  * @returns LinkContextObject
  */
 const constructLinkContextObject = (
   uri: CreateLinkRegistrationDto,
   identificationKeyCode: string,
   attrs: { resolverDomain: string; linkTypeVocDomain: string },
+  versionHistory?: VersionHistoryEntry[],
 ): LinkContextObject => {
   const linkContextObject: LinkContextObject = {
     anchor: buildOriginalRequest(uri, identificationKeyCode, attrs),
@@ -53,6 +58,7 @@ const constructLinkContextObject = (
   const linkTargetObjects = constructLinkTargetObjects(
     uri.responses,
     attrs.linkTypeVocDomain,
+    versionHistory,
   );
   return { ...linkContextObject, ...linkTargetObjects };
 };
@@ -61,13 +67,15 @@ const constructLinkContextObject = (
  * The function constructs the link target objects for the extension relation types.
  * @param responses
  * @param linkTypeVocDomain
- * @returns Record<string, LinkTargetObject>
+ * @param versionHistory Optional version history for predecessor-version entries
+ * @returns Record<string, LinkTargetObject[]>
  *
  */
 const constructLinkTargetObjects = (
   responses: Response[],
   linkTypeVocDomain: string,
-): Record<string, LinkTargetObject> => {
+  versionHistory?: VersionHistoryEntry[],
+): Record<string, LinkTargetObject[]> => {
   const sortedResponses = postprocessResponses(responses);
 
   //   Group responses by linkType
@@ -76,47 +84,106 @@ const constructLinkTargetObjects = (
     (res) => res.linkType,
   ) as Record<string, Response[]>;
 
-  return Object.values(groupedResponses).reduce((acc, responses) => {
-    const response = responses[0];
-    const key = constructExtensionRelationType(
-      linkTypeVocDomain,
-      response.linkType,
-    );
+  const result: Record<string, LinkTargetObject[]> = Object.values(
+    groupedResponses,
+  ).reduce(
+    (acc, responses) => {
+      const response = responses[0];
+      const key = constructExtensionRelationType(
+        linkTypeVocDomain,
+        response.linkType,
+      );
 
-    // Group responses by mimeType, targetUrl, and context
-    const groupResponsesByMimeTypeTargetUrlAndContext = _.groupBy(
-      responses,
-      (res) => `${res.targetUrl}-${res.mimeType}-${res.context}`,
-    );
+      // Group responses by mimeType, targetUrl, and context
+      const groupResponsesByMimeTypeTargetUrlAndContext = _.groupBy(
+        responses,
+        (res) => `${res.targetUrl}-${res.mimeType}-${res.context}`,
+      );
 
-    acc[key] = [];
+      acc[key] = [];
 
-    // Construct the link target objects
-    Object.values(groupResponsesByMimeTypeTargetUrlAndContext).map(
-      (groupedResponses: any) => {
-        const firstGroupedResponse = groupedResponses[0];
-        const href = firstGroupedResponse.targetUrl;
-        const type =
-          firstGroupedResponse.mimeType !== 'xx'
-            ? firstGroupedResponse.mimeType
-            : '';
-        const title = firstGroupedResponse.title;
+      // Construct the link target objects
+      Object.values(groupResponsesByMimeTypeTargetUrlAndContext).map(
+        (groupedResponses: any) => {
+          const firstGroupedResponse = groupedResponses[0];
+          const href = firstGroupedResponse.targetUrl;
+          const type =
+            firstGroupedResponse.mimeType !== 'xx'
+              ? firstGroupedResponse.mimeType
+              : '';
+          const title = firstGroupedResponse.title;
 
-        let titles = groupedResponses
-          .filter((res) => res.ianaLanguage && res.ianaLanguage !== 'xx')
-          .map((res) => ({ value: res.title, language: res.ianaLanguage }));
+          let titles = groupedResponses
+            .filter((res) => res.ianaLanguage && res.ianaLanguage !== 'xx')
+            .map((res) => ({ value: res.title, language: res.ianaLanguage }));
 
-        // Remove duplicates on language
-        titles = Object.values(
-          _.groupBy(titles, (title) => title.language),
-        ).map((title) => title[0]);
-        const hreflang = titles.map((title) => title.language);
+          // Remove duplicates on language
+          titles = Object.values(
+            _.groupBy(titles, (title) => title.language),
+          ).map((title) => title[0]);
+          const hreflang = titles.map((title) => title.language);
 
-        acc[key].push({ href, title, type, hreflang, 'title*': titles });
-      },
-    );
-    return acc;
-  }, {});
+          const linkTarget: LinkTargetObject = {
+            href,
+            title,
+            type,
+            hreflang,
+            'title*': titles,
+          };
+
+          if (firstGroupedResponse.encryptionMethod) {
+            linkTarget.encryptionMethod = firstGroupedResponse.encryptionMethod;
+          }
+          if (firstGroupedResponse.accessRole?.length > 0) {
+            linkTarget.accessRole = firstGroupedResponse.accessRole;
+          }
+          if (firstGroupedResponse.method) {
+            linkTarget.method = firstGroupedResponse.method;
+          }
+
+          acc[key].push(linkTarget);
+        },
+      );
+
+      // Add predecessor-version entries for responses in this link type group
+      if (versionHistory?.length) {
+        for (const response of responses) {
+          const linkId = (response as any).linkId;
+          if (!linkId) continue;
+
+          for (const entry of versionHistory) {
+            for (const change of entry.changes) {
+              if (change.linkId !== linkId || !change.previousTargetUrl)
+                continue;
+
+              const prevMimeType = change.previousMimeType ?? response.mimeType;
+              const prevIanaLanguage =
+                change.previousIanaLanguage ?? response.ianaLanguage;
+
+              acc[key].push({
+                href: change.previousTargetUrl,
+                rel: ['predecessor-version'],
+                title: response.title,
+                type: prevMimeType !== 'xx' ? prevMimeType : '',
+                hreflang: [prevIanaLanguage],
+                'title*': [
+                  {
+                    value: response.title,
+                    language: prevIanaLanguage,
+                  },
+                ],
+              });
+            }
+          }
+        }
+      }
+
+      return acc;
+    },
+    {} as Record<string, LinkTargetObject[]>,
+  );
+
+  return result;
 };
 
 /**
