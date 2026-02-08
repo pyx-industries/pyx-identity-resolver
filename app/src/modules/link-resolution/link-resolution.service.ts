@@ -32,10 +32,20 @@ export class LinkResolutionService {
       'LINK_HEADER_MAX_SIZE',
       '8192',
     );
-    const parsed = parseInt(rawMaxSize, 10);
-    if (isNaN(parsed) || parsed <= 0) {
+    if (!/^\d+$/.test(rawMaxSize)) {
       throw new Error(
-        `Invalid LINK_HEADER_MAX_SIZE configuration: '${rawMaxSize}'. Must be a positive integer.`,
+        `Invalid LINK_HEADER_MAX_SIZE configuration: '${rawMaxSize}'. Must be a positive integer (digits only).`,
+      );
+    }
+    const parsed = parseInt(rawMaxSize, 10);
+    if (parsed <= 0) {
+      throw new Error(
+        `Invalid LINK_HEADER_MAX_SIZE configuration: '${rawMaxSize}'. Must be greater than 0.`,
+      );
+    }
+    if (parsed > 1048576) {
+      this.logger.warn(
+        `LINK_HEADER_MAX_SIZE is very large (${parsed} bytes). Recommended max: 65536 (64KB).`,
       );
     }
     this.linkHeaderMaxSize = parsed;
@@ -58,12 +68,15 @@ export class LinkResolutionService {
     if (uriWithId && uriWithId.active) {
       const accessRole = identifierParams.descriptiveAttributes?.accessRole;
 
-      // Progressive cleanup: strip stale linkHeaderText field
+      // Progressive cleanup: strip stale linkHeaderText field from documents
+      // written before query-time header construction was introduced. This
+      // cleanup can be removed once all documents have been accessed at least
+      // once, or via a migration script.
       if ((uriWithId as any).linkHeaderText !== undefined) {
         const cleanedDoc = { ...uriWithId, id };
         delete (cleanedDoc as any).linkHeaderText;
         this.repositoryProvider.save(cleanedDoc).catch((err) => {
-          this.logger.error(
+          this.logger.warn(
             `Failed to strip stale linkHeaderText from document: ${id}`,
             err instanceof Error ? err.stack : err,
           );

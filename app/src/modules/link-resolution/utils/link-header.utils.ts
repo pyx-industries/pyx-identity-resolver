@@ -7,8 +7,9 @@ const logger = new Logger('LinkHeaderUtils');
 /**
  * Build the canonical URL for a resolved identifier.
  *
- * Mirrors the logic from `buildOriginalRequest` in link-set.utils.ts,
- * but accepts a {@link ResolutionContext} instead of raw URI + attrs.
+ * Duplicates the URL construction logic from `buildOriginalRequest` in
+ * link-set.utils.ts but accepts a {@link ResolutionContext} instead of
+ * raw URI + attrs. If URL construction logic changes, both must be updated.
  */
 export const buildCanonicalUrl = (ctx: ResolutionContext): string =>
   `${ctx.resolverDomain}/${ctx.namespace}/${ctx.identificationKeyCode}/${ctx.identificationKey}${ctx.qualifierPath === '/' ? '' : ctx.qualifierPath}`;
