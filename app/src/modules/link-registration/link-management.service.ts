@@ -17,10 +17,7 @@ import {
 import { ListLinksQueryDto, UpdateLinkDto } from './dto/link-management.dto';
 import { VersionedUri, LinkChange } from './interfaces/versioned-uri.interface';
 import { LinkResponse } from '../link-resolution/interfaces/uri.interface';
-import {
-  constructHTTPLink,
-  constructLinkSetJson,
-} from './utils/link-set.utils';
+import { constructLinkSetJson } from './utils/link-set.utils';
 import { getObjectName } from './utils/link-registration.utils';
 import { convertAICode } from '../shared/utils/uri.utils';
 import {
@@ -99,7 +96,7 @@ export class LinkManagementService {
   }
 
   /**
-   * Reconstructs linkset and linkHeaderText from a document.
+   * Reconstructs linkset from a document.
    * Used after any mutation to keep the stored linkset in sync.
    */
   private reconstructLinkset(
@@ -123,7 +120,6 @@ export class LinkManagementService {
       attrs,
       doc.versionHistory,
     );
-    doc.linkHeaderText = constructHTTPLink(payload, aiCode, attrs);
   }
 
   /**

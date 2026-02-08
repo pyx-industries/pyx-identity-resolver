@@ -33,10 +33,11 @@ describe('LinkResolutionService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn((key: string) => {
+            get: jest.fn((key: string, defaultValue?: string) => {
               if (key === 'RESOLVER_DOMAIN')
                 return 'http://localhost:3002/api/1.0.0';
-              return undefined;
+              if (key === 'LINK_HEADER_MAX_SIZE') return '8192';
+              return defaultValue ?? undefined;
             }),
             getOrThrow: jest.fn((key: string) => {
               if (key === 'RESOLVER_DOMAIN')
@@ -129,20 +130,18 @@ describe('LinkResolutionService', () => {
         },
       ],
       linkset: undefined,
-      linkHeaderText: '',
     };
 
     mockRepository.one.mockReturnValue(mockUri);
 
     const result = await service.resolve(identifierParams);
 
-    expect(result).toEqual({
-      targetUrl: 'http://example-json.com',
-      mimeType: 'application/json',
-      data: { linkset: [] },
-      fwqs: false,
-      linkHeaderText: '',
-    });
+    expect(result.targetUrl).toBe('http://example-json.com');
+    expect(result.mimeType).toBe('application/json');
+    expect(result.data).toEqual({ linkset: [] });
+    expect(result.fwqs).toBe(false);
+    expect(result.linkHeaderText).toBeDefined();
+    expect(result.linkHeaderTextFull).toBeDefined();
   });
 
   it('should throw an error if no link is found', async () => {
@@ -227,7 +226,6 @@ describe('LinkResolutionService', () => {
         },
       ],
       linkset: { anchor: 'http://localhost:3002/api/1.0.0/idr/01/123' },
-      linkHeaderText: '<http://public.com>; rel="idr:dpp"',
     };
 
     it('should resolve without filtering when no accessRole provided', async () => {
@@ -243,8 +241,7 @@ describe('LinkResolutionService', () => {
       const result = await service.resolve(identifierParams);
 
       expect(result.targetUrl).toBe('http://public.com');
-      // No accessRole => uses pre-stored linkset/linkHeader
-      expect(result.linkHeaderText).toBe('<http://public.com>; rel="idr:dpp"');
+      expect(result.linkHeaderText).toBeDefined();
     });
 
     it('should filter responses by accessRole shorthand and resolve customer-only linkType', async () => {

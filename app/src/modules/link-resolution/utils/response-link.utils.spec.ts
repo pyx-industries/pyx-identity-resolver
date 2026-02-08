@@ -12,6 +12,7 @@ describe('responseResolvedLink', () => {
       redirect: jest.fn(),
       setHeader: jest.fn(),
       json: jest.fn(),
+      type: jest.fn().mockReturnThis(),
     };
     mockRequest = {
       accepts: jest.fn().mockReturnValue(['application/json', 'text/html']),
@@ -25,6 +26,7 @@ describe('responseResolvedLink', () => {
       mimeType: 'text/html',
       fwqs: false,
       linkHeaderText: '',
+      linkHeaderTextFull: '',
     };
     responseResolvedLink(mockResponse, mockRequest, resolvedLink);
 
@@ -38,6 +40,7 @@ describe('responseResolvedLink', () => {
       mimeType: 'application/json',
       fwqs: false,
       linkHeaderText: '',
+      linkHeaderTextFull: '',
     };
     responseResolvedLink(mockResponse, mockRequest, resolvedLink);
 
@@ -52,6 +55,7 @@ describe('responseResolvedLink', () => {
       mimeType: 'text/html',
       fwqs: true,
       linkHeaderText: '',
+      linkHeaderTextFull: '',
     };
     mockRequest.query = { key: 'value' };
     responseResolvedLink(mockResponse, mockRequest, resolvedLink);
@@ -68,6 +72,7 @@ describe('responseResolvedLink', () => {
       mimeType: 'text/html',
       fwqs: true,
       linkHeaderText: '',
+      linkHeaderTextFull: '',
     };
     mockRequest.query = { key: 'value' };
     responseResolvedLink(mockResponse, mockRequest, resolvedLink);
@@ -84,6 +89,7 @@ describe('responseResolvedLink', () => {
       mimeType: 'text/html',
       fwqs: true,
       linkHeaderText: '',
+      linkHeaderTextFull: '',
     };
     responseResolvedLink(mockResponse, mockRequest, resolvedLink);
 
@@ -98,6 +104,7 @@ describe('responseResolvedLink', () => {
         mimeType: 'text/html',
         fwqs: true,
         linkHeaderText: '',
+        linkHeaderTextFull: '',
       };
       mockRequest.query = { decryptionKey: 'mysecret' };
       responseResolvedLink(mockResponse, mockRequest, resolvedLink);
@@ -114,6 +121,7 @@ describe('responseResolvedLink', () => {
         mimeType: 'text/html',
         fwqs: true,
         linkHeaderText: '',
+        linkHeaderTextFull: '',
       };
       mockRequest.query = { linkType: 'idr:dpp', decryptionKey: 'mysecret' };
       responseResolvedLink(mockResponse, mockRequest, resolvedLink);
@@ -130,6 +138,7 @@ describe('responseResolvedLink', () => {
         mimeType: 'text/html',
         fwqs: false,
         linkHeaderText: '',
+        linkHeaderTextFull: '',
       };
       mockRequest.query = { decryptionKey: 'mysecret' };
       responseResolvedLink(mockResponse, mockRequest, resolvedLink);
@@ -144,6 +153,7 @@ describe('responseResolvedLink', () => {
         mimeType: 'application/json',
         fwqs: false,
         linkHeaderText: '',
+        linkHeaderTextFull: '',
       };
       mockRequest.query = { decryptionKey: 'mysecret' };
       responseResolvedLink(mockResponse, mockRequest, resolvedLink);
@@ -154,5 +164,23 @@ describe('responseResolvedLink', () => {
         'decryptionKey',
       );
     });
+  });
+
+  it('should return linkHeaderTextFull for application/linkset Accept header', () => {
+    resolvedLink = {
+      targetUrl: 'https://example.com',
+      data: undefined,
+      mimeType: 'text/html',
+      fwqs: false,
+      linkHeaderText: 'bounded-header',
+      linkHeaderTextFull: 'full-unbounded-header',
+    };
+    mockRequest.accepts = jest.fn().mockReturnValue(['application/linkset']);
+    mockResponse.send = jest.fn();
+    responseResolvedLink(mockResponse, mockRequest, resolvedLink);
+
+    expect(mockResponse.type).toHaveBeenCalledWith('application/linkset+json');
+    expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.send).toHaveBeenCalledWith('full-unbounded-header');
   });
 });

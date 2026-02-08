@@ -14,7 +14,7 @@ export const responseResolvedLink = (
   ) {
     res.status(200).json(resolvedLink.data);
   } else if (checkRequestAccepts(req, 'linkset')) {
-    res.status(200).send(resolvedLink.linkHeaderText);
+    res.status(200).send(resolvedLink.linkHeaderTextFull);
   } else if (resolvedLink.targetUrl) {
     const link = constructRedirectLink(
       resolvedLink.targetUrl,

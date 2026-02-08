@@ -7,18 +7,6 @@ import {
 } from '../interfaces/link-set.interface';
 import { VersionHistoryEntry } from '../interfaces/versioned-uri.interface';
 
-export const constructHTTPLink = (
-  uri: LinkSetInput,
-  identificationKeyCode: string,
-  attrs: { resolverDomain: string; linkTypeVocDomain: string },
-): string => {
-  let linkText = '';
-  uri.responses.forEach((response) => {
-    linkText += `<${response.targetUrl}>; rel="${response.linkType}"; type="${response.mimeType}"; hreflang="${response.ianaLanguage}"; title="${response.title}", `;
-  });
-  return `${linkText}<${buildOriginalRequest(uri, identificationKeyCode, attrs)}>; rel="owl:sameAs"`;
-};
-
 export const constructLinkSetJson = (
   uri: LinkSetInput,
   identificationKeyCode: string,

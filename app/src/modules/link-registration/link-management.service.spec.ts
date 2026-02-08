@@ -43,7 +43,6 @@ describe('LinkManagementService', () => {
       },
     ],
     linkset: {},
-    linkHeaderText: '',
   };
 
   const mockIndex = { documentPath: 'gs1/01/09359502000010.json' };
@@ -636,6 +635,20 @@ describe('LinkManagementService', () => {
           previousContext: 'us',
         }),
       );
+    });
+
+    it('should not include linkHeaderText in saved document after update', async () => {
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
+      );
+      repositoryProvider.save.mockResolvedValue(undefined);
+
+      await service.updateLink('abc12345', { title: 'Updated Title' });
+
+      const savedDoc = repositoryProvider.save.mock.calls[0][0];
+      expect(savedDoc).not.toHaveProperty('linkHeaderText');
     });
 
     it('should throw ConflictException when update would revert to link own previous composite key', async () => {

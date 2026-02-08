@@ -51,6 +51,8 @@ describe('LinkResolutionController', () => {
       data: undefined,
       mimeType: 'text/html',
       fwqs: false,
+      linkHeaderText: '',
+      linkHeaderTextFull: '',
     };
 
     mockService.resolve = jest.fn().mockResolvedValue(resolvedLink);
@@ -91,6 +93,8 @@ describe('LinkResolutionController', () => {
       data: undefined,
       mimeType: 'text/html',
       fwqs: false,
+      linkHeaderText: '',
+      linkHeaderTextFull: '',
     };
 
     mockService.resolve = jest.fn().mockResolvedValue(resolvedLink);

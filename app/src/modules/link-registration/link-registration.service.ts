@@ -2,10 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { CreateLinkRegistrationDto } from './dto/link-registration.dto';
 import { IRepositoryProvider } from '../../repository/providers/provider.repository.interface';
-import {
-  constructHTTPLink,
-  constructLinkSetJson,
-} from './utils/link-set.utils';
+import { constructLinkSetJson } from './utils/link-set.utils';
 import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
 import { convertAICode } from '../shared/utils/uri.utils';
 import { ConfigService } from '@nestjs/config';
@@ -106,11 +103,6 @@ export class LinkRegistrationService {
       { resolverDomain, linkTypeVocDomain },
       versionHistory,
     );
-    const linkHeaderText = constructHTTPLink(activePayload, aiCode, {
-      resolverDomain,
-      linkTypeVocDomain,
-    });
-
     await this.repositoryProvider.save({
       ...payload,
       id: objectName,
@@ -119,7 +111,6 @@ export class LinkRegistrationService {
       version,
       versionHistory,
       linkset,
-      linkHeaderText,
     });
 
     // Write linkId index entries only for NEW responses
