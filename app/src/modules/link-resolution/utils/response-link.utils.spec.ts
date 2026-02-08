@@ -89,4 +89,70 @@ describe('responseResolvedLink', () => {
 
     expect(mockResponse.redirect).toHaveBeenCalledWith(resolvedLink.targetUrl);
   });
+
+  describe('decryptionKey forwarding', () => {
+    it('should forward decryptionKey to the targetUrl when fwqs is true', () => {
+      resolvedLink = {
+        targetUrl: 'https://example.com',
+        data: undefined,
+        mimeType: 'text/html',
+        fwqs: true,
+        linkHeaderText: '',
+      };
+      mockRequest.query = { decryptionKey: 'mysecret' };
+      responseResolvedLink(mockResponse, mockRequest, resolvedLink);
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        'https://example.com?decryptionKey=mysecret',
+      );
+    });
+
+    it('should forward decryptionKey along with other query params when fwqs is true', () => {
+      resolvedLink = {
+        targetUrl: 'https://example.com',
+        data: undefined,
+        mimeType: 'text/html',
+        fwqs: true,
+        linkHeaderText: '',
+      };
+      mockRequest.query = { linkType: 'idr:dpp', decryptionKey: 'mysecret' };
+      responseResolvedLink(mockResponse, mockRequest, resolvedLink);
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        'https://example.com?linkType=idr:dpp&decryptionKey=mysecret',
+      );
+    });
+
+    it('should not forward decryptionKey to the targetUrl when fwqs is false', () => {
+      resolvedLink = {
+        targetUrl: 'https://example.com',
+        data: undefined,
+        mimeType: 'text/html',
+        fwqs: false,
+        linkHeaderText: '',
+      };
+      mockRequest.query = { decryptionKey: 'mysecret' };
+      responseResolvedLink(mockResponse, mockRequest, resolvedLink);
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith('https://example.com');
+    });
+
+    it('should not include decryptionKey in the data response when there is no targetUrl', () => {
+      resolvedLink = {
+        targetUrl: undefined,
+        data: { key: 'value' },
+        mimeType: 'application/json',
+        fwqs: false,
+        linkHeaderText: '',
+      };
+      mockRequest.query = { decryptionKey: 'mysecret' };
+      responseResolvedLink(mockResponse, mockRequest, resolvedLink);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({ key: 'value' });
+      expect(JSON.stringify(mockResponse.json.mock.calls[0][0])).not.toContain(
+        'decryptionKey',
+      );
+    });
+  });
 });
