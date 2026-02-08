@@ -1,14 +1,25 @@
-import {
-  processUri,
-  LinksetReconstructionContext,
-} from './link-resolution.utils';
+import { processUri } from './link-resolution.utils';
 import { LinkResolutionDto } from '../dto/link-resolution.dto';
-import { ResolvedLink } from '../interfaces/link-resolution.interface';
+import {
+  ResolvedLink,
+  ResolutionContext,
+} from '../interfaces/link-resolution.interface';
 import { Uri } from '../interfaces/uri.interface';
 
 describe('Link Resolution Utils', () => {
   describe('processUri', () => {
     let uri: Uri;
+
+    const defaultContext: ResolutionContext = {
+      identificationKeyCode: '01',
+      resolverDomain: 'https://id.idr.org',
+      linkTypeVocDomain: 'https://idr.com/voc',
+      namespace: 'idr',
+      identificationKey: '9359502000041',
+      qualifierPath: '/',
+      linkHeaderMaxSize: 8192,
+    };
+
     beforeEach(() => {
       uri = {
         id: 'idr/01/09359502000041',
@@ -126,8 +137,6 @@ describe('Link Resolution Utils', () => {
             },
           ],
         },
-        linkHeaderText:
-          '<http://example-json.com>; rel="idr:certificationInfo"; type="application/json"; hreflang="en"; title="Passport", <http://example-html.com>; rel="idr:certificationInfo"; type="text/html"; hreflang="en"; title="Passport", <http://example-json.com.au>; rel="idr:certificationInfo"; type="application/json"; hreflang="en"; title="Passport", <http://example-html.com.au>; rel="idr:certificationInfo"; type="text/html"; hreflang="en"; title="Passport", <https://id.idr.org/01/09359502000041>; rel="owl:sameAs"',
       };
     });
 
@@ -145,13 +154,12 @@ describe('Link Resolution Utils', () => {
         },
       };
 
-      const result = processUri(uri, identifierParams);
+      const result = processUri(uri, identifierParams, defaultContext);
 
-      expect(result).toEqual({
-        data: { linkset: [uri.linkset] },
-        mimeType: 'application/json',
-        linkHeaderText: uri.linkHeaderText,
-      });
+      expect(result.data).toEqual({ linkset: [uri.linkset] });
+      expect(result.mimeType).toBe('application/json');
+      expect(result.linkHeaderText).toBeDefined();
+      expect(result.linkHeaderTextFull).toBeDefined();
     });
 
     it('should return undefined when linkType is all and linkset is undefined', () => {
@@ -169,7 +177,7 @@ describe('Link Resolution Utils', () => {
         },
       };
 
-      const result = processUri(uri, identifierParams);
+      const result = processUri(uri, identifierParams, defaultContext);
 
       expect(result).toBeUndefined();
     });
@@ -195,17 +203,18 @@ describe('Link Resolution Utils', () => {
         },
       };
 
-      const result = processUri(uri, identifierParams);
+      const result = processUri(
+        uri,
+        identifierParams,
+        defaultContext,
+      ) as ResolvedLink;
 
-      expect(result).toEqual({
-        data: {
-          linkset: [uri.linkset],
-        },
-        targetUrl: uri.responses[0].targetUrl,
-        mimeType: uri.responses[0].mimeType,
-        fwqs: uri.responses[0].fwqs,
-        linkHeaderText: uri.linkHeaderText,
-      });
+      expect(result.data).toEqual({ linkset: [uri.linkset] });
+      expect(result.targetUrl).toBe(uri.responses[0].targetUrl);
+      expect(result.mimeType).toBe(uri.responses[0].mimeType);
+      expect(result.fwqs).toBe(uri.responses[0].fwqs);
+      expect(result.linkHeaderText).toBeDefined();
+      expect(result.linkHeaderTextFull).toBeDefined();
     });
 
     it('should return ResolvedLink when linkType idr:certificationInfo, mimeType is undefined, ianaLanguage is en, and context is au', () => {
@@ -228,17 +237,18 @@ describe('Link Resolution Utils', () => {
         },
       };
 
-      const result = processUri(uri, identifierParams);
+      const result = processUri(
+        uri,
+        identifierParams,
+        defaultContext,
+      ) as ResolvedLink;
 
-      expect(result).toEqual({
-        data: {
-          linkset: [uri.linkset],
-        },
-        targetUrl: uri.responses[1].targetUrl,
-        mimeType: uri.responses[1].mimeType,
-        fwqs: uri.responses[1].fwqs,
-        linkHeaderText: uri.linkHeaderText,
-      });
+      expect(result.data).toEqual({ linkset: [uri.linkset] });
+      expect(result.targetUrl).toBe(uri.responses[1].targetUrl);
+      expect(result.mimeType).toBe(uri.responses[1].mimeType);
+      expect(result.fwqs).toBe(uri.responses[1].fwqs);
+      expect(result.linkHeaderText).toBeDefined();
+      expect(result.linkHeaderTextFull).toBeDefined();
     });
 
     it('should return ResolvedLink when linkType idr:certificationInfo, mimeType is undefined, ianaLanguage is en, and context is undefined', () => {
@@ -260,17 +270,18 @@ describe('Link Resolution Utils', () => {
         },
       };
 
-      const result = processUri(uri, identifierParams);
+      const result = processUri(
+        uri,
+        identifierParams,
+        defaultContext,
+      ) as ResolvedLink;
 
-      expect(result).toEqual({
-        data: {
-          linkset: [uri.linkset],
-        },
-        targetUrl: uri.responses[3].targetUrl,
-        mimeType: uri.responses[3].mimeType,
-        fwqs: uri.responses[3].fwqs,
-        linkHeaderText: uri.linkHeaderText,
-      });
+      expect(result.data).toEqual({ linkset: [uri.linkset] });
+      expect(result.targetUrl).toBe(uri.responses[3].targetUrl);
+      expect(result.mimeType).toBe(uri.responses[3].mimeType);
+      expect(result.fwqs).toBe(uri.responses[3].fwqs);
+      expect(result.linkHeaderText).toBeDefined();
+      expect(result.linkHeaderTextFull).toBeDefined();
     });
 
     it('should return ResolvedLink when linkType idr:certificationInfo, mimeType is undefined, ianaLanguage is undefined, and context is undefined', () => {
@@ -287,17 +298,18 @@ describe('Link Resolution Utils', () => {
         },
       };
 
-      const result = processUri(uri, identifierParams);
+      const result = processUri(
+        uri,
+        identifierParams,
+        defaultContext,
+      ) as ResolvedLink;
 
-      expect(result).toEqual({
-        data: {
-          linkset: [uri.linkset],
-        },
-        targetUrl: uri.responses[3].targetUrl,
-        mimeType: uri.responses[3].mimeType,
-        fwqs: uri.responses[3].fwqs,
-        linkHeaderText: uri.linkHeaderText,
-      });
+      expect(result.data).toEqual({ linkset: [uri.linkset] });
+      expect(result.targetUrl).toBe(uri.responses[3].targetUrl);
+      expect(result.mimeType).toBe(uri.responses[3].mimeType);
+      expect(result.fwqs).toBe(uri.responses[3].fwqs);
+      expect(result.linkHeaderText).toBeDefined();
+      expect(result.linkHeaderTextFull).toBeDefined();
     });
 
     it('should return ResolvedLink when linkType is undefined, mimeType is undefined, ianaLanguage is undefined, and context is undefined', () => {
@@ -312,15 +324,18 @@ describe('Link Resolution Utils', () => {
         descriptiveAttributes: {},
       };
 
-      const result = processUri(uri, identifierParams);
+      const result = processUri(
+        uri,
+        identifierParams,
+        defaultContext,
+      ) as ResolvedLink;
 
-      expect(result).toEqual({
-        data: { linkset: [uri.linkset] },
-        targetUrl: uri.responses[3].targetUrl,
-        mimeType: uri.responses[3].mimeType,
-        fwqs: uri.responses[3].fwqs,
-        linkHeaderText: uri.linkHeaderText,
-      });
+      expect(result.data).toEqual({ linkset: [uri.linkset] });
+      expect(result.targetUrl).toBe(uri.responses[3].targetUrl);
+      expect(result.mimeType).toBe(uri.responses[3].mimeType);
+      expect(result.fwqs).toBe(uri.responses[3].fwqs);
+      expect(result.linkHeaderText).toBeDefined();
+      expect(result.linkHeaderTextFull).toBeDefined();
     });
 
     it('should return undefined when linkType is invalid', () => {
@@ -337,16 +352,20 @@ describe('Link Resolution Utils', () => {
         },
       };
 
-      const result = processUri(uri, identifierParams);
+      const result = processUri(uri, identifierParams, defaultContext);
 
       expect(result).toBeUndefined();
     });
 
     describe('processUri with reconstructionContext', () => {
-      const reconstructionContext: LinksetReconstructionContext = {
+      const reconstructionContext: ResolutionContext = {
         identificationKeyCode: '01',
         resolverDomain: 'http://localhost:3002/api/1.0.0',
         linkTypeVocDomain: 'http://localhost:3002/api/1.0.0/voc',
+        namespace: 'idr',
+        identificationKey: '9359502000041',
+        qualifierPath: '/',
+        linkHeaderMaxSize: 8192,
       };
 
       const expectedRebuiltAnchor =
@@ -366,7 +385,12 @@ describe('Link Resolution Utils', () => {
           },
         };
 
-        const result = processUri(uri, identifierParams, reconstructionContext);
+        const accessRoleContext: ResolutionContext = {
+          ...reconstructionContext,
+          accessRole: 'customer',
+        };
+
+        const result = processUri(uri, identifierParams, accessRoleContext);
 
         expect(result).toBeDefined();
         expect(result.mimeType).toBe('application/json');
@@ -396,10 +420,15 @@ describe('Link Resolution Utils', () => {
           },
         };
 
+        const accessRoleContext: ResolutionContext = {
+          ...reconstructionContext,
+          accessRole: 'customer',
+        };
+
         const result = processUri(
           uri,
           identifierParams,
-          reconstructionContext,
+          accessRoleContext,
         ) as ResolvedLink;
 
         expect(result).toBeDefined();

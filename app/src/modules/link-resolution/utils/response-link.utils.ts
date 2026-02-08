@@ -14,7 +14,11 @@ export const responseResolvedLink = (
   ) {
     res.status(200).json(resolvedLink.data);
   } else if (checkRequestAccepts(req, 'linkset')) {
-    res.status(200).send(resolvedLink.linkHeaderText);
+    res
+      .type('application/linkset+json')
+      .set('X-Content-Type-Options', 'nosniff')
+      .status(200)
+      .send(resolvedLink.linkHeaderTextFull);
   } else if (resolvedLink.targetUrl) {
     const link = constructRedirectLink(
       resolvedLink.targetUrl,

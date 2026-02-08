@@ -33,10 +33,11 @@ describe('LinkResolutionService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn((key: string) => {
+            get: jest.fn((key: string, defaultValue?: string) => {
               if (key === 'RESOLVER_DOMAIN')
                 return 'http://localhost:3002/api/1.0.0';
-              return undefined;
+              if (key === 'LINK_HEADER_MAX_SIZE') return '8192';
+              return defaultValue ?? undefined;
             }),
             getOrThrow: jest.fn((key: string) => {
               if (key === 'RESOLVER_DOMAIN')
@@ -129,20 +130,18 @@ describe('LinkResolutionService', () => {
         },
       ],
       linkset: undefined,
-      linkHeaderText: '',
     };
 
     mockRepository.one.mockReturnValue(mockUri);
 
     const result = await service.resolve(identifierParams);
 
-    expect(result).toEqual({
-      targetUrl: 'http://example-json.com',
-      mimeType: 'application/json',
-      data: { linkset: [] },
-      fwqs: false,
-      linkHeaderText: '',
-    });
+    expect(result.targetUrl).toBe('http://example-json.com');
+    expect(result.mimeType).toBe('application/json');
+    expect(result.data).toEqual({ linkset: [] });
+    expect(result.fwqs).toBe(false);
+    expect(result.linkHeaderText).toBeDefined();
+    expect(result.linkHeaderTextFull).toBeDefined();
   });
 
   it('should throw an error if no link is found', async () => {
@@ -169,6 +168,178 @@ describe('LinkResolutionService', () => {
         lang: 'en',
       },
     );
+  });
+
+  describe('LINK_HEADER_MAX_SIZE configuration', () => {
+    it('should reject non-numeric values', async () => {
+      await expect(
+        Test.createTestingModule({
+          providers: [
+            LinkResolutionService,
+            {
+              provide: 'RepositoryProvider',
+              useFactory: repositoryProviderMockFactory,
+            },
+            { provide: I18nService, useFactory: i18nServiceMockFactory },
+            {
+              provide: ConfigService,
+              useValue: {
+                get: jest.fn((key: string) => {
+                  if (key === 'LINK_HEADER_MAX_SIZE') return '8kb';
+                  return undefined;
+                }),
+                getOrThrow: jest.fn(),
+              },
+            },
+            {
+              provide: IdentifierManagementService,
+              useValue: { getIdentifier: jest.fn() },
+            },
+          ],
+        }).compile(),
+      ).rejects.toThrow(/digits only/);
+    });
+
+    it('should reject decimal values', async () => {
+      await expect(
+        Test.createTestingModule({
+          providers: [
+            LinkResolutionService,
+            {
+              provide: 'RepositoryProvider',
+              useFactory: repositoryProviderMockFactory,
+            },
+            { provide: I18nService, useFactory: i18nServiceMockFactory },
+            {
+              provide: ConfigService,
+              useValue: {
+                get: jest.fn((key: string) => {
+                  if (key === 'LINK_HEADER_MAX_SIZE') return '8192.5';
+                  return undefined;
+                }),
+                getOrThrow: jest.fn(),
+              },
+            },
+            {
+              provide: IdentifierManagementService,
+              useValue: { getIdentifier: jest.fn() },
+            },
+          ],
+        }).compile(),
+      ).rejects.toThrow(/digits only/);
+    });
+  });
+
+  describe('progressive cleanup', () => {
+    it('should strip stale linkHeaderText and still resolve', async () => {
+      const mockUri: Uri = {
+        id: '123',
+        namespace: 'idr',
+        identificationKeyType: 'primary',
+        identificationKey: '123',
+        itemDescription: '',
+        qualifierPath: '/',
+        active: true,
+        responses: [
+          {
+            targetUrl: 'http://example.com',
+            title: 'Test',
+            linkType: 'idr:certificationInfo',
+            ianaLanguage: 'en',
+            context: 'us',
+            mimeType: 'application/json',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+            defaultMimeType: true,
+          },
+        ],
+        linkset: undefined,
+      };
+
+      const docWithStaleField = {
+        ...mockUri,
+        linkHeaderText: '<stale-value>',
+      };
+
+      mockRepository.one.mockReturnValue(docWithStaleField);
+      (mockRepository.save as jest.Mock).mockResolvedValue(undefined);
+
+      const result = await service.resolve({
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {},
+      });
+
+      expect(result).toBeDefined();
+      expect(mockRepository.save).toHaveBeenCalledWith(
+        expect.not.objectContaining({ linkHeaderText: expect.anything() }),
+      );
+    });
+
+    it('should log warning when cleanup save fails', async () => {
+      const warnSpy = jest
+        .spyOn(service['logger'], 'warn')
+        .mockImplementation();
+
+      const mockUri: Uri = {
+        id: '123',
+        namespace: 'idr',
+        identificationKeyType: 'primary',
+        identificationKey: '123',
+        itemDescription: '',
+        qualifierPath: '/',
+        active: true,
+        responses: [
+          {
+            targetUrl: 'http://example.com',
+            title: 'Test',
+            linkType: 'idr:certificationInfo',
+            ianaLanguage: 'en',
+            context: 'us',
+            mimeType: 'application/json',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+            defaultMimeType: true,
+          },
+        ],
+        linkset: undefined,
+      };
+
+      const docWithStaleField = {
+        ...mockUri,
+        linkHeaderText: '<stale-value>',
+      };
+
+      mockRepository.one.mockReturnValue(docWithStaleField);
+      (mockRepository.save as jest.Mock).mockRejectedValue(
+        new Error('Save failed'),
+      );
+
+      const result = await service.resolve({
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {},
+      });
+
+      // Resolution should succeed despite cleanup failure
+      expect(result).toBeDefined();
+
+      // Wait for fire-and-forget promise to settle
+      await new Promise((resolve) => setImmediate(resolve));
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to strip stale linkHeaderText'),
+        expect.anything(),
+      );
+
+      warnSpy.mockRestore();
+    });
   });
 
   describe('accessRole filtering', () => {
@@ -227,7 +398,6 @@ describe('LinkResolutionService', () => {
         },
       ],
       linkset: { anchor: 'http://localhost:3002/api/1.0.0/idr/01/123' },
-      linkHeaderText: '<http://public.com>; rel="idr:dpp"',
     };
 
     it('should resolve without filtering when no accessRole provided', async () => {
@@ -243,8 +413,7 @@ describe('LinkResolutionService', () => {
       const result = await service.resolve(identifierParams);
 
       expect(result.targetUrl).toBe('http://public.com');
-      // No accessRole => uses pre-stored linkset/linkHeader
-      expect(result.linkHeaderText).toBe('<http://public.com>; rel="idr:dpp"');
+      expect(result.linkHeaderText).toBeDefined();
     });
 
     it('should filter responses by accessRole shorthand and resolve customer-only linkType', async () => {

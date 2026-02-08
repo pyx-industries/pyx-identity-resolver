@@ -48,7 +48,6 @@ export interface Uri {
   active: boolean;
   responses: LinkResponse[];
   linkset?: LinkContextObject;
-  linkHeaderText?: string;
   version?: number;
   createdAt?: string;
   updatedAt?: string;

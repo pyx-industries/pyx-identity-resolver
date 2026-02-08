@@ -196,19 +196,25 @@ describe('Full flow (e2e)', () => {
       const gtin = '01/12345678901234';
       const lot = '10/LOT1234';
       const serial = '21/SER5678';
-      const linkType = gs1 + ':certificationInfo';
       const expectedLocation = 'https://example-json.com';
-      const expectedLinkHeader = `<${expectedLocation}>; rel="${linkType}"; type="application/json"; hreflang="en"; title="Certification Information", <https://example-html.com>; rel="${linkType}"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${gs1}/${gtin}/${lot}/${serial}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(
-          `/${gs1}/${gtin}/${lot}/${serial}?linkType=${encodeURIComponent(linkType)}`,
+          `/${gs1}/${gtin}/${lot}/${serial}?linkType=${encodeURIComponent(gs1 + ':certificationInfo')}`,
         )
         .set('Accept', 'application/json')
         .set('Accept-Language', 'en-AU')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${gs1}/${gtin}/${lot}/${serial}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
 
     it('should get link resolution with gtin, lot, and serial number in qualifierPath, language is en, context is US, and mimeType is text/html', async () => {
@@ -216,19 +222,25 @@ describe('Full flow (e2e)', () => {
       const gtin = '01/12345678901234';
       const lot = '10/LOT1234';
       const serial = '21/SER5678';
-      const linkType = gs1 + ':certificationInfo';
       const expectedLocation = 'https://example-html.com';
-      const expectedLinkHeader = `<https://example-json.com>; rel="${linkType}"; type="application/json"; hreflang="en"; title="Certification Information", <${expectedLocation}>; rel="${linkType}"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${gs1}/${gtin}/${lot}/${serial}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(
-          `/${gs1}/${gtin}/${lot}/${serial}?linkType=${encodeURIComponent(linkType)}`,
+          `/${gs1}/${gtin}/${lot}/${serial}?linkType=${encodeURIComponent(gs1 + ':certificationInfo')}`,
         )
         .set('Accept', 'text/html')
         .set('Accept-Language', 'en-AU')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${gs1}/${gtin}/${lot}/${serial}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
 
     it('should register a link with gtin and lot in qualifierPath', async () => {
@@ -269,7 +281,6 @@ describe('Full flow (e2e)', () => {
       const gtin = '01/12345678901234';
       const lot = '10/LOT1234';
       const expectedLocation = 'https://example-html.com';
-      const expectedLinkHeader = `<${expectedLocation}>; rel="${gs1}:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${gs1}/${gtin}/${lot}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(`/${gs1}/${gtin}/${lot}`)
@@ -277,7 +288,15 @@ describe('Full flow (e2e)', () => {
         .set('Accept-Language', 'en-US')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${gs1}/${gtin}/${lot}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
 
     it('should register a link with only gtin', async () => {
@@ -317,7 +336,6 @@ describe('Full flow (e2e)', () => {
       const gs1 = 'e2e-test-mock-gs1';
       const gtin = '01/12345678901234';
       const expectedLocation = 'https://example-html.com';
-      const expectedLinkHeader = `<${expectedLocation}>; rel="${gs1}:certificationInfo"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${gs1}/${gtin}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(`/${gs1}/${gtin}`)
@@ -325,7 +343,15 @@ describe('Full flow (e2e)', () => {
         .set('Accept-Language', 'en-AU')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${gs1}/${gtin}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
   });
 
@@ -368,7 +394,6 @@ describe('Full flow (e2e)', () => {
       const identificationKey = '03/1234567890123456/21/SER1234';
       const linkType = nlisid + ':epcis';
       const expectedLocation = 'https://example-html.com';
-      const expectedLinkHeader = `<${expectedLocation}>; rel="${linkType}"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${nlisid}/${identificationKey}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(
@@ -378,7 +403,15 @@ describe('Full flow (e2e)', () => {
         .set('Accept-Language', 'en-AU')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${nlisid}/${identificationKey}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
   });
 
@@ -421,7 +454,6 @@ describe('Full flow (e2e)', () => {
       const identificationKey = '8017/123456789012345678/8019/1234';
       const linkType = namespace + ':certificationInfo';
       const expectedLocation = 'https://example-html.com';
-      const expectedLinkHeader = `<${expectedLocation}>; rel="${linkType}"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${namespace}/${identificationKey}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(
@@ -431,7 +463,15 @@ describe('Full flow (e2e)', () => {
         .set('Accept-Language', 'en-AU')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${namespace}/${identificationKey}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
 
     it('should register a link with gsrn and srin in qualifierPath', async () => {
@@ -472,7 +512,6 @@ describe('Full flow (e2e)', () => {
       const identificationKey = '8017/123456789012345678/8019/1234';
       const linkType = namespace + ':certificationInfo';
       const expectedLocation = 'https://example-html.com';
-      const expectedLinkHeader = `<${expectedLocation}>; rel="${linkType}"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${namespace}/${identificationKey}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(
@@ -482,7 +521,15 @@ describe('Full flow (e2e)', () => {
         .set('Accept-Language', 'en-AU')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${namespace}/${identificationKey}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
 
     it('should register a link with only gsrnp', async () => {
@@ -523,7 +570,6 @@ describe('Full flow (e2e)', () => {
       const identificationKey = '8017/123456789012345678';
       const linkType = namespace + ':certificationInfo';
       const expectedLocation = 'https://example-html.com';
-      const expectedLinkHeader = `<${expectedLocation}>; rel="${linkType}"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${namespace}/${identificationKey}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(
@@ -533,7 +579,15 @@ describe('Full flow (e2e)', () => {
         .set('Accept-Language', 'en-AU')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${namespace}/${identificationKey}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
 
     it('should register a link with only gsrn', async () => {
@@ -574,7 +628,6 @@ describe('Full flow (e2e)', () => {
       const identificationKey = '8017/123456789012345678';
       const linkType = namespace + ':certificationInfo';
       const expectedLocation = 'https://example-html.com';
-      const expectedLinkHeader = `<${expectedLocation}>; rel="${linkType}"; type="text/html"; hreflang="en"; title="Certification Information", <${baseUrl}/${namespace}/${identificationKey}>; rel="owl:sameAs"`;
 
       await request(baseUrl)
         .get(
@@ -584,7 +637,15 @@ describe('Full flow (e2e)', () => {
         .set('Accept-Language', 'en-AU')
         .expect(302)
         .expect('Location', expectedLocation)
-        .expect('Link', expectedLinkHeader);
+        .expect((res) => {
+          const link = res.headers['link'];
+          expect(link).toBeDefined();
+          expect(link).toContain(
+            `<${baseUrl}/${namespace}/${identificationKey}>; rel="owl:sameAs"`,
+          );
+          expect(link).toContain('rel="linkset"');
+          expect(link).toContain(expectedLocation);
+        });
     });
   });
 

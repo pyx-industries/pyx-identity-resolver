@@ -1,81 +1,8 @@
 import { VersionHistoryEntry } from '../../link-resolution/interfaces/uri.interface';
 import { LinkSetInput } from '../interfaces/link-set.interface';
-import { constructHTTPLink, constructLinkSetJson } from './link-set.utils';
+import { constructLinkSetJson } from './link-set.utils';
 
 describe('Link Set Utils', () => {
-  describe('constructHTTPLink', () => {
-    it('should construct the HTTP link correctly', () => {
-      const uri: LinkSetInput = {
-        namespace: 'idr',
-        identificationKeyType: 'test',
-        identificationKey: '12345',
-        itemDescription: 'example',
-        qualifierPath: '/',
-        active: true,
-        responses: [
-          {
-            targetUrl: 'https://example.com',
-            title: 'example',
-            linkType: 'idr:exampleLinkType',
-            ianaLanguage: 'en',
-            context: 'us',
-            mimeType: 'application/json',
-            active: true,
-            fwqs: true,
-            defaultLinkType: true,
-            defaultIanaLanguage: true,
-            defaultContext: true,
-            defaultMimeType: true,
-          },
-          {
-            targetUrl: 'https://example2.com',
-            title: 'example2',
-            linkType: 'idr:exampleLinkType2',
-            ianaLanguage: 'en',
-            context: 'us',
-            mimeType: 'application/json',
-            active: true,
-            fwqs: true,
-            defaultLinkType: true,
-            defaultIanaLanguage: true,
-            defaultContext: true,
-            defaultMimeType: true,
-          },
-          {
-            targetUrl: 'https://example3.com',
-            title: 'example3',
-            linkType: 'idr:exampleLinkType3',
-            ianaLanguage: 'en',
-            context: 'us',
-            mimeType: 'application/json',
-            active: true,
-            fwqs: true,
-            defaultLinkType: true,
-            defaultIanaLanguage: true,
-            defaultContext: true,
-            defaultMimeType: true,
-          },
-        ],
-      };
-
-      const identificationKeyCode = '01';
-      const attrs = {
-        resolverDomain: 'https://resolver.example.com',
-        linkTypeVocDomain: 'https://linktypevoc.example.com/voc',
-      };
-
-      const expectedLink =
-        '<https://example.com>; rel="idr:exampleLinkType"; type="application/json"; hreflang="en"; title="example", <https://example2.com>; rel="idr:exampleLinkType2"; type="application/json"; hreflang="en"; title="example2", <https://example3.com>; rel="idr:exampleLinkType3"; type="application/json"; hreflang="en"; title="example3", <https://resolver.example.com/idr/01/12345>; rel="owl:sameAs"';
-      const constructedLink = constructHTTPLink(
-        uri,
-        identificationKeyCode,
-        attrs,
-      );
-
-      expect(constructedLink).toEqual(expectedLink);
-    });
-  });
-
   describe('constructLinkSetJson', () => {
     it('should construct the LinkSet JSON correctly', () => {
       const uri: LinkSetInput = {

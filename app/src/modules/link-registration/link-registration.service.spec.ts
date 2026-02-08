@@ -546,5 +546,26 @@ describe('LinkRegistrationService', () => {
       const saveCall = (repositoryProvider.save as jest.Mock).mock.calls[0][0];
       expect(saveCall).toHaveProperty('versionHistory');
     });
+
+    it('should not include linkHeaderText in saved document', async () => {
+      const payload = {
+        namespace: 'testNamespace',
+        identificationKeyType: '01',
+        identificationKey: 'testKey',
+        itemDescription: 'testDescription',
+        qualifierPath: '',
+        active: true,
+        responses: [],
+      };
+
+      jest
+        .spyOn(service['configService'], 'get')
+        .mockReturnValue('testResolverDomain');
+
+      await service.create(payload);
+
+      const saveCall = (repositoryProvider.save as jest.Mock).mock.calls[0][0];
+      expect(saveCall).not.toHaveProperty('linkHeaderText');
+    });
   });
 });
