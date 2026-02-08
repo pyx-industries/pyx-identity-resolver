@@ -60,6 +60,14 @@ export class LinkResolutionController {
     description: 'Link type',
     example: 'all',
   })
+  @ApiQuery({
+    name: 'accessRole',
+    type: String,
+    required: false,
+    description:
+      'Access role for variant-based disclosure filtering (e.g., customer, regulator, recycler)',
+    example: 'customer',
+  })
   @ApiFoundResponse({
     description: 'Redirect to the resolved link',
   })

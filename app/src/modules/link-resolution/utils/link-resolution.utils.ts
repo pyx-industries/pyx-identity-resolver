@@ -1,4 +1,8 @@
 import { LinkContextObject } from '../../link-registration/interfaces/link-set.interface';
+import {
+  constructHTTPLink,
+  constructLinkSetJson,
+} from '../../link-registration/utils/link-set.utils';
 import { LinkResolutionDto } from '../dto/link-resolution.dto';
 import {
   IanalanguageContext,
@@ -6,18 +10,65 @@ import {
 } from '../interfaces/link-resolution.interface';
 import { LinkResponse, Uri } from '../interfaces/uri.interface';
 
+export interface LinksetReconstructionContext {
+  identificationKeyCode: string;
+  resolverDomain: string;
+  linkTypeVocDomain: string;
+}
+
+/**
+ * Rebuild the linkset and Link header from the (potentially filtered) responses
+ * on a URI. Used when access-role filtering has been applied and the pre-built
+ * linkset/linkHeader stored on the document no longer reflects the correct set
+ * of responses.
+ */
+const buildLinksetFromResponses = (
+  uri: Uri,
+  ctx: LinksetReconstructionContext,
+): { linkset: LinkContextObject; linkHeaderText: string } => {
+  const activeResponses = uri.responses.filter((r) => r.active);
+  const asDto = {
+    namespace: uri.namespace,
+    identificationKeyType: uri.identificationKeyType,
+    identificationKey: uri.identificationKey,
+    qualifierPath: uri.qualifierPath,
+    active: uri.active,
+    itemDescription: uri.itemDescription,
+    responses: activeResponses,
+  };
+  const attrs = {
+    resolverDomain: ctx.resolverDomain,
+    linkTypeVocDomain: ctx.linkTypeVocDomain,
+  };
+  return {
+    linkset: constructLinkSetJson(asDto, ctx.identificationKeyCode, attrs),
+    linkHeaderText: constructHTTPLink(asDto, ctx.identificationKeyCode, attrs),
+  };
+};
+
 /**
  * Process the URI and return the appropriate response or linkset.
  *
- * @param uri
- * @param identifierParams
- * @returns LinkResponse | LinkContextObject | undefined
+ * @param uri - the URI document containing responses and pre-built linkset
+ * @param identifierParams - request parameters including linkType and descriptive attributes
+ * @param reconstructionContext - when provided, the linkset and Link header are
+ *   rebuilt from the URI's responses rather than using the pre-stored values.
+ *   This is necessary after access-role filtering has narrowed the response set.
+ * @returns ResolvedLink or undefined if no matching response is found
  */
-export const processUri = (uri: Uri, identifierParams: LinkResolutionDto) => {
+export const processUri = (
+  uri: Uri,
+  identifierParams: LinkResolutionDto,
+  reconstructionContext?: LinksetReconstructionContext,
+) => {
   if (identifierParams.descriptiveAttributes.linkType === 'all') {
-    return processUriForLinkTypeAll(uri);
+    return processUriForLinkTypeAll(uri, reconstructionContext);
   } else {
-    return processUriForSpecificLinkType(uri, identifierParams);
+    return processUriForSpecificLinkType(
+      uri,
+      identifierParams,
+      reconstructionContext,
+    );
   }
 };
 
@@ -33,13 +84,15 @@ export const processUri = (uri: Uri, identifierParams: LinkResolutionDto) => {
  * 7. linkType
  * 8. defaultLinkType
  *
- * @param uri
- * @param identifierParams
- * @returns LinkResponse | undefined
+ * @param uri - the URI document containing responses and pre-built linkset
+ * @param identifierParams - request parameters including linkType and descriptive attributes
+ * @param reconstructionContext - when provided, the linkset is rebuilt from responses
+ * @returns ResolvedLink or undefined if no matching response is found
  */
 const processUriForSpecificLinkType = (
   uri: Uri,
   identifierParams: LinkResolutionDto,
+  reconstructionContext?: LinksetReconstructionContext,
 ): ResolvedLink | undefined => {
   const responses = uri.responses.filter((res) => res.active).reverse(); // Temporary fix so that IDR Link resolves to latest issued VC.
   const {
@@ -80,6 +133,14 @@ const processUriForSpecificLinkType = (
     return undefined;
   }
 
+  if (reconstructionContext) {
+    const { linkset, linkHeaderText } = buildLinksetFromResponses(
+      uri,
+      reconstructionContext,
+    );
+    return constructResolvedLinkForResponse(response, linkset, linkHeaderText);
+  }
+
   return constructResolvedLinkForResponse(
     response,
     uri.linkset,
@@ -90,11 +151,26 @@ const processUriForSpecificLinkType = (
 /**
  * Process the URI when request linkType=all.
  *
- * @param uri
- * @param identifierParams
- * @returns LinkSet
+ * @param uri - the URI document containing responses and pre-built linkset
+ * @param reconstructionContext - when provided, the linkset is rebuilt from responses
+ * @returns ResolvedLink or undefined if no responses or linkset available
  */
-const processUriForLinkTypeAll = (uri: Uri) => {
+const processUriForLinkTypeAll = (
+  uri: Uri,
+  reconstructionContext?: LinksetReconstructionContext,
+) => {
+  if (reconstructionContext) {
+    const activeResponses = uri.responses.filter((r) => r.active);
+    if (activeResponses.length === 0) {
+      return undefined;
+    }
+    const { linkset, linkHeaderText } = buildLinksetFromResponses(
+      uri,
+      reconstructionContext,
+    );
+    return constructResolvedLinkForLinkSet(linkset, linkHeaderText);
+  }
+
   const { linkset } = uri;
 
   if (!linkset) {

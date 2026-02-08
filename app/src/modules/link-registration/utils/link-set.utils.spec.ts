@@ -1,15 +1,11 @@
-import {
-  Uri,
-  VersionHistoryEntry,
-} from '../../link-resolution/interfaces/uri.interface';
-import { EncryptionMethod, UntpAccessRole } from '../constants/untp-enums';
+import { VersionHistoryEntry } from '../../link-resolution/interfaces/uri.interface';
+import { LinkSetInput } from '../interfaces/link-set.interface';
 import { constructHTTPLink, constructLinkSetJson } from './link-set.utils';
 
 describe('Link Set Utils', () => {
   describe('constructHTTPLink', () => {
     it('should construct the HTTP link correctly', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -82,8 +78,7 @@ describe('Link Set Utils', () => {
 
   describe('constructLinkSetJson', () => {
     it('should construct the LinkSet JSON correctly', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -224,8 +219,7 @@ describe('Link Set Utils', () => {
     };
 
     it('should include UNTP properties on link targets when present', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -246,8 +240,11 @@ describe('Link Set Utils', () => {
             defaultIanaLanguage: true,
             defaultContext: true,
             defaultMimeType: true,
-            encryptionMethod: EncryptionMethod.AES256,
-            accessRole: [UntpAccessRole.Customer, UntpAccessRole.Regulator],
+            encryptionMethod: 'AES-256',
+            accessRole: [
+              'untp:accessRole#Customer',
+              'untp:accessRole#Regulator',
+            ],
             method: 'POST',
           },
         ],
@@ -259,17 +256,16 @@ describe('Link Set Utils', () => {
 
       expect(linkTargets).toBeDefined();
       expect(linkTargets).toHaveLength(1);
-      expect(linkTargets[0].encryptionMethod).toBe(EncryptionMethod.AES256);
+      expect(linkTargets[0].encryptionMethod).toBe('AES-256');
       expect(linkTargets[0].accessRole).toEqual([
-        UntpAccessRole.Customer,
-        UntpAccessRole.Regulator,
+        'untp:accessRole#Customer',
+        'untp:accessRole#Regulator',
       ]);
       expect(linkTargets[0].method).toBe('POST');
     });
 
     it('should omit UNTP properties when not present on response', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -306,8 +302,7 @@ describe('Link Set Utils', () => {
     });
 
     it('should include predecessor-version entries from version history', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -366,8 +361,7 @@ describe('Link Set Utils', () => {
     });
 
     it('should not include predecessor-version when history has no previousTargetUrl', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -417,8 +411,7 @@ describe('Link Set Utils', () => {
     });
 
     it('should not include predecessor-version when versionHistory is omitted', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -454,8 +447,7 @@ describe('Link Set Utils', () => {
     });
 
     it('should include encryptionMethod when value is "none"', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -476,7 +468,7 @@ describe('Link Set Utils', () => {
             defaultIanaLanguage: true,
             defaultContext: true,
             defaultMimeType: true,
-            encryptionMethod: EncryptionMethod.None,
+            encryptionMethod: 'none',
           },
         ],
       };
@@ -487,12 +479,11 @@ describe('Link Set Utils', () => {
 
       expect(linkTargets).toBeDefined();
       expect(linkTargets).toHaveLength(1);
-      expect(linkTargets[0].encryptionMethod).toBe(EncryptionMethod.None);
+      expect(linkTargets[0].encryptionMethod).toBe('none');
     });
 
     it('should exclude empty arrays for accessRole and method', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -530,8 +521,7 @@ describe('Link Set Utils', () => {
     });
 
     it('should include multiple predecessor versions from multiple history entries', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
@@ -600,8 +590,7 @@ describe('Link Set Utils', () => {
     });
 
     it('should use historical metadata for predecessor-version entries', () => {
-      const uri: Uri = {
-        id: '1',
+      const uri: LinkSetInput = {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
