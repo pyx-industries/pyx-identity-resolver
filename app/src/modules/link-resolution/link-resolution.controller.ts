@@ -68,6 +68,16 @@ export class LinkResolutionController {
       'Access role for variant-based disclosure filtering (e.g., customer, regulator, recycler)',
     example: 'customer',
   })
+  @ApiQuery({
+    name: 'decryptionKey',
+    type: String,
+    required: false,
+    description:
+      'Shared secret for decrypting encrypted content at the target URL. ' +
+      'Forwarded to the target URL when fwqs (forward query string) is enabled on the matched response. ' +
+      'Silently ignored when the resolution does not result in a redirect or when fwqs is disabled for the link target.',
+    example: 'a3f2b8c1d5e6f7a8b9c0d1e2f3a4b5c6',
+  })
   @ApiFoundResponse({
     description: 'Redirect to the resolved link',
   })
