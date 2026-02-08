@@ -27,8 +27,12 @@ jobs:
         run: npm ci # Install dependencies
         working-directory: app
 
+      - name: Format check
+        run: npm run format:check
+        working-directory: app
+
       - name: Lint
-        run: npm run lint # Lint the application
+        run: npm run lint
         working-directory: app
 
       - name: Build
