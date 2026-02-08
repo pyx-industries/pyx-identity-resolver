@@ -23,4 +23,4 @@ import Disclaimer from './../\_disclaimer.mdx';
 
 The way in which users authenticate with the Identity Resolver is by providing an API when making a request to the service.
 This API key is set when the system is initialise and can be configured by modifying the `API_KEY` environment variable within the `.env.development` file.
-More details on how to configure the system can be found [here](docs/getting-started/configuration.md)
+More details on how to configure the system can be found [here](../getting-started/configuration.md)

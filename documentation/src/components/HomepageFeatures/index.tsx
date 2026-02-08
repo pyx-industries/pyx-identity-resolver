@@ -10,32 +10,32 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: "Identifier scheme management",
+    title: "Set up your identifiers",
     image: require("@site/static/img/feature-1.png").default,
     description: (
       <>
-        Registering and configuring identifier schemes for link registration and
-        resolution.
+        Define which identifier schemes your resolver supports, from product
+        barcodes to business numbers.
       </>
     ),
   },
   {
-    title: "Link registration and management",
+    title: "Register links",
     image: require("@site/static/img/feature-2.png").default,
     description: (
       <>
-        Allowing registry operators or identifier owners to add and update links
-        to product information.
+        Connect identifiers to the information that matters: sustainability
+        reports, product data, certifications.
       </>
     ),
   },
   {
-    title: "Link resolution",
+    title: "Resolve anything",
     image: require("@site/static/img/feature-3.png").default,
     description: (
       <>
-        Enabling value chain actors to access additional information associated
-        with identifiers across various identifier schemes.
+        Anyone with an identifier can find the information they need, no account
+        required.
       </>
     ),
   },

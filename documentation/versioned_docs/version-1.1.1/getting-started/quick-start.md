@@ -28,7 +28,7 @@ docker compose up -d
 
 4. Within the API documentation, click the Authorize button and enter the default API key `test123`
 
-The default configuration and examples within the API documentation will be sufficient for you to get started. When you are ready, you can find more detailed setup and configuration options [here](docs/getting-started/configuration.md).
+The default configuration and examples within the API documentation will be sufficient for you to get started. When you are ready, you can find more detailed setup and configuration options [here](./configuration.md).
 
 ## Using Pre-built Docker Images
 
