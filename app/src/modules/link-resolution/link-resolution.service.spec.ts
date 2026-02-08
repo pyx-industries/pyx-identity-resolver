@@ -10,6 +10,7 @@ import { MockType } from '../../__mocks__/mock.interface';
 import { Uri } from './interfaces/uri.interface';
 import { I18nService } from 'nestjs-i18n';
 import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('LinkResolutionService', () => {
   let service: LinkResolutionService;
@@ -30,10 +31,21 @@ describe('LinkResolutionService', () => {
           useFactory: i18nServiceMockFactory,
         },
         {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'RESOLVER_DOMAIN')
+                return 'http://localhost:3002/api/1.0.0';
+              return undefined;
+            }),
+          },
+        },
+        {
           provide: IdentifierManagementService,
           useValue: {
             getIdentifier: jest.fn().mockResolvedValue({
               namespace: 'testNamespace',
+              namespaceURI: '',
               applicationIdentifiers: [
                 {
                   ai: '01',
@@ -152,5 +164,199 @@ describe('LinkResolutionService', () => {
         lang: 'en',
       },
     );
+  });
+
+  describe('accessRole filtering', () => {
+    const baseMockUri: Uri = {
+      id: '123',
+      namespace: 'idr',
+      identificationKeyType: 'primary',
+      identificationKey: '123',
+      itemDescription: '',
+      qualifierPath: '/',
+      active: true,
+      responses: [
+        {
+          targetUrl: 'http://public.com',
+          title: 'Public DPP',
+          linkType: 'idr:dpp',
+          ianaLanguage: 'en',
+          context: 'us',
+          mimeType: 'application/json',
+          active: true,
+          fwqs: false,
+          defaultLinkType: true,
+          defaultIanaLanguage: true,
+          defaultContext: true,
+          defaultMimeType: true,
+        },
+        {
+          targetUrl: 'http://customer.com',
+          title: 'Customer DCC',
+          linkType: 'idr:dcc',
+          ianaLanguage: 'en',
+          context: 'us',
+          mimeType: 'application/json',
+          active: true,
+          fwqs: false,
+          defaultLinkType: false,
+          defaultIanaLanguage: true,
+          defaultContext: true,
+          defaultMimeType: true,
+          accessRole: ['untp:accessRole#Customer'],
+        },
+        {
+          targetUrl: 'http://regulator.com',
+          title: 'Regulator DCC',
+          linkType: 'idr:dcc',
+          ianaLanguage: 'en',
+          context: 'us',
+          mimeType: 'application/json',
+          active: true,
+          fwqs: false,
+          defaultLinkType: false,
+          defaultIanaLanguage: true,
+          defaultContext: true,
+          defaultMimeType: true,
+          accessRole: ['untp:accessRole#Regulator'],
+        },
+      ],
+      linkset: { anchor: 'http://localhost:3002/api/1.0.0/idr/01/123' },
+      linkHeaderText: '<http://public.com>; rel="idr:dpp"',
+    };
+
+    it('should resolve without filtering when no accessRole provided', async () => {
+      const identifierParams: LinkResolutionDto = {
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: { linkType: 'idr:dpp' },
+      };
+
+      mockRepository.one.mockReturnValue(
+        JSON.parse(JSON.stringify(baseMockUri)),
+      );
+      const result = await service.resolve(identifierParams);
+
+      expect(result.targetUrl).toBe('http://public.com');
+      // No accessRole => uses pre-stored linkset/linkHeader
+      expect(result.linkHeaderText).toBe('<http://public.com>; rel="idr:dpp"');
+    });
+
+    it('should filter responses by accessRole shorthand and resolve customer-only linkType', async () => {
+      const identifierParams: LinkResolutionDto = {
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {
+          linkType: 'idr:dcc',
+          accessRole: 'customer',
+        },
+      };
+
+      mockRepository.one.mockReturnValue(
+        JSON.parse(JSON.stringify(baseMockUri)),
+      );
+      const result = await service.resolve(identifierParams);
+
+      // Customer link matches idr:dcc; regulator link filtered out
+      expect(result.targetUrl).toBe('http://customer.com');
+    });
+
+    it('should reconstruct linkset when accessRole filtering is active', async () => {
+      const identifierParams: LinkResolutionDto = {
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {
+          linkType: 'idr:dcc',
+          accessRole: 'customer',
+        },
+      };
+
+      mockRepository.one.mockReturnValue(
+        JSON.parse(JSON.stringify(baseMockUri)),
+      );
+      const result = await service.resolve(identifierParams);
+
+      expect(result.data.linkset).not.toEqual([baseMockUri.linkset]);
+      expect(result.data.linkset[0].anchor).toBeDefined();
+      expect(result.linkHeaderText).toContain('http://customer.com');
+      expect(result.linkHeaderText).not.toContain('http://regulator.com');
+    });
+
+    it('should filter by full URI accessRole', async () => {
+      const identifierParams: LinkResolutionDto = {
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {
+          linkType: 'idr:dcc',
+          accessRole: 'untp:accessRole#Customer',
+        },
+      };
+
+      mockRepository.one.mockReturnValue(
+        JSON.parse(JSON.stringify(baseMockUri)),
+      );
+      const result = await service.resolve(identifierParams);
+
+      expect(result.targetUrl).toBe('http://customer.com');
+    });
+
+    it('should return only public links for unknown accessRole', async () => {
+      const identifierParams: LinkResolutionDto = {
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {
+          linkType: 'idr:dpp',
+          accessRole: 'unknown',
+        },
+      };
+
+      mockRepository.one.mockReturnValue(
+        JSON.parse(JSON.stringify(baseMockUri)),
+      );
+      const result = await service.resolve(identifierParams);
+
+      // Only public link (no accessRole) should match idr:dpp
+      expect(result.targetUrl).toBe('http://public.com');
+    });
+
+    it('should throw when accessRole filter excludes all responses', async () => {
+      const noPublicUri: Uri = {
+        ...baseMockUri,
+        responses: [
+          {
+            targetUrl: 'http://regulator.com',
+            title: 'Regulator Only',
+            linkType: 'idr:dpp',
+            ianaLanguage: 'en',
+            context: 'us',
+            mimeType: 'application/json',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+            defaultMimeType: true,
+            accessRole: ['untp:accessRole#Regulator'],
+          },
+        ],
+      };
+
+      const identifierParams: LinkResolutionDto = {
+        namespace: 'idr',
+        identifiers: { primary: { id: '123', qualifier: '01' } },
+        descriptiveAttributes: {
+          linkType: 'idr:dpp',
+          accessRole: 'customer',
+        },
+      };
+
+      mockRepository.one.mockReturnValue(
+        JSON.parse(JSON.stringify(noPublicUri)),
+      );
+
+      await expect(service.resolve(identifierParams)).rejects.toThrow(
+        'General Error Exception',
+      );
+    });
   });
 });

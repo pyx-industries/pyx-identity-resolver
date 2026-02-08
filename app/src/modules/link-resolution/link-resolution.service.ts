@@ -1,9 +1,14 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { LinkResolutionDto } from './dto/link-resolution.dto';
 import { IRepositoryProvider } from '../../repository/providers/provider.repository.interface';
 import { constructID, convertAICode } from '../shared/utils/uri.utils';
 import { Uri } from './interfaces/uri.interface';
-import { processUri } from './utils/link-resolution.utils';
+import {
+  processUri,
+  LinksetReconstructionContext,
+} from './utils/link-resolution.utils';
+import { filterByAccessRole } from './utils/access-role-filter.utils';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
 import { I18nService } from 'nestjs-i18n';
 import { ResolvedLink } from './interfaces/link-resolution.interface';
@@ -18,14 +23,14 @@ export class LinkResolutionService {
     @Inject()
     private readonly identifierManagementService: IdentifierManagementService,
     private readonly i18n: I18nService,
+    private readonly configService: ConfigService,
   ) {}
 
   async resolve(identifierParams: LinkResolutionDto): Promise<ResolvedLink> {
-    const allIdentifiers = (
-      await this.identifierManagementService.getIdentifier(
-        identifierParams.namespace,
-      )
-    ).applicationIdentifiers;
+    const identifier = await this.identifierManagementService.getIdentifier(
+      identifierParams.namespace,
+    );
+    const allIdentifiers = identifier.applicationIdentifiers;
 
     const standardizedParams = this.standardizeLinkResolutionDto(
       identifierParams,
@@ -36,7 +41,37 @@ export class LinkResolutionService {
     const uriWithId: Uri = await this.repositoryProvider.one(id);
 
     if (uriWithId && uriWithId.active) {
-      const resolvedLink = processUri(uriWithId, standardizedParams);
+      const accessRole = identifierParams.descriptiveAttributes?.accessRole;
+
+      let effectiveUri = uriWithId;
+      let reconstructionContext: LinksetReconstructionContext | undefined;
+
+      if (accessRole) {
+        effectiveUri = {
+          ...uriWithId,
+          responses: filterByAccessRole(uriWithId.responses, accessRole),
+        };
+
+        const resolverDomain =
+          this.configService.get<string>('RESOLVER_DOMAIN');
+        const linkTypeVocDomain =
+          identifier.namespaceURI && identifier.namespaceURI !== ''
+            ? identifier.namespaceURI
+            : resolverDomain + '/voc';
+
+        reconstructionContext = {
+          identificationKeyCode:
+            standardizedParams.identifiers.primary.qualifier,
+          resolverDomain,
+          linkTypeVocDomain,
+        };
+      }
+
+      const resolvedLink = processUri(
+        effectiveUri,
+        standardizedParams,
+        reconstructionContext,
+      );
       if (resolvedLink) {
         return resolvedLink;
       }

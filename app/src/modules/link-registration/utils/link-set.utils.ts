@@ -1,16 +1,14 @@
 import * as _ from 'lodash';
 import {
-  CreateLinkRegistrationDto,
-  Response,
-} from '../dto/link-registration.dto';
-import {
   LinkContextObject,
+  LinkSetInput,
+  LinkSetResponseInput,
   LinkTargetObject,
 } from '../interfaces/link-set.interface';
 import { VersionHistoryEntry } from '../interfaces/versioned-uri.interface';
 
 export const constructHTTPLink = (
-  uri: CreateLinkRegistrationDto,
+  uri: LinkSetInput,
   identificationKeyCode: string,
   attrs: { resolverDomain: string; linkTypeVocDomain: string },
 ): string => {
@@ -22,7 +20,7 @@ export const constructHTTPLink = (
 };
 
 export const constructLinkSetJson = (
-  uri: CreateLinkRegistrationDto,
+  uri: LinkSetInput,
   identificationKeyCode: string,
   attrs: { resolverDomain: string; linkTypeVocDomain: string },
   versionHistory?: VersionHistoryEntry[],
@@ -46,7 +44,7 @@ export const constructLinkSetJson = (
  * @returns LinkContextObject
  */
 const constructLinkContextObject = (
-  uri: CreateLinkRegistrationDto,
+  uri: LinkSetInput,
   identificationKeyCode: string,
   attrs: { resolverDomain: string; linkTypeVocDomain: string },
   versionHistory?: VersionHistoryEntry[],
@@ -72,7 +70,7 @@ const constructLinkContextObject = (
  *
  */
 const constructLinkTargetObjects = (
-  responses: Response[],
+  responses: LinkSetResponseInput[],
   linkTypeVocDomain: string,
   versionHistory?: VersionHistoryEntry[],
 ): Record<string, LinkTargetObject[]> => {
@@ -82,7 +80,7 @@ const constructLinkTargetObjects = (
   const groupedResponses = _.groupBy(
     sortedResponses,
     (res) => res.linkType,
-  ) as Record<string, Response[]>;
+  ) as Record<string, LinkSetResponseInput[]>;
 
   const result: Record<string, LinkTargetObject[]> = Object.values(
     groupedResponses,
@@ -192,7 +190,9 @@ const constructLinkTargetObjects = (
  * @param responses
  * @returns responses
  */
-const postprocessResponses = (responses: Response[]): Response[] => {
+const postprocessResponses = (
+  responses: LinkSetResponseInput[],
+): LinkSetResponseInput[] => {
   // Set up the sort priority order with direction = 1 (meaning 'ascending' whereas -1 means descending)
   const sortBy = [
     {
@@ -243,7 +243,7 @@ const constructExtensionRelationType = (
 };
 
 const buildOriginalRequest = (
-  uri: CreateLinkRegistrationDto,
+  uri: LinkSetInput,
   identificationKeyCode: string,
   attrs: { resolverDomain: string; linkTypeVocDomain: string },
 ) =>
