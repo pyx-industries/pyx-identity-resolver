@@ -475,10 +475,10 @@ Request the sustainability information for product `12345`:
 curl -v https://your-resolver.example.com/api/1.0.0/acme/01/12345?linkType=acme:sustainabilityInfo
 ```
 
-The resolver responds with a **302 redirect** to the target URL:
+The resolver responds with a **307 redirect** to the target URL:
 
 ```
-< HTTP/1.1 302 Found
+< HTTP/1.1 307 Temporary Redirect
 < Location: https://acme.example.com/products/12345/sustainability
 < Link: <https://your-resolver.example.com/api/1.0.0/acme/01/12345?linkType=all>; rel="linkset"; type="application/linkset+json"
 ```
@@ -546,7 +546,7 @@ The `Accept` header also controls the **response format**:
 | Accept value | Behaviour |
 |---|---|
 | `application/linkset+json` | Returns the full linkset as JSON instead of redirecting |
-| `application/linkset` | Returns the linkset in RFC 9264 text format |
+| `application/linkset` | Returns the full set of Link header entries as `application/linkset+json` |
 | Anything else | Redirects to the matched response's `targetUrl` (default) |
 
 ### Resolve with `linkType=all`

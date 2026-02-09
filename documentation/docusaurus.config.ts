@@ -109,19 +109,19 @@ const config: Config = {
           items: [
             {
               label: "Understanding the Service",
-              to: "/docs/understanding-the-service",
+              to: "/docs/understanding-the-service/",
             },
             {
               label: "Developer Guide",
-              to: "/docs/developer-guide",
+              to: "/docs/developer-guide/",
             },
             {
               label: "Deployment Guide",
-              to: "/docs/deployment-guide",
+              to: "/docs/deployment-guide/",
             },
             {
               label: "Contributing",
-              to: "/docs/contributing",
+              to: "/docs/contributing/",
             },
           ],
         },

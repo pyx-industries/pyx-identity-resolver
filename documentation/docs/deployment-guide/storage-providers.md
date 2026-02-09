@@ -26,8 +26,8 @@ This means any storage service that implements the S3 interface will work:
 - [Cloudflare R2](https://developers.cloudflare.com/r2/)
 
 The IDR reads and writes JSON files to a single bucket.
-The bucket must be created **before** the IDR starts ---
-the service does not create it automatically.
+It creates the bucket automatically on startup
+if it does not already exist.
 
 ## MinIO
 
