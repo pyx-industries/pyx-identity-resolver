@@ -1,5 +1,46 @@
 # Changelog
 
+## [2.0.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.1.3...v2.0.0) (2026-02-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* **link-registration:** harden registration service and upsert utilities ([#66](https://github.com/pyx-industries/pyx-identity-resolver/issues/66))
+
+### Features
+
+* **ci:** Enforce conventional commit syntax ([#50](https://github.com/pyx-industries/pyx-identity-resolver/issues/50)) ([5155f89](https://github.com/pyx-industries/pyx-identity-resolver/commit/5155f89d14ce8fb38514208c2c7e7231c2133e7f))
+* **link-management:** Add CRUD endpoints for individual links ([#67](https://github.com/pyx-industries/pyx-identity-resolver/issues/67)) ([397c701](https://github.com/pyx-industries/pyx-identity-resolver/commit/397c701484938b0bdf4be0b81eba308117d54447))
+* **link-registration:** Add UNTP data model fields and link type constants ([#68](https://github.com/pyx-industries/pyx-identity-resolver/issues/68)) ([172b1bb](https://github.com/pyx-industries/pyx-identity-resolver/commit/172b1bbb519f670530fc8813292f44e7637e56ca))
+* **link-registration:** Add UNTP linkset extensions and predecessor-version support ([#69](https://github.com/pyx-industries/pyx-identity-resolver/issues/69)) ([6f97592](https://github.com/pyx-industries/pyx-identity-resolver/commit/6f97592e074afa5c9fa6cf1e14a759f2a0bed1cc))
+* **link-registration:** Add versioning, link-index, and default-flags utilities ([#65](https://github.com/pyx-industries/pyx-identity-resolver/issues/65)) ([de8b979](https://github.com/pyx-industries/pyx-identity-resolver/commit/de8b979f3a573fc98ff2b5d38acb325e026d2c9f))
+* **link-resolution:** Add query-time Link header construction ([#75](https://github.com/pyx-industries/pyx-identity-resolver/issues/75)) ([49d6000](https://github.com/pyx-industries/pyx-identity-resolver/commit/49d6000fda081730db83cf2db4fb6eed0cfa896b))
+* **link-resolution:** Add variant-based disclosure with accessRole filtering ([#71](https://github.com/pyx-industries/pyx-identity-resolver/issues/71)) ([ccc8108](https://github.com/pyx-industries/pyx-identity-resolver/commit/ccc81085316af6407db9bb86da21cae25a72299f))
+
+
+### Bug Fixes
+
+* **docs:** Sync documentation package version with docVersion ([#51](https://github.com/pyx-industries/pyx-identity-resolver/issues/51)) ([414d0ec](https://github.com/pyx-industries/pyx-identity-resolver/commit/414d0eca4b6291d19debdf2c918cb63cc82ddcc9))
+* **link-registration:** Harden registration service and upsert utilities ([#66](https://github.com/pyx-industries/pyx-identity-resolver/issues/66)) ([5dc8ff2](https://github.com/pyx-industries/pyx-identity-resolver/commit/5dc8ff2da09346ac769b4a43ca899ae86b9f7940))
+
+
+### Tests
+
+* **link-resolution:** Add decryptionKey query parameter tests ([#73](https://github.com/pyx-industries/pyx-identity-resolver/issues/73)) ([2245cc8](https://github.com/pyx-industries/pyx-identity-resolver/commit/2245cc867f450970af89f3bfb6e27e7b66c5c7e8))
+
+
+### Documentation
+
+* **deployment:** Add migration guide for 1.x to 2.0.0 upgrade ([b377200](https://github.com/pyx-industries/pyx-identity-resolver/commit/b377200da7ae4eabbcae3b28a245306687f98694))
+* **migration:** Move migration guide to its own sidebar category ([d202c1e](https://github.com/pyx-industries/pyx-identity-resolver/commit/d202c1efafddb21b4c19d37b0b5150a9074a6c05))
+* Rewrite documentation site for current architecture ([#79](https://github.com/pyx-industries/pyx-identity-resolver/issues/79)) ([d4502dd](https://github.com/pyx-industries/pyx-identity-resolver/commit/d4502dd95ff00a7afbdbc2218030778414e44269))
+
+
+### Miscellaneous
+
+* **ci:** Exclude release commits from changelog ([2d5b7d1](https://github.com/pyx-industries/pyx-identity-resolver/commit/2d5b7d148d4e1a2d3d5d268dbfda20e1cba77ffb))
+* **release:** Prepare release 2.0.0 ([2772b15](https://github.com/pyx-industries/pyx-identity-resolver/commit/2772b1531cf8873da2ed10fe670ca353f61a7a51))
+
 ## [1.1.3](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.1.2...v1.1.3) (2026-01-29)
 
 
