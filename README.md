@@ -55,7 +55,7 @@ docker pull ghcr.io/pyx-industries/pyx-identity-resolver:1.1.2
 docker pull ghcr.io/pyx-industries/pyx-identity-resolver:1.1.2-serverless
 ```
 
-For more details on available tags, see the [Package workflow documentation](./docs/ci/package.md).
+For more details on available tags, see the [CI/CD Pipeline](https://pyx-industries.github.io/pyx-identity-resolver/docs/deployment-guide/ci-cd) page on the documentation site.
 
 ## Contributing
 
@@ -63,35 +63,6 @@ We use [Semantic Line Breaks](https://sembr.org/) in our documentation. Please f
 
 ## Release and Publishing
 
-This project uses two primary workflows:
-
-1. [Release](./.github/workflows/release.yml): Creates version tags and GitHub releases when merging to `master`.
-2. [Package](./.github/workflows/package.yml): Builds and pushes Docker images to the GitHub Container Registry.
-
 We follow [Semantic Versioning](https://semver.org/) with the format `MAJOR.MINOR.PATCH`.
 
-For more detailed information, please refer to the [Release Guide](./RELEASE_GUIDE.md) and [Release Management Guide](./RELEASE_MANAGEMENT_GUIDE.md).
-
-### Quick Release Guide
-
-1. Create a `release/*` branch from `master` (e.g., `release/1.2.0`).
-2. Update version in `app/package.json` and `version.json`.
-3. If documentation changed, generate new version: `cd documentation && yarn release:doc`.
-4. Merge the auto-generated changelog PR into the release branch.
-5. Create a PR from the release branch to `master`.
-6. Merge the PR - the release pipeline will automatically create tags and GitHub releases.
-
-The `version.json` file contains version metadata:
-
-```json
-{
-  "version": "MAJOR.MINOR.PATCH",
-  "apiVersion": "MAJOR.MINOR.PATCH",
-  "docVersion": "MAJOR.MINOR.PATCH",
-  "dependencies": {}
-}
-```
-
-- `version`: Always update to match the release version.
-- `apiVersion`: Only update if the API contract changes.
-- `docVersion`: Only update if documentation changed.
+For the full release process, refer to the [Release Process](https://pyx-industries.github.io/pyx-identity-resolver/docs/contributing/release-process) page on the documentation site.

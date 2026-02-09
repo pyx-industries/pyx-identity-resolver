@@ -15,7 +15,7 @@ function HomepageHero() {
           <div className="home-hero__actions">
             <Link
               className="button button--primary button--lg"
-              to={"/docs/getting-started/"}
+              to={"/docs/understanding-the-service/"}
             >
               Get Started
             </Link>

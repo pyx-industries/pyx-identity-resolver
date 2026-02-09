@@ -7,7 +7,7 @@ const baseUrl = process.env.DOCS_BASE_URL || "/";
 const config: Config = {
   title: "Pyx Identity Resolver",
   tagline:
-    "Streamline product traceability by enabling flexible link registration and resolution across diverse identifier schemes.",
+    "Turn any identifier into a gateway to trusted information.",
   favicon: "img/favicon.png",
 
   url,
@@ -35,6 +35,12 @@ const config: Config = {
         docs: {
           sidebarPath: "./sidebars.ts",
           editUrl: "https://github.com/pyx-industries/pyx-identity-resolver",
+          lastVersion: "current",
+          versions: {
+            current: {
+              label: "Current",
+            },
+          },
         },
         blog: false,
         theme: {
@@ -67,10 +73,24 @@ const config: Config = {
           type: "docsVersionDropdown",
           position: "right",
         },
-        { to: "/docs/introduction/", label: "Introduction", position: "right" },
         {
-          to: "/docs/getting-started/",
-          label: "Getting started",
+          to: "/docs/understanding-the-service/",
+          label: "Understanding the Service",
+          position: "right",
+        },
+        {
+          to: "/docs/developer-guide/",
+          label: "Developer Guide",
+          position: "right",
+        },
+        {
+          to: "/docs/deployment-guide/",
+          label: "Deployment Guide",
+          position: "right",
+        },
+        {
+          to: "/docs/contributing/",
+          label: "Contributing",
           position: "right",
         },
         {
@@ -88,16 +108,20 @@ const config: Config = {
           title: "Docs",
           items: [
             {
-              label: "Introduction",
-              to: "/docs/introduction",
+              label: "Understanding the Service",
+              to: "/docs/understanding-the-service/",
             },
             {
-              label: "Getting Started",
-              to: "/docs/getting-started",
+              label: "Developer Guide",
+              to: "/docs/developer-guide/",
             },
             {
-              label: "Contribute",
-              to: "https://github.com/pyx-industries/pyx-identity-resolver",
+              label: "Deployment Guide",
+              to: "/docs/deployment-guide/",
+            },
+            {
+              label: "Contributing",
+              to: "/docs/contributing/",
             },
           ],
         },
