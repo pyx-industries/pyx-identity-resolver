@@ -1,0 +1,205 @@
+---
+sidebar_position: 7
+title: Migrating to 2.0.0
+---
+
+# Migrating from 1.x to 2.0.0
+
+This guide covers what changed between 1.1.3 and 2.0.0,
+what you need to do before upgrading,
+and what you can adopt at your own pace after the upgrade.
+
+## Before you upgrade
+
+### 1. Update `RESOLVER_DOMAIN`
+
+The API version path has changed.
+Update your environment variable from:
+
+```
+RESOLVER_DOMAIN=https://resolver.example.com/api/1.0.0
+```
+
+to:
+
+```
+RESOLVER_DOMAIN=https://resolver.example.com/api/2.0.0
+```
+
+This is the only **required** configuration change.
+All API endpoints move from `/api/1.0.0/...` to `/api/2.0.0/...`.
+The route structure after the version prefix is unchanged.
+
+### 2. Update API client base paths
+
+Any code that calls the IDR needs its base URL updated
+to `/api/2.0.0`.
+This includes registration scripts, resolution clients,
+and any integrations that construct resolver URLs.
+
+### 3. Review Link header consumers
+
+The `Link` response header has been restructured.
+Every resolution response now includes:
+
+- An `owl:sameAs` entry pointing to the canonical URL of the identifier.
+- A self-referencing `linkset` entry pointing to `?linkType=all`.
+- Up to three parent `linkset` entries when the request includes qualifier paths.
+- Target link entries for each active response
+  (subject to a size budget, see below).
+
+If your clients parse the `Link` header,
+review the parsing logic to handle these new entries.
+If you only use the linkset JSON body (`Accept: application/linkset+json`),
+no changes are needed.
+
+## Breaking changes
+
+### Composite key expansion
+
+Duplicate detection during registration now uses **five fields**
+instead of three:
+
+| Field | 1.x | 2.0.0 |
+|-------|-----|-------|
+| `targetUrl` | Used | Used |
+| `linkType` | Used | Used |
+| `mimeType` | Used | Used |
+| `ianaLanguage` | Ignored | **Used** |
+| `context` | Ignored | **Used** |
+
+**What this means:**
+two responses that share the same `targetUrl`, `linkType`, and `mimeType`
+but differ in `ianaLanguage` or `context`
+are now treated as **distinct links**.
+Under 1.x these would have been rejected as duplicates.
+
+**Existing data** does not need migration.
+Documents registered under 1.x continue to work.
+The only behavioural difference is that new registrations
+now allow combinations that were previously blocked.
+
+### Link header size budgeting
+
+A new environment variable `LINK_HEADER_MAX_SIZE` (default: `8192` bytes)
+controls the maximum size of the `Link` response header.
+
+If the assembled header exceeds this limit,
+all target link entries are dropped.
+The mandatory entries (`owl:sameAs` and linkset references) are always included.
+
+For identifiers with many registered responses,
+you may need to increase this value.
+Watch for `"Link header truncated"` warnings in the logs.
+
+```
+LINK_HEADER_MAX_SIZE=16384
+```
+
+## New features
+
+These features are all **opt-in**.
+Existing workflows continue to work without changes.
+
+### Link management CRUD
+
+New endpoints at `/resolver/links` allow you to
+list, update, and delete individual link responses
+without re-registering the entire identifier document.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/resolver/links?namespace=...&identificationKeyType=...&identificationKey=...` | List all responses for an identifier (active and inactive) |
+| `GET` | `/resolver/links/{linkId}` | Get a single response by ID |
+| `PUT` | `/resolver/links/{linkId}` | Update a response (partial update) |
+| `DELETE` | `/resolver/links/{linkId}` | Soft-delete a response (sets `active: false`) |
+| `DELETE` | `/resolver/links/{linkId}?hard=true` | Hard-delete a response (permanently removes it) |
+
+All endpoints require `Authorization: Bearer {API_KEY}`.
+See the [Developer Guide](../developer-guide/) for request/response details.
+
+### UNTP data model fields
+
+Three optional fields have been added to link responses
+for [UN Transparency Protocol](https://uncefact.github.io/spec-untp/) compliance:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `encryptionMethod` | `"none"` \| `"AES-128"` \| `"AES-256"` | Encryption applied to the target resource |
+| `accessRole` | Array of role URIs | Roles that may access this link variant |
+| `method` | String (e.g. `"POST"`) | HTTP method for accessing the target |
+
+These fields are stored when provided during registration
+and appear in linkset output.
+If omitted, responses behave exactly as before.
+
+### Access role filtering
+
+A new `?accessRole=` query parameter filters resolution results
+by UNTP access role.
+
+```
+GET /api/2.0.0/{namespace}/{ai}/{key}?linkType=all&accessRole=customer
+```
+
+Shorthand values are normalised automatically:
+`customer` becomes `untp:accessRole#Customer`.
+
+Responses without an `accessRole` field are treated as public
+and always included.
+When the parameter is omitted, all responses are returned (existing behaviour).
+
+### Predecessor-version links
+
+When a response's `targetUrl` is changed via the Link Management `PUT` endpoint,
+the previous URL is recorded in the version history
+and appears in the linkset as a `rel="predecessor-version"` entry
+following [RFC 6903](https://www.rfc-editor.org/rfc/rfc6903).
+
+### Decryption key forwarding
+
+A new `?decryptionKey=` query parameter forwards the key
+to the target URL during resolution,
+but only when the matched response has `fwqs: true`.
+When `fwqs` is false or the parameter is absent, nothing changes.
+
+### Link versioning
+
+Every link response now carries:
+
+- A `linkId` (UUID) for unique identification.
+- A `version` number that increments on each update.
+- A `versionHistory` array recording what changed and when.
+
+These fields are added automatically.
+Documents created under 1.x are **auto-normalised on first read**:
+the service adds `linkId`, `version: 1`, and an empty `versionHistory`
+to each response, then persists the updated document.
+No manual migration is needed.
+
+## New environment variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `LINK_HEADER_MAX_SIZE` | No | `8192` | Maximum `Link` header size in bytes. Increase if you see truncation warnings. |
+
+## Checklist
+
+### Required before upgrade
+
+- [ ] Update `RESOLVER_DOMAIN` to include `/api/2.0.0`
+- [ ] Update all API clients to use the `/api/2.0.0` base path
+- [ ] Pull the `2.0.0` container image
+
+### Recommended after upgrade
+
+- [ ] Review Link header parsing logic if your clients depend on it
+- [ ] Test resolution with existing identifiers to confirm auto-normalisation works
+- [ ] Set `LINK_HEADER_MAX_SIZE` if you have identifiers with many responses
+
+### Optional adoption
+
+- [ ] Use `/resolver/links` CRUD endpoints for fine-grained link management
+- [ ] Add UNTP fields (`encryptionMethod`, `accessRole`, `method`) to new registrations
+- [ ] Use `?accessRole=` filtering for variant-based disclosure
+- [ ] Update linkset parsers to handle `predecessor-version` entries and UNTP fields
