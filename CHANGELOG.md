@@ -5,17 +5,7 @@
 
 ### Bug Fixes
 
-* **docs:** Default docs site to v2.0.0 and remove current version ([055ddbe](https://github.com/pyx-industries/pyx-identity-resolver/commit/055ddbe091b11a139751f873f7362f1afa820761))
-
-
-### Documentation
-
-* **migration:** Document linkset metadata staleness for upgraded identifiers ([62730a4](https://github.com/pyx-industries/pyx-identity-resolver/commit/62730a4f0ee9edc5291588c72dfa034802461540))
-
-
-### Miscellaneous
-
-* **release:** Prepare release 2.0.1 ([7fd998f](https://github.com/pyx-industries/pyx-identity-resolver/commit/7fd998fbd42686838a45b0b0f86ccd5f5f62e0e0))
+* **docs:** Fix docs site to default to v2.0.0 and document linkset metadata staleness for upgraded identifiers ([055ddbe](https://github.com/pyx-industries/pyx-identity-resolver/commit/055ddbe091b11a139751f873f7362f1afa820761)), ([62730a4](https://github.com/pyx-industries/pyx-identity-resolver/commit/62730a4f0ee9edc5291588c72dfa034802461540))
 
 ## [2.0.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/1.1.3...v2.0.0) (2026-02-09)
 
