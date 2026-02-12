@@ -117,22 +117,58 @@ describe('MinioProvider', () => {
     loggerSpy.mockRestore();
   });
 
-  it('should log error and return undefined when MinIO throws a non-NoSuchKey error', async () => {
+  it('should log error and re-throw when MinIO throws a non-NoSuchKey error', async () => {
     const loggerSpy = jest
       .spyOn(Logger.prototype, 'error')
       .mockImplementation();
     const connectionError = new Error('Connection refused');
     jest.spyOn(minioClient, 'getObject').mockRejectedValue(connectionError);
 
-    const result = await provider.one('some-object');
-
-    expect(result).toBeUndefined();
+    await expect(provider.one('some-object')).rejects.toThrow(
+      'Connection refused',
+    );
     expect(loggerSpy).toHaveBeenCalledWith(
       expect.stringContaining('some-object'),
       expect.any(String),
     );
     expect(loggerSpy).toHaveBeenCalledWith(
       expect.stringContaining('test'),
+      expect.any(String),
+    );
+
+    loggerSpy.mockRestore();
+  });
+
+  it('should log error and re-throw when save fails', async () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation();
+    const writeError = new Error('Access denied');
+    jest.spyOn(minioClient, 'putObject').mockRejectedValue(writeError);
+
+    await expect(
+      provider.save({ id: 'test-object', name: 'data' } as any),
+    ).rejects.toThrow('Access denied');
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('test-object'),
+      expect.any(String),
+    );
+
+    loggerSpy.mockRestore();
+  });
+
+  it('should log error and re-throw when delete fails', async () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation();
+    const deleteError = new Error('Bucket not found');
+    jest.spyOn(minioClient, 'removeObject').mockRejectedValue(deleteError);
+
+    await expect(provider.delete('test-object')).rejects.toThrow(
+      'Bucket not found',
+    );
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('test-object'),
       expect.any(String),
     );
 

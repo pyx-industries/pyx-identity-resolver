@@ -26,14 +26,21 @@ export class MinioProvider implements IRepositoryProvider {
     const id = data.id.endsWith('.json') ? data.id : `${data.id}.json`;
     const stringifiedData = JSON.stringify(data);
 
-    await this.minioClient.putObject(
-      this.options.bucket,
-      id,
-      stringifiedData,
-      stringifiedData.length,
-      metaData,
-    );
-    return;
+    try {
+      await this.minioClient.putObject(
+        this.options.bucket,
+        id,
+        stringifiedData,
+        stringifiedData.length,
+        metaData,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to write object "${id}" to bucket "${this.options.bucket}"`,
+        error instanceof Error ? error.stack : error,
+      );
+      throw error;
+    }
   }
 
   async one<T>(id: string): Promise<T | undefined> {
@@ -50,13 +57,14 @@ export class MinioProvider implements IRepositoryProvider {
       const data = Buffer.concat(chunks);
       return JSON.parse(data.toString());
     } catch (error) {
-      if ((error as any)?.code !== 'NoSuchKey') {
-        this.logger.error(
-          `Failed to read object "${id}" from bucket "${this.options.bucket}"`,
-          error instanceof Error ? error.stack : error,
-        );
+      if ((error as any)?.code === 'NoSuchKey') {
+        return undefined;
       }
-      return undefined;
+      this.logger.error(
+        `Failed to read object "${id}" from bucket "${this.options.bucket}"`,
+        error instanceof Error ? error.stack : error,
+      );
+      throw error;
     }
   }
 
@@ -78,9 +86,14 @@ export class MinioProvider implements IRepositoryProvider {
 
   async delete(id: string): Promise<void> {
     const idWithExtension = id.endsWith('.json') ? id : `${id}.json`;
-    return await this.minioClient.removeObject(
-      this.options.bucket,
-      idWithExtension,
-    );
+    try {
+      await this.minioClient.removeObject(this.options.bucket, idWithExtension);
+    } catch (error) {
+      this.logger.error(
+        `Failed to delete object "${idWithExtension}" from bucket "${this.options.bucket}"`,
+        error instanceof Error ? error.stack : error,
+      );
+      throw error;
+    }
   }
 }
