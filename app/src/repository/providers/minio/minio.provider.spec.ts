@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Logger } from '@nestjs/common';
 import * as Minio from 'minio';
 import { MinioProvider } from './minio.provider';
 import { REPOSITORY_MODULE_OPTIONS } from '../../repository.constants';
@@ -94,5 +95,83 @@ describe('MinioProvider', () => {
       .spyOn(minioClient, 'removeObject')
       .mockImplementation(() => Promise.resolve());
     await provider.delete(id);
+  });
+
+  it('should return undefined without logging when object does not exist (NoSuchKey)', async () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation();
+    const noSuchKeyError = Object.assign(
+      new Error('The specified key does not exist.'),
+      {
+        code: 'NoSuchKey',
+      },
+    );
+    jest.spyOn(minioClient, 'getObject').mockRejectedValue(noSuchKeyError);
+
+    const result = await provider.one('missing-object');
+
+    expect(result).toBeUndefined();
+    expect(loggerSpy).not.toHaveBeenCalled();
+
+    loggerSpy.mockRestore();
+  });
+
+  it('should log error and re-throw when MinIO throws a non-NoSuchKey error', async () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation();
+    const connectionError = new Error('Connection refused');
+    jest.spyOn(minioClient, 'getObject').mockRejectedValue(connectionError);
+
+    await expect(provider.one('some-object')).rejects.toThrow(
+      'Connection refused',
+    );
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('some-object'),
+      expect.any(String),
+    );
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('test'),
+      expect.any(String),
+    );
+
+    loggerSpy.mockRestore();
+  });
+
+  it('should log error and re-throw when save fails', async () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation();
+    const writeError = new Error('Access denied');
+    jest.spyOn(minioClient, 'putObject').mockRejectedValue(writeError);
+
+    await expect(
+      provider.save({ id: 'test-object', name: 'data' } as any),
+    ).rejects.toThrow('Access denied');
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('test-object'),
+      expect.any(String),
+    );
+
+    loggerSpy.mockRestore();
+  });
+
+  it('should log error and re-throw when delete fails', async () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation();
+    const deleteError = new Error('Bucket not found');
+    jest.spyOn(minioClient, 'removeObject').mockRejectedValue(deleteError);
+
+    await expect(provider.delete('test-object')).rejects.toThrow(
+      'Bucket not found',
+    );
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('test-object'),
+      expect.any(String),
+    );
+
+    loggerSpy.mockRestore();
   });
 });
