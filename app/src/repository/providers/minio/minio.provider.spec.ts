@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Logger } from '@nestjs/common';
 import * as Minio from 'minio';
 import { MinioProvider } from './minio.provider';
 import { REPOSITORY_MODULE_OPTIONS } from '../../repository.constants';
@@ -94,5 +95,47 @@ describe('MinioProvider', () => {
       .spyOn(minioClient, 'removeObject')
       .mockImplementation(() => Promise.resolve());
     await provider.delete(id);
+  });
+
+  it('should return undefined without logging when object does not exist (NoSuchKey)', async () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation();
+    const noSuchKeyError = Object.assign(
+      new Error('The specified key does not exist.'),
+      {
+        code: 'NoSuchKey',
+      },
+    );
+    jest.spyOn(minioClient, 'getObject').mockRejectedValue(noSuchKeyError);
+
+    const result = await provider.one('missing-object');
+
+    expect(result).toBeUndefined();
+    expect(loggerSpy).not.toHaveBeenCalled();
+
+    loggerSpy.mockRestore();
+  });
+
+  it('should log error and return undefined when MinIO throws a non-NoSuchKey error', async () => {
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation();
+    const connectionError = new Error('Connection refused');
+    jest.spyOn(minioClient, 'getObject').mockRejectedValue(connectionError);
+
+    const result = await provider.one('some-object');
+
+    expect(result).toBeUndefined();
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('some-object'),
+      expect.any(String),
+    );
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('test'),
+      expect.any(String),
+    );
+
+    loggerSpy.mockRestore();
   });
 });

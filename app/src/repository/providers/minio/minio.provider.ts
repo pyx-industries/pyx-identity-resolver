@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as Minio from 'minio';
 import { InjectRepository } from '../../repository.decorators';
 import { REPOSITORY_MODULE_OPTIONS } from '../../repository.constants';
@@ -10,6 +10,8 @@ import {
 
 @Injectable()
 export class MinioProvider implements IRepositoryProvider {
+  private readonly logger = new Logger(MinioProvider.name);
+
   constructor(
     @InjectRepository('Minio')
     private minioClient: Minio.Client,
@@ -48,6 +50,12 @@ export class MinioProvider implements IRepositoryProvider {
       const data = Buffer.concat(chunks);
       return JSON.parse(data.toString());
     } catch (error) {
+      if ((error as any)?.code !== 'NoSuchKey') {
+        this.logger.error(
+          `Failed to read object "${id}" from bucket "${this.options.bucket}"`,
+          error instanceof Error ? error.stack : error,
+        );
+      }
       return undefined;
     }
   }
