@@ -1,23 +1,18 @@
 # Changelog
 
-## [2.0.2](https://github.com/pyx-industries/pyx-identity-resolver/compare/2.0.1...v2.0.2) (2026-02-12)
+## [2.0.2](https://github.com/pyx-industries/pyx-identity-resolver/compare/2.0.1...v2.0.2) (2026-02-13)
 
 
 ### Bug Fixes
 
-* **ci:** Remove push condition ([0eebbfb](https://github.com/pyx-industries/pyx-identity-resolver/commit/0eebbfb8534de6ac8b2f0a73d9724a264ad36eec))
 * **ci:** Remove push condition ([cd375dc](https://github.com/pyx-industries/pyx-identity-resolver/commit/cd375dc26b59fa368e2cca204b36a59ad07fef17))
 * **storage:** Add error logging to MinIO provider and global exception filter ([e493c1e](https://github.com/pyx-industries/pyx-identity-resolver/commit/e493c1e66a1effc1c824681031a54eb750a1198f))
+* **storage:** Harden error handling in MinIO provider and exception filter ([0248994](https://github.com/pyx-industries/pyx-identity-resolver/commit/0248994))
 
 
 ### Documentation
 
 * **migration:** Add data backup warning to v2 migration guide ([d5b6898](https://github.com/pyx-industries/pyx-identity-resolver/commit/d5b689822e56307b67767bc4609190c350cf7258))
-
-
-### Miscellaneous
-
-* **release:** Bump version to 2.0.2 ([5ef6543](https://github.com/pyx-industries/pyx-identity-resolver/commit/5ef6543a53ac2e3452f8c8526bc4395fc5076596))
 
 ## [2.0.1](https://github.com/pyx-industries/pyx-identity-resolver/compare/2.0.0...v2.0.1) (2026-02-09)
 
