@@ -1,169 +1,38 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
-import { IdentifierDto } from '../../src/modules/identifier-management/dto/identifier.dto';
-import { defaultLinkTypes } from '../../src/modules/common/data/default-link-types';
+import { gs1LinkTypes } from '../../src/modules/link-registration/constants/gs1-link-types';
+import { untpLinkTypes } from '../../src/modules/link-registration/constants/untp-link-types';
 import { APP_ROUTE_PREFIX } from '../../src/common/utils/config.utils';
 
 const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
 const appName = process.env.APP_NAME;
-const apiKey = process.env.API_KEY;
-
-const environment = process.env.NODE_ENV;
-const gs1 = `e2e-${environment}-mock-gs1`;
-
-const namespaceURI = `${baseUrl}/voc/`;
-const namespaceProfile = `${baseUrl}/voc/?show=linktypes`;
 
 describe('CommonController (e2e)', () => {
-  describe('namespace with namespaceProfile and namespaceURI', () => {
-    let identifier: string;
-    const identifierDto: IdentifierDto = {
-      namespace: gs1,
-      namespaceProfile: namespaceProfile,
-      namespaceURI: namespaceURI,
-      applicationIdentifiers: [],
-    };
-
-    it('should create the namespace successfully', async () => {
-      const res = await request(baseUrl)
-        .post('/identifiers')
-        .set('Authorization', `Bearer ${apiKey}`)
-        .send(identifierDto)
-        .expect(HttpStatus.OK);
-
-      expect(res.body).toEqual({
-        message: 'Application identifier upserted successfully',
-      });
-
-      const response = await request(baseUrl)
-        .get('/identifiers')
-        .set('Authorization', `Bearer ${apiKey}`)
-        .query({ namespace: identifierDto.namespace })
-        .expect(HttpStatus.OK);
-
-      expect(response.body).toMatchObject(identifierDto);
-
-      identifier = response.body.namespace;
-    });
-
-    it('GET /.well-known/resolver', async () => {
+  describe('GET /.well-known/resolver', () => {
+    it('should return resolver description with gs1 and untp link type vocabularies', async () => {
       const response = await request(baseUrl)
         .get('/.well-known/resolver')
         .expect(HttpStatus.OK);
 
       expect(response.body.name).toBe(appName);
-      expect(response.body.supportedLinkType).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            namespace: namespaceURI,
-            prefix: `${gs1}:`,
-            profile: namespaceProfile,
-          }),
-        ]),
-      );
-
-      expect(response.body.supportedLinkType).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            namespace: `${baseUrl}/voc/`,
-            prefix: `${gs1}:`,
-            profile: `${baseUrl}/voc/?show=linktypes`,
-          }),
-        ]),
-      );
-      // Cleanup
-      await request(baseUrl)
-        .delete('/identifiers')
-        .set('Authorization', `Bearer ${apiKey}`)
-        .query({ namespace: identifierDto.namespace })
-        .expect(HttpStatus.OK);
-    });
-
-    it('GET /voc', async () => {
-      const response = await request(baseUrl)
-        .get('/voc')
-        .expect(HttpStatus.FOUND);
-
-      expect(response.header.location).toBe('/voc/?show=linktypes');
-    });
-
-    it('GET /voc/?show=linktypes', async () => {
-      const response = await request(baseUrl)
-        .get('/voc/?show=linktypes')
-        .expect(HttpStatus.OK);
-
-      expect(response.body).toEqual(defaultLinkTypes);
-    });
-
-    it('GET /voc/:linktype', async () => {
-      const response = await request(baseUrl)
-        .get('/voc/epcis')
-        .expect(HttpStatus.OK);
-
-      expect(response.body).toEqual(defaultLinkTypes.epcis);
+      expect(response.body.supportedPrimaryKeys).toEqual(['all']);
+      expect(response.body.supportedLinkType).toEqual([
+        {
+          namespace: 'http://gs1.org/voc/',
+          prefix: 'gs1:',
+          profile: expect.stringContaining('/voc/?show=linktypes'),
+        },
+        {
+          namespace: 'https://vocabulary.uncefact.org/untp/linkType#',
+          prefix: 'untp:',
+          profile: expect.stringContaining('/voc/?show=linktypes'),
+        },
+      ]);
     });
   });
 
-  describe('namespace without namespaceProfile and namespaceURI', () => {
-    let identifier: string;
-    const identifierDto: IdentifierDto = {
-      namespace: gs1,
-      namespaceProfile: '',
-      namespaceURI: '',
-      applicationIdentifiers: [],
-    };
-
-    it('should create the namespace successfully', async () => {
-      const res = await request(baseUrl)
-        .post('/identifiers')
-        .set('Authorization', `Bearer ${apiKey}`)
-        .send(identifierDto)
-        .expect(HttpStatus.OK);
-
-      expect(res.body).toEqual({
-        message: 'Application identifier upserted successfully',
-      });
-
-      const response = await request(baseUrl)
-        .get('/identifiers')
-        .set('Authorization', `Bearer ${apiKey}`)
-        .query({ namespace: identifierDto.namespace })
-        .expect(HttpStatus.OK);
-
-      expect(response.body).toMatchObject(identifierDto);
-
-      identifier = response.body.namespace;
-    });
-
-    it('GET /.well-known/resolver', async () => {
-      const response = await request(baseUrl)
-        .get('/.well-known/resolver')
-        .expect(HttpStatus.OK);
-
-      expect(response.body.name).toBe(appName);
-      expect(response.body.supportedLinkType).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            namespace: namespaceURI,
-            prefix: `${gs1}:`,
-            profile: namespaceProfile,
-          }),
-        ]),
-      );
-
-      expect(response.body.supportedLinkType).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            namespace: `${baseUrl}/voc/`,
-            prefix: `${gs1}:`,
-            profile: `${baseUrl}/voc/?show=linktypes`,
-          }),
-        ]),
-      );
-    });
-
-    it('GET /voc', async () => {
+  describe('GET /voc', () => {
+    it('should redirect to /voc/?show=linktypes', async () => {
       const response = await request(baseUrl)
         .get('/voc')
         .expect(HttpStatus.FOUND);
@@ -171,23 +40,64 @@ describe('CommonController (e2e)', () => {
       expect(response.header.location).toBe('/voc/?show=linktypes');
     });
 
-    it('GET /voc/?show=linktypes', async () => {
+    it('should return link types grouped by prefix', async () => {
       const response = await request(baseUrl)
         .get('/voc/?show=linktypes')
         .expect(HttpStatus.OK);
 
-      expect(response.body).toEqual(defaultLinkTypes);
+      expect(response.body).toEqual({
+        gs1: gs1LinkTypes,
+        untp: untpLinkTypes,
+      });
     });
 
-    it('GET /voc/:linktype', async () => {
+    it('should return only gs1 link types when prefix=gs1', async () => {
+      const response = await request(baseUrl)
+        .get('/voc/?show=linktypes&prefix=gs1')
+        .expect(HttpStatus.OK);
+
+      expect(response.body).toEqual({
+        gs1: gs1LinkTypes,
+      });
+    });
+
+    it('should return only untp link types when prefix=untp', async () => {
+      const response = await request(baseUrl)
+        .get('/voc/?show=linktypes&prefix=untp')
+        .expect(HttpStatus.OK);
+
+      expect(response.body).toEqual({
+        untp: untpLinkTypes,
+      });
+    });
+
+    it('should return empty object for unknown prefix', async () => {
+      const response = await request(baseUrl)
+        .get('/voc/?show=linktypes&prefix=unknown')
+        .expect(HttpStatus.OK);
+
+      expect(response.body).toEqual({});
+    });
+  });
+
+  describe('GET /voc/:linktype', () => {
+    it('should return a specific gs1 link type', async () => {
       const response = await request(baseUrl)
         .get('/voc/epcis')
         .expect(HttpStatus.OK);
 
-      expect(response.body).toEqual(defaultLinkTypes.epcis);
+      expect(response.body).toEqual(gs1LinkTypes['epcis']);
     });
 
-    it('should throw error when GET /voc/:invalidLinktype', async () => {
+    it('should return a specific untp link type', async () => {
+      const response = await request(baseUrl)
+        .get('/voc/dpp')
+        .expect(HttpStatus.OK);
+
+      expect(response.body).toEqual(untpLinkTypes['dpp']);
+    });
+
+    it('should return error for invalid link type', async () => {
       await request(baseUrl).get('/voc/unknown').expect(HttpStatus.BAD_REQUEST);
     });
   });

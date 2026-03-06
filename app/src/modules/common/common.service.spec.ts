@@ -124,15 +124,8 @@ describe('CommonService', () => {
   });
 
   it('should throw error if link type is not valid', () => {
-    const linkType = 'example';
-    try {
-      service.getSpecificLinkType(linkType);
-    } catch (error) {
-      expect(error).toBeInstanceOf(GeneralErrorException);
-      expect(mockI18nService.translate).toHaveBeenCalledWith(
-        'errors.invalid_voc_linktype',
-        { args: undefined, lang: 'en' },
-      );
-    }
+    expect(() => service.getSpecificLinkType('example')).toThrow(
+      GeneralErrorException,
+    );
   });
 });

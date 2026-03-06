@@ -1258,6 +1258,47 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
+    it('should reject a link type without a prefix', () => {
+      return request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '12345678901234',
+          qualifierPath: '/10/12345678901234567890/22/ABCDE',
+          itemDescription: 'DPP',
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: 'certificationInfo',
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Certification Information',
+              targetUrl: 'https://example.com',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${process.env.API_KEY}`)
+        .expect(404)
+        .expect((res) => {
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
+          expect(res.body.errors).toEqual([
+            {
+              field: 'linkType',
+              message: "Invalid link type 'certificationInfo'",
+            },
+          ]);
+        });
+    });
+
     it("should throw a bad request error for invalid response's linkTitle", () => {
       return request(baseUrl)
         .post('/resolver')
