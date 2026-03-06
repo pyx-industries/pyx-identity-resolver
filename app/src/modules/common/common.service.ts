@@ -6,7 +6,6 @@ import {
   ResolverConfig,
   SupportedLinkType,
 } from './interface/common.interface';
-import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
 import { gs1LinkTypes } from '../link-registration/constants/gs1-link-types';
 import { untpLinkTypes } from '../link-registration/constants/untp-link-types';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
@@ -15,30 +14,12 @@ import { GeneralErrorException } from '../../common/exceptions/general-error.exc
 export class CommonService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly identifierService: IdentifierManagementService,
     private readonly i18n: I18nService,
   ) {}
 
   /*
-   * This method transforms the data from the IdentifierService into the ResolverConfig object.
-   * @returns A Promise that resolves to a ResolverConfig
-   * Example:
-   * {
-   *    "name": "The IDR",
-   *    "resolverRoot": "http://localhost:3000", // current host get from RESOLVER_DOMAIN in .env
-   *    "supportedLinkType": [
-   *        {
-   *            "namespace": "http://gs1.org/voc/" | "http://localhost:3000/voc/", // get from namespaceURI or default current host
-   *            "prefix": "gs1:", // get from namespace
-   *            "profile": "https://www.gs1.org/voc/?show=linktypes" | "http://localhost:3000/voc/?show=linktypes" // get from namespaceProfile or default is the json of linkTypes in source code
-   *        },
-   *        {
-   *            "namespace": "http://integrity-system.org/",
-   *            "prefix": "integrity-system:",
-   *            "profile": "http://integrity-system.org/?show=linktypes"
-   *        }
-   *    ]
-   * }
+   * Builds the resolver description for .well-known/resolver.
+   * @returns A ResolverConfig with supported link type vocabularies (gs1, untp).
    */
   async transformResolverData(): Promise<ResolverConfig> {
     const appName = this.configService.get('APP_NAME');
@@ -56,43 +37,37 @@ export class CommonService {
     return {
       name: this.configService.get('APP_NAME'),
       resolverRoot: this.configService.get('RESOLVER_DOMAIN'),
-      supportedLinkType: await this.mapSupportedLinkTypes(),
+      supportedLinkType: this.mapSupportedLinkTypes(),
       supportedPrimaryKeys: ['all'],
     };
   }
 
-  private async mapSupportedLinkTypes(): Promise<SupportedLinkType[]> {
-    const identifiers = await this.identifierService.getIdentifiers();
-    const identifierLinkTypes = Object.keys(identifiers).map((key) => {
-      return {
-        namespace:
-          identifiers[key].namespaceURI && identifiers[key].namespaceURI !== ''
-            ? identifiers[key].namespaceURI
-            : `${this.configService.get('RESOLVER_DOMAIN')}/voc/`,
-        prefix: `${identifiers[key].namespace}:`,
-        profile:
-          identifiers[key].namespaceProfile &&
-          identifiers[key].namespaceProfile !== ''
-            ? identifiers[key].namespaceProfile
-            : `${this.configService.get('RESOLVER_DOMAIN')}/voc/?show=linktypes`,
-      };
-    });
-
-    // Include the UNTP link type namespace as a built-in entry
-    identifierLinkTypes.push({
-      namespace: 'https://test.uncefact.org/untp/linkType#',
-      prefix: 'untp:',
-      profile: 'https://untp.unece.org/docs/specification/IdentityResolver',
-    });
-
-    return identifierLinkTypes;
+  private mapSupportedLinkTypes(): SupportedLinkType[] {
+    return [
+      {
+        namespace: 'http://gs1.org/voc/',
+        prefix: 'gs1:',
+        profile: `${this.configService.get('RESOLVER_DOMAIN')}/voc/?show=linktypes`,
+      },
+      {
+        namespace: 'https://vocabulary.uncefact.org/untp/linkType#',
+        prefix: 'untp:',
+        profile: `${this.configService.get('RESOLVER_DOMAIN')}/voc/?show=linktypes`,
+      },
+    ];
   }
 
-  getLinkTypes(): Record<string, Record<string, unknown>> {
-    return {
+  getLinkTypes(prefix?: string): Record<string, Record<string, unknown>> {
+    const all = {
       gs1: gs1LinkTypes,
       untp: untpLinkTypes,
     };
+
+    if (!prefix) {
+      return all;
+    }
+
+    return prefix in all ? { [prefix]: all[prefix] } : {};
   }
 
   getSpecificLinkType(linkType: string) {

@@ -1,10 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { CommonService } from './common.service';
-import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
 import { gs1LinkTypes } from '../link-registration/constants/gs1-link-types';
 import { untpLinkTypes } from '../link-registration/constants/untp-link-types';
-import { IdentifierDto } from '../identifier-management/dto/identifier.dto';
 import { I18nService } from 'nestjs-i18n';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
 
@@ -15,10 +13,10 @@ const mockI18nService = {
   translate: jest.fn().mockResolvedValue('translated message'),
 };
 
-describe('CommonService Success Cases', () => {
+describe('CommonService', () => {
   let service: CommonService;
   let configService: ConfigService;
-  let identifierService: IdentifierManagementService;
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -29,99 +27,26 @@ describe('CommonService Success Cases', () => {
             get: jest.fn(),
           },
         },
-        {
-          provide: IdentifierManagementService,
-          useValue: {
-            getIdentifiers: jest.fn().mockResolvedValue({
-              example: {
-                namespace: 'example',
-              },
-            }),
-          },
-        },
         { provide: I18nService, useValue: mockI18nService },
       ],
     }).compile();
 
     service = module.get<CommonService>(CommonService);
     configService = module.get<ConfigService>(ConfigService);
-    identifierService = module.get<IdentifierManagementService>(
-      IdentifierManagementService,
-    );
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should correctly map supported link types with default values', async () => {
-    const mockIdentifiers: IdentifierDto[] = [
-      {
-        namespace: 'example',
-        namespaceURI: null,
-        namespaceProfile: null,
-        applicationIdentifiers: [],
-      },
-    ];
-
+  it('should return resolver description with gs1 and untp link type vocabularies', async () => {
     jest.spyOn(configService, 'get').mockImplementation((key: string) => {
       if (key === 'APP_NAME') return APP_NAME;
       if (key === 'RESOLVER_DOMAIN') return RESOLVER_DOMAIN;
       return null;
     });
 
-    jest
-      .spyOn(identifierService, 'getIdentifiers')
-      .mockResolvedValue(mockIdentifiers);
-
     const result = await service.transformResolverData();
-    expect(result).toEqual({
-      name: APP_NAME,
-      resolverRoot: RESOLVER_DOMAIN,
-      supportedLinkType: [
-        {
-          namespace: `${RESOLVER_DOMAIN}/voc/`,
-          prefix: 'example:',
-          profile: `${RESOLVER_DOMAIN}/voc/?show=linktypes`,
-        },
-        {
-          namespace: 'https://test.uncefact.org/untp/linkType#',
-          prefix: 'untp:',
-          profile: 'https://untp.unece.org/docs/specification/IdentityResolver',
-        },
-      ],
-      supportedPrimaryKeys: ['all'],
-    });
-  });
-
-  it('should correctly map supported link types with provided values', async () => {
-    const mockIdentifiers: IdentifierDto[] = [
-      {
-        namespace: 'gs1',
-        namespaceURI: 'http://gs1.org/voc/',
-        namespaceProfile: 'https://www.gs1.org/voc/?show=linktypes',
-        applicationIdentifiers: [],
-      },
-      {
-        namespace: 'integrity-system',
-        namespaceURI: 'http://integrity-system.org/',
-        namespaceProfile: 'http://integrity-system.org/?show=linktypes',
-        applicationIdentifiers: [],
-      },
-    ];
-
-    jest.spyOn(configService, 'get').mockImplementation((key: string) => {
-      if (key === 'APP_NAME') return APP_NAME;
-      if (key === 'RESOLVER_DOMAIN') return RESOLVER_DOMAIN;
-      return null;
-    });
-
-    jest
-      .spyOn(identifierService, 'getIdentifiers')
-      .mockResolvedValue(mockIdentifiers);
-
-    const result = await service.transformResolverData();
-
     expect(result).toEqual({
       name: APP_NAME,
       resolverRoot: RESOLVER_DOMAIN,
@@ -129,17 +54,12 @@ describe('CommonService Success Cases', () => {
         {
           namespace: 'http://gs1.org/voc/',
           prefix: 'gs1:',
-          profile: 'https://www.gs1.org/voc/?show=linktypes',
+          profile: `${RESOLVER_DOMAIN}/voc/?show=linktypes`,
         },
         {
-          namespace: 'http://integrity-system.org/',
-          prefix: 'integrity-system:',
-          profile: 'http://integrity-system.org/?show=linktypes',
-        },
-        {
-          namespace: 'https://test.uncefact.org/untp/linkType#',
+          namespace: 'https://vocabulary.uncefact.org/untp/linkType#',
           prefix: 'untp:',
-          profile: 'https://untp.unece.org/docs/specification/IdentityResolver',
+          profile: `${RESOLVER_DOMAIN}/voc/?show=linktypes`,
         },
       ],
       supportedPrimaryKeys: ['all'],
@@ -152,6 +72,21 @@ describe('CommonService Success Cases', () => {
       gs1: gs1LinkTypes,
       untp: untpLinkTypes,
     });
+  });
+
+  it('should get link types filtered by prefix', () => {
+    const result = service.getLinkTypes('gs1');
+    expect(result).toEqual({ gs1: gs1LinkTypes });
+  });
+
+  it('should get link types filtered by untp prefix', () => {
+    const result = service.getLinkTypes('untp');
+    expect(result).toEqual({ untp: untpLinkTypes });
+  });
+
+  it('should return empty object for unknown prefix', () => {
+    const result = service.getLinkTypes('unknown');
+    expect(result).toEqual({});
   });
 
   it('should get a gs1 link type by key', () => {

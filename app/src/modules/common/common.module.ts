@@ -2,10 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CommonController } from './common.controller';
 import { CommonService } from './common.service';
-import { IdentifierManagementModule } from '../identifier-management/identifier-management.module';
 
 @Module({
-  imports: [ConfigModule, IdentifierManagementModule],
+  imports: [ConfigModule],
   controllers: [CommonController],
   providers: [CommonService],
 })
