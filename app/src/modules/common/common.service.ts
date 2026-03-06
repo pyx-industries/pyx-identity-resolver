@@ -7,7 +7,8 @@ import {
   SupportedLinkType,
 } from './interface/common.interface';
 import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
-import { defaultLinkTypes } from './data/default-link-types';
+import { gs1LinkTypes } from '../link-registration/constants/gs1-link-types';
+import { untpLinkTypes } from '../link-registration/constants/untp-link-types';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
 
 @Injectable()
@@ -87,19 +88,23 @@ export class CommonService {
     return identifierLinkTypes;
   }
 
-  // Get the content of the JSON file
-  getLinkTypes() {
-    const defaultLinkTypesPath = defaultLinkTypes;
-    return defaultLinkTypesPath;
+  getLinkTypes(): Record<string, Record<string, unknown>> {
+    return {
+      gs1: gs1LinkTypes,
+      untp: untpLinkTypes,
+    };
   }
 
   getSpecificLinkType(linkType: string) {
-    const linkTypes = this.getLinkTypes();
-    if (!linkTypes[linkType]) {
-      throw new GeneralErrorException(this.i18n, HttpStatus.BAD_REQUEST, {
-        key: 'invalid_voc_linktype',
-      });
+    const registries = this.getLinkTypes();
+    for (const registry of Object.values(registries)) {
+      if (linkType in registry) {
+        return registry[linkType];
+      }
     }
-    return linkTypes[linkType];
+
+    throw new GeneralErrorException(this.i18n, HttpStatus.BAD_REQUEST, {
+      key: 'invalid_voc_linktype',
+    });
   }
 }

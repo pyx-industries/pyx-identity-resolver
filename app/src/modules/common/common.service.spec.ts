@@ -2,7 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { CommonService } from './common.service';
 import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
-import { defaultLinkTypes } from './data/default-link-types';
+import { gs1LinkTypes } from '../link-registration/constants/gs1-link-types';
+import { untpLinkTypes } from '../link-registration/constants/untp-link-types';
 import { IdentifierDto } from '../identifier-management/dto/identifier.dto';
 import { I18nService } from 'nestjs-i18n';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
@@ -145,15 +146,22 @@ describe('CommonService Success Cases', () => {
     });
   });
 
-  it('should get default link types', () => {
+  it('should get link types grouped by prefix', () => {
     const result = service.getLinkTypes();
-    expect(result).toEqual(defaultLinkTypes);
+    expect(result).toEqual({
+      gs1: gs1LinkTypes,
+      untp: untpLinkTypes,
+    });
   });
 
-  it('should get specific link type', () => {
-    const linkType = 'epcis';
-    const result = service.getSpecificLinkType(linkType);
-    expect(result).toEqual(defaultLinkTypes[linkType]);
+  it('should get a gs1 link type by key', () => {
+    const result = service.getSpecificLinkType('epcis');
+    expect(result).toEqual(gs1LinkTypes['epcis']);
+  });
+
+  it('should get a untp link type by key', () => {
+    const result = service.getSpecificLinkType('dpp');
+    expect(result).toEqual(untpLinkTypes['dpp']);
   });
 
   it('should throw error if APP_NAME is not defined', async () => {

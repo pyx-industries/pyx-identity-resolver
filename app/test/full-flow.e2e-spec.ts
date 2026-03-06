@@ -160,7 +160,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: gs1 + ':certificationInfo',
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
@@ -174,7 +174,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: false,
             fwqs: false,
             active: true,
-            linkType: gs1 + ':certificationInfo',
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
@@ -200,7 +200,7 @@ describe('Full flow (e2e)', () => {
 
       await request(baseUrl)
         .get(
-          `/${gs1}/${gtin}/${lot}/${serial}?linkType=${encodeURIComponent(gs1 + ':certificationInfo')}`,
+          `/${gs1}/${gtin}/${lot}/${serial}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept', 'application/json')
         .set('Accept-Language', 'en-AU')
@@ -226,7 +226,7 @@ describe('Full flow (e2e)', () => {
 
       await request(baseUrl)
         .get(
-          `/${gs1}/${gtin}/${lot}/${serial}?linkType=${encodeURIComponent(gs1 + ':certificationInfo')}`,
+          `/${gs1}/${gtin}/${lot}/${serial}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept', 'text/html')
         .set('Accept-Language', 'en-AU')
@@ -259,7 +259,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: gs1 + ':certificationInfo',
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'us',
             title: 'Certification Information',
@@ -315,7 +315,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: gs1 + ':certificationInfo',
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
