@@ -35,12 +35,14 @@ export class ApplicationIdentifier {
   shortcode: string;
 
   @ApiProperty({
-    description: 'The application identifier (AI)',
+    description:
+      'The application identifier (AI). Optional — defaults to shortcode if omitted.',
     example: '01',
+    required: false,
   })
-  @IsNotEmpty()
   @IsString()
-  ai: string;
+  @IsOptional()
+  ai?: string;
 
   @ApiProperty({
     description:
