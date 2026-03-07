@@ -372,7 +372,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: nlisid + ':epcis',
+            linkType: 'gs1:epcis',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
@@ -392,7 +392,7 @@ describe('Full flow (e2e)', () => {
     it('should get link resolution with nlisid and serial number', async () => {
       const nlisid = 'e2e-test-mock-nlisid';
       const identificationKey = '03/1234567890123456/21/SER1234';
-      const linkType = nlisid + ':epcis';
+      const linkType = 'gs1:epcis';
       const expectedLocation = 'https://example-html.com';
 
       await request(baseUrl)
@@ -432,7 +432,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: multiPrimaryIdentifiers + ':certificationInfo',
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
@@ -452,7 +452,7 @@ describe('Full flow (e2e)', () => {
     it('should get link resolution with gsrnp and srin', async () => {
       const namespace = multiPrimaryIdentifiers;
       const identificationKey = '8017/123456789012345678/8019/1234';
-      const linkType = namespace + ':certificationInfo';
+      const linkType = 'gs1:certificationInfo';
       const expectedLocation = 'https://example-html.com';
 
       await request(baseUrl)
@@ -490,7 +490,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: multiPrimaryIdentifiers + ':certificationInfo',
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
@@ -510,7 +510,7 @@ describe('Full flow (e2e)', () => {
     it('should get link resolution with gsrn and srin', async () => {
       const namespace = multiPrimaryIdentifiers;
       const identificationKey = '8017/123456789012345678/8019/1234';
-      const linkType = namespace + ':certificationInfo';
+      const linkType = 'gs1:certificationInfo';
       const expectedLocation = 'https://example-html.com';
 
       await request(baseUrl)
@@ -548,7 +548,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: multiPrimaryIdentifiers + ':certificationInfo',
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
@@ -568,7 +568,7 @@ describe('Full flow (e2e)', () => {
     it('should get link resolution with only gsrnp', async () => {
       const namespace = multiPrimaryIdentifiers;
       const identificationKey = '8017/123456789012345678';
-      const linkType = namespace + ':certificationInfo';
+      const linkType = 'gs1:certificationInfo';
       const expectedLocation = 'https://example-html.com';
 
       await request(baseUrl)
@@ -606,7 +606,7 @@ describe('Full flow (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: multiPrimaryIdentifiers + ':certificationInfo',
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
@@ -626,7 +626,7 @@ describe('Full flow (e2e)', () => {
     it('should get link resolution with only gsrn', async () => {
       const namespace = multiPrimaryIdentifiers;
       const identificationKey = '8017/123456789012345678';
-      const linkType = namespace + ':certificationInfo';
+      const linkType = 'gs1:certificationInfo';
       const expectedLocation = 'https://example-html.com';
 
       await request(baseUrl)

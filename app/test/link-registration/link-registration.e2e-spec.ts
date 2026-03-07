@@ -175,7 +175,7 @@ describe('LinkResolutionController (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: `${namespace}:${linkType}`,
+            linkType: `gs1:${linkType}`,
             ianaLanguage: 'en',
             context: 'au',
             title,
@@ -233,7 +233,7 @@ describe('LinkResolutionController (e2e)', () => {
           const link = res.headers['link'];
           expect(link).toContain('rel="owl:sameAs"');
           expect(link).toContain('rel="linkset"');
-          expect(link).toContain(`rel="${namespace}:epcis"`);
+          expect(link).toContain('rel="gs1:epcis"');
           expect(link).toContain('https://example-epics.com');
         });
     });
@@ -273,7 +273,7 @@ describe('LinkResolutionController (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: `${namespace}:${linkType}`,
+            linkType: `gs1:${linkType}`,
             ianaLanguage: 'en',
             context: 'au',
             title,
@@ -336,7 +336,7 @@ describe('LinkResolutionController (e2e)', () => {
           const link = res.headers['link'];
           expect(link).toContain('rel="owl:sameAs"');
           expect(link).toContain('rel="linkset"');
-          expect(link).toContain(`rel="${namespace}:certificationInfo"`);
+          expect(link).toContain('rel="gs1:certificationInfo"');
           expect(link).toContain('https://example.com');
         });
 
@@ -1456,7 +1456,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Response A - Original Default',
@@ -1487,7 +1487,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:epcis`,
+              linkType: 'gs1:epcis',
               ianaLanguage: 'fr',
               context: 'us',
               title: 'Response B - New Default LinkType',
@@ -1518,7 +1518,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'fr',
               context: 'ca',
               title: 'Response C - New Default Language',
@@ -1549,7 +1549,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'gb',
               title: 'Response D - New Default Context',
@@ -1580,7 +1580,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: false,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Response E - New Default MimeType',
@@ -1614,7 +1614,7 @@ describe('LinkResolutionController (e2e)', () => {
       // it should resolve to response C (which has defaultIanaLanguage: true for certificationInfo)
       await request(baseUrl)
         .get(
-          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .expect(302)
         .expect('Location', 'https://response-c.com');
@@ -1623,7 +1623,7 @@ describe('LinkResolutionController (e2e)', () => {
       // it should resolve to response D (which has defaultContext: true for certificationInfo+en)
       await request(baseUrl)
         .get(
-          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept-Language', 'en')
         .expect(302)
@@ -1633,7 +1633,7 @@ describe('LinkResolutionController (e2e)', () => {
       // but no Accept header, it should resolve to response E (which has defaultMimeType: true for certificationInfo+en+au)
       await request(baseUrl)
         .get(
-          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept-Language', 'en-AU')
         .expect(302)
