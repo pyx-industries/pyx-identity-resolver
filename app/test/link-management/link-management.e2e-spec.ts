@@ -98,7 +98,7 @@ describe('LinkManagementController (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: `${gs1}:certificationInfo`,
+            linkType: 'gs1:certificationInfo',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Certification Information',
@@ -112,7 +112,7 @@ describe('LinkManagementController (e2e)', () => {
             defaultContext: false,
             fwqs: false,
             active: true,
-            linkType: `${gs1}:pip`,
+            linkType: 'gs1:pip',
             ianaLanguage: 'en',
             context: 'au',
             title: 'Product Information',
@@ -171,13 +171,13 @@ describe('LinkManagementController (e2e)', () => {
       const res = await request(baseUrl)
         .get('/resolver/links')
         .set(headers)
-        .query({ ...listLinksQuery, linkType: `${gs1}:certificationInfo` })
+        .query({ ...listLinksQuery, linkType: 'gs1:certificationInfo' })
         .expect(HttpStatus.OK);
 
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBeGreaterThanOrEqual(1);
       res.body.forEach((link: any) => {
-        expect(link.linkType).toBe(`${gs1}:certificationInfo`);
+        expect(link.linkType).toBe('gs1:certificationInfo');
       });
     });
 
@@ -215,7 +215,7 @@ describe('LinkManagementController (e2e)', () => {
         .set(headers)
         .query({
           ...listLinksQuery,
-          linkType: `${gs1}:certificationInfo`,
+          linkType: 'gs1:certificationInfo',
           mimeType: 'application/json',
         })
         .expect(HttpStatus.OK);
@@ -223,7 +223,7 @@ describe('LinkManagementController (e2e)', () => {
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBeGreaterThanOrEqual(1);
       res.body.forEach((link: any) => {
-        expect(link.linkType).toBe(`${gs1}:certificationInfo`);
+        expect(link.linkType).toBe('gs1:certificationInfo');
         expect(link.mimeType).toBe('application/json');
       });
     });
@@ -315,7 +315,7 @@ describe('LinkManagementController (e2e)', () => {
               defaultContext: false,
               fwqs: false,
               active: true,
-              linkType: `${gs1}:epcis`,
+              linkType: 'gs1:epcis',
               ianaLanguage: 'en',
               context: 'au',
               title: 'EPCIS Information',
@@ -364,7 +364,7 @@ describe('LinkManagementController (e2e)', () => {
               defaultContext: false,
               fwqs: false,
               active: true,
-              linkType: `${gs1}:recipeInfo`,
+              linkType: 'gs1:recipeInfo',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Recipe Information',
@@ -423,7 +423,7 @@ describe('LinkManagementController (e2e)', () => {
               fwqs: false,
               active: true,
               targetUrl: 'https://example.com/to-update',
-              linkType: `${gs1}:hasRetailers`,
+              linkType: 'gs1:hasRetailers',
               title: 'Original Title',
               mimeType: 'text/html',
               ianaLanguage: 'en',
@@ -543,7 +543,7 @@ describe('LinkManagementController (e2e)', () => {
               fwqs: false,
               active: true,
               targetUrl: 'https://example.com/to-soft-delete',
-              linkType: `${gs1}:masterData`,
+              linkType: 'gs1:masterData',
               title: 'Soft Delete Target',
               mimeType: 'text/html',
               ianaLanguage: 'en',
@@ -629,7 +629,7 @@ describe('LinkManagementController (e2e)', () => {
               fwqs: false,
               active: true,
               targetUrl: 'https://example.com/to-hard-delete',
-              linkType: `${gs1}:quickStartGuide`,
+              linkType: 'gs1:quickStartGuide',
               title: 'Hard Delete Target',
               mimeType: 'text/html',
               ianaLanguage: 'en',
@@ -697,7 +697,7 @@ describe('LinkManagementController (e2e)', () => {
               fwqs: false,
               active: true,
               targetUrl: 'https://example.com/version-track',
-              linkType: `${gs1}:traceability`,
+              linkType: 'gs1:traceability',
               title: 'Version Track Test',
               mimeType: 'text/html',
               ianaLanguage: 'en',
@@ -790,7 +790,7 @@ describe('LinkManagementController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${bcNamespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'au',
               title: 'BC Certification Info',
@@ -851,7 +851,7 @@ describe('LinkManagementController (e2e)', () => {
               defaultContext: false,
               fwqs: false,
               active: true,
-              linkType: `${gs1}:dpp`,
+              linkType: 'untp:dpp',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Digital Product Passport',

@@ -97,7 +97,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: gs1 + ':certificationInfo',
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Certification Information',
@@ -132,7 +132,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: gs1 + ':certificationInfo',
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Certification Information',
@@ -175,7 +175,7 @@ describe('LinkResolutionController (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: `${namespace}:${linkType}`,
+            linkType: `gs1:${linkType}`,
             ianaLanguage: 'en',
             context: 'au',
             title,
@@ -233,7 +233,7 @@ describe('LinkResolutionController (e2e)', () => {
           const link = res.headers['link'];
           expect(link).toContain('rel="owl:sameAs"');
           expect(link).toContain('rel="linkset"');
-          expect(link).toContain(`rel="${namespace}:epcis"`);
+          expect(link).toContain('rel="gs1:epcis"');
           expect(link).toContain('https://example-epics.com');
         });
     });
@@ -273,7 +273,7 @@ describe('LinkResolutionController (e2e)', () => {
             defaultContext: true,
             fwqs: false,
             active: true,
-            linkType: `${namespace}:${linkType}`,
+            linkType: `gs1:${linkType}`,
             ianaLanguage: 'en',
             context: 'au',
             title,
@@ -336,7 +336,7 @@ describe('LinkResolutionController (e2e)', () => {
           const link = res.headers['link'];
           expect(link).toContain('rel="owl:sameAs"');
           expect(link).toContain('rel="linkset"');
-          expect(link).toContain(`rel="${namespace}:certificationInfo"`);
+          expect(link).toContain('rel="gs1:certificationInfo"');
           expect(link).toContain('https://example.com');
         });
 
@@ -1059,7 +1059,7 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    it("should throw a bad request error for invalid response's linkType", () => {
+    it('should throw a not found error for an unregistered linkType key', () => {
       return request(baseUrl)
         .post('/resolver')
         .send({
@@ -1077,7 +1077,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: 'invalid', // invalid link type
+              linkType: 'gs1:nonExistentLinkType',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Certification Information',
@@ -1094,8 +1094,206 @@ describe('LinkResolutionController (e2e)', () => {
           expect(res.body.errors).toEqual([
             {
               field: 'linkType',
-              message:
-                "Invalid namespace prefix: 'invalid'. Expected: 'e2e-test-mock-gs1'",
+              message: "Invalid link type 'gs1:nonExistentLinkType'",
+            },
+          ]);
+        });
+    });
+
+    it('should reject a untp link type key used with gs1 prefix', () => {
+      return request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '12345678901234',
+          qualifierPath: '/10/12345678901234567890/22/ABCDE',
+          itemDescription: 'DPP',
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: 'gs1:dpp',
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Digital Product Passport',
+              targetUrl: 'https://example.com/dpp',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${process.env.API_KEY}`)
+        .expect(404)
+        .expect((res) => {
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
+          expect(res.body.errors).toEqual([
+            {
+              field: 'linkType',
+              message: "Invalid link type 'gs1:dpp'",
+            },
+          ]);
+        });
+    });
+
+    it('should register a link with a untp-prefixed link type on a gs1 namespace', async () => {
+      return request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '12345678901234',
+          qualifierPath: '/10/UNTPTEST01',
+          itemDescription: 'UNTP Cross-Prefix Test',
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: 'untp:dpp',
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Digital Product Passport',
+              targetUrl: 'https://example.com/dpp',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${process.env.API_KEY}`)
+        .expect(201)
+        .expect({
+          message: 'Link resolver registered successfully',
+        });
+    });
+
+    it('should reject a gs1 link type key used with untp prefix', () => {
+      return request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '12345678901234',
+          qualifierPath: '/10/12345678901234567890/22/ABCDE',
+          itemDescription: 'DPP',
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: 'untp:certificationInfo',
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Certification Information',
+              targetUrl: 'https://example.com',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${process.env.API_KEY}`)
+        .expect(404)
+        .expect((res) => {
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
+          expect(res.body.errors).toEqual([
+            {
+              field: 'linkType',
+              message: "Invalid link type 'untp:certificationInfo'",
+            },
+          ]);
+        });
+    });
+
+    it('should reject an unknown link type prefix', () => {
+      return request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '12345678901234',
+          qualifierPath: '/10/12345678901234567890/22/ABCDE',
+          itemDescription: 'DPP',
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: 'custom:certificationInfo',
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Certification Information',
+              targetUrl: 'https://example.com',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${process.env.API_KEY}`)
+        .expect(404)
+        .expect((res) => {
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
+          expect(res.body.errors).toEqual([
+            {
+              field: 'linkType',
+              message: expect.stringContaining('Invalid namespace prefix'),
+            },
+          ]);
+        });
+    });
+
+    it('should reject a link type without a prefix', () => {
+      return request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace: gs1,
+          identificationKeyType: 'gtin',
+          identificationKey: '12345678901234',
+          qualifierPath: '/10/12345678901234567890/22/ABCDE',
+          itemDescription: 'DPP',
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: 'certificationInfo',
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'Certification Information',
+              targetUrl: 'https://example.com',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${process.env.API_KEY}`)
+        .expect(404)
+        .expect((res) => {
+          expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
+          expect(res.body.errors).toEqual([
+            {
+              field: 'linkType',
+              message: "Invalid link type 'certificationInfo'",
             },
           ]);
         });
@@ -1258,7 +1456,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Response A - Original Default',
@@ -1289,7 +1487,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:epcis`,
+              linkType: 'gs1:epcis',
               ianaLanguage: 'fr',
               context: 'us',
               title: 'Response B - New Default LinkType',
@@ -1320,7 +1518,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'fr',
               context: 'ca',
               title: 'Response C - New Default Language',
@@ -1351,7 +1549,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'gb',
               title: 'Response D - New Default Context',
@@ -1382,7 +1580,7 @@ describe('LinkResolutionController (e2e)', () => {
               defaultContext: false,
               fwqs: false,
               active: true,
-              linkType: `${namespace}:certificationInfo`,
+              linkType: 'gs1:certificationInfo',
               ianaLanguage: 'en',
               context: 'au',
               title: 'Response E - New Default MimeType',
@@ -1416,7 +1614,7 @@ describe('LinkResolutionController (e2e)', () => {
       // it should resolve to response C (which has defaultIanaLanguage: true for certificationInfo)
       await request(baseUrl)
         .get(
-          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .expect(302)
         .expect('Location', 'https://response-c.com');
@@ -1425,7 +1623,7 @@ describe('LinkResolutionController (e2e)', () => {
       // it should resolve to response D (which has defaultContext: true for certificationInfo+en)
       await request(baseUrl)
         .get(
-          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept-Language', 'en')
         .expect(302)
@@ -1435,7 +1633,7 @@ describe('LinkResolutionController (e2e)', () => {
       // but no Accept header, it should resolve to response E (which has defaultMimeType: true for certificationInfo+en+au)
       await request(baseUrl)
         .get(
-          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent(`${namespace}:certificationInfo`)}`,
+          `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept-Language', 'en-AU')
         .expect(302)

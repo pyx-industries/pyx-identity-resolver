@@ -20,16 +20,29 @@ export class CommonController {
   @ApiQuery({
     name: 'show',
     required: false,
-    description:
-      'The namespace of the identifier to retrieve. If not provided, all identifiers are returned.',
+    description: 'Set to "linktypes" to retrieve link type vocabularies.',
     schema: {
       type: 'string',
       example: 'linktypes',
     },
   })
-  getVoc(@Query('show') show: string, @Res() res: Response) {
+  @ApiQuery({
+    name: 'prefix',
+    required: false,
+    description:
+      'Filter link types by vocabulary prefix (e.g. gs1, untp). Only applies when show=linktypes.',
+    schema: {
+      type: 'string',
+      example: 'gs1',
+    },
+  })
+  getVoc(
+    @Query('show') show: string,
+    @Query('prefix') prefix: string,
+    @Res() res: Response,
+  ) {
     if (show && show.toLowerCase() === 'linktypes') {
-      return res.json(this.commonService.getLinkTypes());
+      return res.json(this.commonService.getLinkTypes(prefix));
     } else {
       return res.redirect('/voc/?show=linktypes');
     }

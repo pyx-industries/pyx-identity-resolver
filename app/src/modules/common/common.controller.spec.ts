@@ -38,15 +38,23 @@ describe('CommonController', () => {
     expect(data).toBe('mocked data');
   });
 
-  it('should get voc data', () => {
+  it('should get all link types', () => {
     const res = { json: jest.fn(), redirect: jest.fn() } as unknown as Response;
-    commonController.getVoc('linktypes', res);
+    commonController.getVoc('linktypes', undefined, res);
+    expect(commonService.getLinkTypes).toHaveBeenCalledWith(undefined);
+    expect(res.json).toHaveBeenCalledWith('mocked link types');
+  });
+
+  it('should get link types filtered by prefix', () => {
+    const res = { json: jest.fn(), redirect: jest.fn() } as unknown as Response;
+    commonController.getVoc('linktypes', 'gs1', res);
+    expect(commonService.getLinkTypes).toHaveBeenCalledWith('gs1');
     expect(res.json).toHaveBeenCalledWith('mocked link types');
   });
 
   it('should redirect if show is not linktypes', () => {
     const res = { json: jest.fn(), redirect: jest.fn() } as unknown as Response;
-    commonController.getVoc('not linktypes', res);
+    commonController.getVoc('not linktypes', undefined, res);
     expect(res.redirect).toHaveBeenCalledWith('/voc/?show=linktypes');
   });
 

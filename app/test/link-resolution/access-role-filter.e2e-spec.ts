@@ -91,7 +91,7 @@ describe('AccessRoleFilter (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${ns}:dpp`,
+              linkType: 'untp:dpp',
               ianaLanguage: 'en',
               context: 'us',
               title: 'Public Digital Product Passport',
@@ -105,7 +105,7 @@ describe('AccessRoleFilter (e2e)', () => {
               defaultContext: false,
               fwqs: false,
               active: true,
-              linkType: `${ns}:dpp`,
+              linkType: 'untp:dpp',
               ianaLanguage: 'en',
               context: 'us',
               title: 'Customer Digital Product Passport',
@@ -120,7 +120,7 @@ describe('AccessRoleFilter (e2e)', () => {
               defaultContext: false,
               fwqs: false,
               active: true,
-              linkType: `${ns}:dpp`,
+              linkType: 'untp:dpp',
               ianaLanguage: 'en',
               context: 'us',
               title: 'Regulator Digital Product Passport',
@@ -228,9 +228,7 @@ describe('AccessRoleFilter (e2e)', () => {
 
     it('specific linkType with accessRole=customer redirects to customer target', () => {
       return request(baseUrl)
-        .get(
-          `/${ns}/01/09520000000014?linkType=${ns}%3Adpp&accessRole=customer`,
-        )
+        .get(`/${ns}/01/09520000000014?linkType=untp%3Adpp&accessRole=customer`)
         .set('Accept', 'text/html')
         .set('Accept-Language', 'en-US')
         .expect(302)
@@ -240,7 +238,7 @@ describe('AccessRoleFilter (e2e)', () => {
     it('specific linkType with accessRole=regulator redirects to regulator target', () => {
       return request(baseUrl)
         .get(
-          `/${ns}/01/09520000000014?linkType=${ns}%3Adpp&accessRole=regulator`,
+          `/${ns}/01/09520000000014?linkType=untp%3Adpp&accessRole=regulator`,
         )
         .set('Accept', 'application/pdf')
         .set('Accept-Language', 'en-US')
@@ -336,7 +334,7 @@ describe('AccessRoleFilter (e2e)', () => {
               defaultContext: true,
               fwqs: false,
               active: true,
-              linkType: `${ns}:dpp`,
+              linkType: 'untp:dpp',
               ianaLanguage: 'en',
               context: 'us',
               title: 'Regulator Only DPP',
