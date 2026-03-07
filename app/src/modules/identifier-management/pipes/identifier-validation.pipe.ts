@@ -16,6 +16,13 @@ export class IdentifierValidationPipe implements PipeTransform {
    * @throws BadRequestException if validation fails.
    */
   transform(identifierDto: IdentifierDto): IdentifierDto {
+    // Default ai to shortcode when omitted
+    identifierDto.applicationIdentifiers.forEach((identifier) => {
+      if (!identifier.ai) {
+        identifier.ai = identifier.shortcode;
+      }
+    });
+
     const errorCollector = new ErrorCollector<FieldError>();
 
     // Check for duplicate identifiers
