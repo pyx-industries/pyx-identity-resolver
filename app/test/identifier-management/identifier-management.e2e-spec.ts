@@ -430,14 +430,6 @@ describe('IdentifierManagementController (e2e)', () => {
           field: 'applicationIdentifiers.1.title',
           message: 'title must be a string',
         },
-        {
-          field: 'applicationIdentifiers.1.ai',
-          message: 'ai must be a string',
-        },
-        {
-          field: 'applicationIdentifiers.1.ai',
-          message: 'ai should not be empty',
-        },
       ]);
     });
 
@@ -475,10 +467,6 @@ describe('IdentifierManagementController (e2e)', () => {
             {
               field: 'applicationIdentifiers.0.shortcode',
               message: 'shortcode should not be empty',
-            },
-            {
-              field: 'applicationIdentifiers.0.ai',
-              message: 'ai should not be empty',
             },
             {
               field: 'applicationIdentifiers.0.type',
