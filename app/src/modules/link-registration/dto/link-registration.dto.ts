@@ -192,7 +192,7 @@ export class CreateLinkRegistrationDto {
     example: '/10/12345678901234567890',
   })
   @IsString()
-  @Matches(/^\/([a-zA-Z0-9]+\/[\w\d]+(\/[a-zA-Z0-9]+\/[\w\d]+)*)?$/)
+  @Matches(/^\/([a-zA-Z0-9]+\/\w+(\/[a-zA-Z0-9]+\/\w+)*)?$/)
   qualifierPath: string = '/';
 
   @ApiProperty({
