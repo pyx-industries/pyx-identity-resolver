@@ -16,7 +16,7 @@ export class IdentifierValidationPipe implements PipeTransform {
    * @throws BadRequestException if validation fails.
    */
   transform(identifierDto: IdentifierDto): IdentifierDto {
-    // Default ai to shortcode when omitted
+    // Default ai to shortcode when omitted or empty (non-GS1 schemes don't use AI codes)
     identifierDto.applicationIdentifiers.forEach((identifier) => {
       if (!identifier.ai) {
         identifier.ai = identifier.shortcode;

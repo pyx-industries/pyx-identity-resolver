@@ -83,6 +83,28 @@ describe('IdentifierValidationPipe', () => {
 
       expect(() => pipe.transform(data)).toThrow(FieldErrorsException);
     });
+
+    it('should default ai to shortcode when ai is an empty string', () => {
+      const data = {
+        applicationIdentifiers: [
+          { ai: '', shortcode: 'nlisid', type: 'I', regex: '^\\d+$' },
+        ],
+      } as IdentifierDto;
+
+      const result = pipe.transform(data);
+      expect(result.applicationIdentifiers[0].ai).toBe('nlisid');
+    });
+
+    it('should detect collision when defaulted ai matches another explicit ai', () => {
+      const data = {
+        applicationIdentifiers: [
+          { shortcode: 'foo', type: 'I', regex: '^\\d+$' },
+          { ai: 'foo', shortcode: 'bar', type: 'I', regex: '^\\d+$' },
+        ],
+      } as IdentifierDto;
+
+      expect(() => pipe.transform(data)).toThrow(FieldErrorsException);
+    });
   });
 
   describe('checkForDuplicateIdentifiers', () => {
