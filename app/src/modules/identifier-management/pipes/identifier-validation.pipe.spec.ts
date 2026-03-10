@@ -32,6 +32,81 @@ describe('IdentifierValidationPipe', () => {
     });
   });
 
+  describe('ai defaulting', () => {
+    it('should default ai to shortcode when ai is omitted', () => {
+      const data = {
+        applicationIdentifiers: [
+          { shortcode: 'nlisid', type: 'I', regex: '^\\d+$' },
+        ],
+      } as IdentifierDto;
+
+      const result = pipe.transform(data);
+      expect(result.applicationIdentifiers[0].ai).toBe('nlisid');
+    });
+
+    it('should not override ai when explicitly provided', () => {
+      const data = {
+        applicationIdentifiers: [
+          { ai: '01', shortcode: 'gtin', type: 'I', regex: '^\\d+$' },
+        ],
+      } as IdentifierDto;
+
+      const result = pipe.transform(data);
+      expect(result.applicationIdentifiers[0].ai).toBe('01');
+    });
+
+    it('should allow qualifiers by shortcode when ai is omitted', () => {
+      const data = {
+        applicationIdentifiers: [
+          {
+            shortcode: 'nlisid',
+            type: 'I',
+            qualifiers: ['property'],
+            regex: '^\\d+$',
+          },
+          { shortcode: 'property', type: 'Q', regex: '^\\w+$' },
+        ],
+      } as IdentifierDto;
+
+      const result = pipe.transform(data);
+      expect(result.applicationIdentifiers[0].ai).toBe('nlisid');
+      expect(result.applicationIdentifiers[1].ai).toBe('property');
+    });
+
+    it('should detect duplicate shortcodes when ai is omitted on both', () => {
+      const data = {
+        applicationIdentifiers: [
+          { shortcode: 'nlisid', type: 'I', regex: '^\\d+$' },
+          { shortcode: 'nlisid', type: 'I', regex: '^\\d+$' },
+        ],
+      } as IdentifierDto;
+
+      expect(() => pipe.transform(data)).toThrow(FieldErrorsException);
+    });
+
+    it('should default ai to shortcode when ai is an empty string', () => {
+      const data = {
+        applicationIdentifiers: [
+          { ai: '', shortcode: 'nlisid', type: 'I', regex: '^\\d+$' },
+        ],
+      } as IdentifierDto;
+
+      const result = pipe.transform(data);
+      expect(result.applicationIdentifiers[0].ai).toBe('nlisid');
+    });
+
+    it('should detect collision when defaulted ai matches another explicit ai', () => {
+      const data = {
+        applicationIdentifiers: [
+          { shortcode: 'foo', type: 'I', regex: '^\\d+$' },
+          { ai: 'foo', shortcode: 'bar', type: 'I', regex: '^\\d+$' },
+        ],
+      } as IdentifierDto;
+
+      expect(() => pipe.transform(data)).toThrow(FieldErrorsException);
+    });
+  });
+
   describe('checkForDuplicateIdentifiers', () => {
     it('should throw error if duplicate AI is found', () => {
       const invalidData = {

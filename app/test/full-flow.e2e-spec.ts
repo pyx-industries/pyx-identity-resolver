@@ -11,6 +11,7 @@ const apiKey = process.env.API_KEY;
 const gs1 = `e2e-${environment}-mock-gs1`;
 const nlisid = `e2e-${environment}-mock-nlisid`;
 const multiPrimaryIdentifiers = `e2e-mock-multi-primary-identifiers`;
+const nlis = `e2e-${environment}-mock-nlis`;
 
 describe('Full flow (e2e)', () => {
   it('should create many namespaces', async () => {
@@ -649,6 +650,86 @@ describe('Full flow (e2e)', () => {
     });
   });
 
+  describe(`Non-GS1 scheme: /${nlis} (no AI codes)`, () => {
+    it('should register namespace with shortcode-only identifiers', async () => {
+      // Clean up any previous test data
+      await request(baseUrl)
+        .delete('/identifiers')
+        .set('Authorization', `Bearer ${apiKey}`)
+        .query({ namespace: nlis });
+
+      const identifierDto = {
+        namespace: nlis,
+        namespaceProfile: '',
+        namespaceURI: '',
+        applicationIdentifiers: [
+          {
+            shortcode: 'nlisid',
+            type: 'I',
+            title: 'NLIS Identifier',
+            label: 'NLISID',
+            regex: '([A-Z0-9]{8,16})',
+            qualifiers: ['property'],
+          },
+          {
+            shortcode: 'property',
+            type: 'Q',
+            title: 'Property Identification Code',
+            label: 'PIC',
+            regex: '([A-Z0-9]{8})',
+          },
+        ],
+      };
+
+      await request(baseUrl)
+        .post('/identifiers')
+        .set('Authorization', `Bearer ${apiKey}`)
+        .send(identifierDto)
+        .expect(200)
+        .expect({ message: 'Application identifier upserted successfully' });
+    });
+
+    it('should register a link using shortcode identificationKeyType', async () => {
+      await request(baseUrl)
+        .post('/resolver')
+        .send({
+          namespace: nlis,
+          identificationKeyType: 'nlisid',
+          identificationKey: 'ABCD1234EFGH5678',
+          itemDescription: 'Test NLIS Animal',
+          qualifierPath: '/property/PROP1234',
+          active: true,
+          responses: [
+            {
+              defaultLinkType: true,
+              defaultMimeType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              fwqs: false,
+              active: true,
+              linkType: 'untp:dpp',
+              ianaLanguage: 'en',
+              context: 'au',
+              title: 'NLIS Digital Product Passport',
+              targetUrl: 'https://example.com/nlis-cert',
+              mimeType: 'application/json',
+            },
+          ],
+        })
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${apiKey}`)
+        .expect(201)
+        .expect({ message: 'Link resolver registered successfully' });
+    });
+
+    it('should resolve using shortcode in URL path', async () => {
+      await request(baseUrl)
+        .get(`/${nlis}/nlisid/ABCD1234EFGH5678/property/PROP1234`)
+        .set('Accept', 'application/json')
+        .expect(302);
+    });
+  });
+
   async function deleteNamespace(namespace: string) {
     await request(baseUrl)
       .delete('/identifiers')
@@ -658,7 +739,7 @@ describe('Full flow (e2e)', () => {
   }
 
   it('delete all namespaces', async () => {
-    const namespaces = [gs1, nlisid, multiPrimaryIdentifiers];
+    const namespaces = [gs1, nlisid, multiPrimaryIdentifiers, nlis];
 
     for (const namespace of namespaces) {
       await deleteNamespace(namespace);
