@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.0.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/2.0.2...v3.0.0) (2026-03-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** validate link types against prefix-specific vocabularies ([#88](https://github.com/pyx-industries/pyx-identity-resolver/issues/88))
+
+### Features
+
+* **api:** Deprecate itemDescription in favour of description ([#90](https://github.com/pyx-industries/pyx-identity-resolver/issues/90)) ([0cad4cc](https://github.com/pyx-industries/pyx-identity-resolver/commit/0cad4cca65fe7e030e04039ad47eeaf2849d4853))
+* **api:** Make application identifier ai field optional for non-GS1 schemes ([#89](https://github.com/pyx-industries/pyx-identity-resolver/issues/89)) ([73e1920](https://github.com/pyx-industries/pyx-identity-resolver/commit/73e192062ff75e064e9905f7ff3c3d5fcab7dcec))
+
+
+### Bug Fixes
+
+* **api:** Validate link types against prefix-specific vocabularies ([#88](https://github.com/pyx-industries/pyx-identity-resolver/issues/88)) ([446e954](https://github.com/pyx-industries/pyx-identity-resolver/commit/446e9546267a84cf3792a797015f7fb4d51026c1))
+
+
+### Miscellaneous
+
+* **release:** Prepare release 3.0.0 ([a7ea63d](https://github.com/pyx-industries/pyx-identity-resolver/commit/a7ea63d9acde7a87ca2b6338f1d40c8d96344bbc))
+
 ## [2.0.2](https://github.com/pyx-industries/pyx-identity-resolver/compare/2.0.1...v2.0.2) (2026-02-13)
 
 
