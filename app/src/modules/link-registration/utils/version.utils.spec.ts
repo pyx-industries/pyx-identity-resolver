@@ -227,6 +227,24 @@ describe('Version Utils', () => {
       expect((result.responses[0] as any).updatedAt).toBe(updatedAt);
     });
 
+    it('should normalise itemDescription to description on read', () => {
+      const doc = { itemDescription: 'Old field', responses: [] } as any;
+      const result = normaliseDocument(doc);
+      expect(result.description).toBe('Old field');
+      expect(result.itemDescription).toBeUndefined();
+    });
+
+    it('should not overwrite description with itemDescription on read', () => {
+      const doc = {
+        description: 'New',
+        itemDescription: 'Old',
+        responses: [],
+      } as any;
+      const result = normaliseDocument(doc);
+      expect(result.description).toBe('New');
+      expect(result.itemDescription).toBeUndefined();
+    });
+
     it('should not modify a fully populated document', () => {
       const doc = {
         id: 'test',

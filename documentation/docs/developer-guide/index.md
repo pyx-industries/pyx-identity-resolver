@@ -186,7 +186,7 @@ curl -X POST https://your-resolver.example.com/api/2.0.0/resolver \
     "namespace": "acme",
     "identificationKeyType": "product",
     "identificationKey": "12345",
-    "itemDescription": "Acme Widget",
+    "description": "Acme Widget",
     "qualifierPath": "/",
     "active": true,
     "responses": [
@@ -229,6 +229,12 @@ A successful `201` response:
   "message": "Link resolver registered successfully"
 }
 ```
+
+:::note Deprecation notice
+The `description` field replaces the deprecated `itemDescription` field.
+Both are accepted for backwards compatibility, but `description` is preferred.
+`itemDescription` will be removed in v3.0.
+:::
 
 #### Append-only behaviour
 

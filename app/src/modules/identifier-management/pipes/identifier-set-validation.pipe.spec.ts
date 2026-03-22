@@ -59,7 +59,7 @@ describe('IdentifierSetValidationPipe', () => {
         identificationKeyType: 'test',
         qualifierPath: '/10/123456',
         responses: [],
-        itemDescription: '',
+        description: '',
         active: false,
       };
 

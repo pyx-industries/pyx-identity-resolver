@@ -43,7 +43,7 @@ export interface Uri {
   namespace: string;
   identificationKeyType: string;
   identificationKey: string;
-  itemDescription: string;
+  description: string;
   qualifierPath: string;
   active: boolean;
   responses: LinkResponse[];

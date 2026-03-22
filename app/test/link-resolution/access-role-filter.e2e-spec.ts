@@ -80,7 +80,7 @@ describe('AccessRoleFilter (e2e)', () => {
           namespace: ns,
           identificationKeyType: 'gtin',
           identificationKey: '09520000000014',
-          itemDescription: 'Access Role DPP',
+          description: 'Access Role DPP',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -323,7 +323,7 @@ describe('AccessRoleFilter (e2e)', () => {
           namespace: ns,
           identificationKeyType: 'gtin',
           identificationKey: '09520000000015',
-          itemDescription: 'All Restricted DPP',
+          description: 'All Restricted DPP',
           qualifierPath: '/',
           active: true,
           responses: [

@@ -16,7 +16,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [
@@ -51,7 +51,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [
@@ -76,7 +76,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [
@@ -130,7 +130,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [sharedResponse],
@@ -140,7 +140,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [sharedResponse],
@@ -174,7 +174,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [response],
@@ -184,7 +184,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [response],
@@ -203,7 +203,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [
@@ -230,7 +230,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [
@@ -279,7 +279,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [
@@ -306,7 +306,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [
@@ -370,7 +370,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [inactiveResponse],
@@ -380,7 +380,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [{ ...inactiveResponse, active: true }],
@@ -418,7 +418,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [existingResponse],
@@ -428,7 +428,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: '',
+      description: '',
       qualifierPath: '',
       active: true,
       responses: [
@@ -468,7 +468,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: 'old description',
+      description: 'old description',
       qualifierPath: '',
       active: true,
       responses: [
@@ -493,7 +493,7 @@ describe('processEntryLinkRegistrationData', () => {
       namespace: 'testnamespace',
       identificationKeyType: 'testidentificationKeyType',
       identificationKey: 'testidentificationKey',
-      itemDescription: 'new description',
+      description: 'new description',
       qualifierPath: '',
       active: false,
       responses: [],
@@ -504,7 +504,7 @@ describe('processEntryLinkRegistrationData', () => {
       entryLinkRegistration,
     );
 
-    expect(result.itemDescription).toBe('new description');
+    expect(result.description).toBe('new description');
     expect(result.active).toBe(false);
     // Existing responses are still present from concatenation
     expect(result.responses).toHaveLength(1);

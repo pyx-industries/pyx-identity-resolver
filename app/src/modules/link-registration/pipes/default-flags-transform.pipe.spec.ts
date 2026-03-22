@@ -31,7 +31,7 @@ describe('DefaultFlagsTransformPipe', () => {
     namespace: 'gs1',
     identificationKeyType: 'gtin',
     identificationKey: '12345678901234',
-    itemDescription: 'Test product',
+    description: 'Test product',
     qualifierPath: '/',
     active: true,
     responses,

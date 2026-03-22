@@ -27,6 +27,9 @@ export class LinkRegistrationTransformPipe
   async transform(
     value: CreateLinkRegistrationDto,
   ): Promise<CreateLinkRegistrationDto> {
+    // Remove deprecated itemDescription (already normalised to description by @Transform on DTO)
+    delete (value as any).itemDescription;
+
     const identifier = await this.identifierManagementService.getIdentifier(
       value.namespace,
     );

@@ -84,7 +84,7 @@ describe('DecryptionKey forwarding (e2e)', () => {
           namespace: ns,
           identificationKeyType: 'gtin',
           identificationKey: gtinFwqsTrue,
-          itemDescription: 'Encrypted DPP (fwqs enabled)',
+          description: 'Encrypted DPP (fwqs enabled)',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -196,7 +196,7 @@ describe('DecryptionKey forwarding (e2e)', () => {
           namespace: ns,
           identificationKeyType: 'gtin',
           identificationKey: gtinFwqsFalse,
-          itemDescription: 'Encrypted DPP (fwqs disabled)',
+          description: 'Encrypted DPP (fwqs disabled)',
           qualifierPath: '/',
           active: true,
           responses: [

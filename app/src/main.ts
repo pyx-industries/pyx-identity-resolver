@@ -21,6 +21,8 @@ async function bootstrap() {
     new ValidationPipe({
       validateCustomDecorators: true,
       exceptionFactory: validationExceptionFactory,
+      transform: true,
+      transformOptions: { enableImplicitConversion: false },
     }),
   );
   app.use(helmet());

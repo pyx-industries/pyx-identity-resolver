@@ -150,7 +150,7 @@ describe('Full flow (e2e)', () => {
         namespace: gs1,
         identificationKeyType: 'gtin',
         identificationKey: '12345678901234',
-        itemDescription: 'Product description',
+        description: 'Product description',
         qualifierPath: '/10/LOT1234/21/SER5678',
         active: true,
         responses: [
@@ -249,7 +249,7 @@ describe('Full flow (e2e)', () => {
         namespace: gs1,
         identificationKeyType: 'gtin',
         identificationKey: '12345678901234',
-        itemDescription: 'Product description',
+        description: 'Product description',
         qualifierPath: '/10/LOT1234',
         active: true,
         responses: [
@@ -305,7 +305,7 @@ describe('Full flow (e2e)', () => {
         namespace: gs1,
         identificationKeyType: 'gtin',
         identificationKey: '12345678901234',
-        itemDescription: 'Product description',
+        description: 'Product description',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -362,7 +362,7 @@ describe('Full flow (e2e)', () => {
         namespace: nlisid,
         identificationKeyType: 'nlisid',
         identificationKey: '1234567890123456',
-        itemDescription: 'Product description',
+        description: 'Product description',
         qualifierPath: '/21/SER1234',
         active: true,
         responses: [
@@ -422,7 +422,7 @@ describe('Full flow (e2e)', () => {
         namespace: multiPrimaryIdentifiers,
         identificationKeyType: 'gsrnp',
         identificationKey: '123456789012345678',
-        itemDescription: 'Product description',
+        description: 'Product description',
         qualifierPath: '/8019/1234',
         active: true,
         responses: [
@@ -480,7 +480,7 @@ describe('Full flow (e2e)', () => {
         namespace: multiPrimaryIdentifiers,
         identificationKeyType: 'gsrn',
         identificationKey: '123456789012345678',
-        itemDescription: 'Product description',
+        description: 'Product description',
         qualifierPath: '/8019/1234',
         active: true,
         responses: [
@@ -538,7 +538,7 @@ describe('Full flow (e2e)', () => {
         namespace: multiPrimaryIdentifiers,
         identificationKeyType: 'gsrnp',
         identificationKey: '123456789012345678',
-        itemDescription: 'Product description',
+        description: 'Product description',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -596,7 +596,7 @@ describe('Full flow (e2e)', () => {
         namespace: multiPrimaryIdentifiers,
         identificationKeyType: 'gsrn',
         identificationKey: '123456789012345678',
-        itemDescription: 'Product description',
+        description: 'Product description',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -696,7 +696,7 @@ describe('Full flow (e2e)', () => {
           namespace: nlis,
           identificationKeyType: 'nlisid',
           identificationKey: 'ABCD1234EFGH5678',
-          itemDescription: 'Test NLIS Animal',
+          description: 'Test NLIS Animal',
           qualifierPath: '/property/PROP1234',
           active: true,
           responses: [

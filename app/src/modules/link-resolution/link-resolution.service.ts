@@ -6,6 +6,7 @@ import { constructID, convertAICode } from '../shared/utils/uri.utils';
 import { Uri } from './interfaces/uri.interface';
 import { processUri } from './utils/link-resolution.utils';
 import { filterByAccessRole } from './utils/access-role-filter.utils';
+import { normaliseDocument } from '../link-registration/utils/version.utils';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
 import { I18nService } from 'nestjs-i18n';
 import {
@@ -63,7 +64,8 @@ export class LinkResolutionService {
     );
 
     const id = constructID(standardizedParams);
-    const uriWithId: Uri = await this.repositoryProvider.one(id);
+    const raw = await this.repositoryProvider.one(id);
+    const uriWithId: Uri | null = raw ? (normaliseDocument(raw) as Uri) : null;
 
     if (uriWithId && uriWithId.active) {
       const accessRole = identifierParams.descriptiveAttributes?.accessRole;

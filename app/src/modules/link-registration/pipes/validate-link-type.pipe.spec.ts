@@ -13,7 +13,7 @@ const makeDto = (
   namespace: 'gs1',
   identificationKeyType: 'gtin',
   identificationKey: '12345678901234',
-  itemDescription: 'Product description',
+  description: 'Product description',
   qualifierPath: '/10/LOT1234/21/SER5678',
   active: true,
   responses: [
