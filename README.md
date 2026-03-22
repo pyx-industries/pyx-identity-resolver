@@ -49,10 +49,10 @@ Both images support `linux/amd64` and `linux/arm64` architectures.
 
 ```bash
 # Standard image (default)
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:1.1.2
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0
 
 # Serverless image (Lambda deployment)
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:1.1.2-serverless
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0-serverless
 ```
 
 For more details on available tags, see the [CI/CD Pipeline](https://pyx-industries.github.io/pyx-identity-resolver/docs/deployment-guide/ci-cd) page on the documentation site.
