@@ -39,6 +39,7 @@ const constructLinkContextObject = (
 ): LinkContextObject => {
   const linkContextObject: LinkContextObject = {
     anchor: buildOriginalRequest(uri, identificationKeyCode, attrs),
+    description: uri.description,
   };
 
   const linkTargetObjects = constructLinkTargetObjects(

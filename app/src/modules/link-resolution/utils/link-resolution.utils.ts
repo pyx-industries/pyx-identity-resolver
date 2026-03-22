@@ -25,7 +25,7 @@ const buildLinksetFromResponses = (
     identificationKey: uri.identificationKey,
     qualifierPath: uri.qualifierPath,
     active: uri.active,
-    itemDescription: uri.itemDescription,
+    description: uri.description,
     responses: activeResponses,
   };
   const attrs = {

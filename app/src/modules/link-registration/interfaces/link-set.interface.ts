@@ -1,5 +1,6 @@
 export type LinkContextObject = {
   anchor: string;
+  description: string;
   [extensionRelationType: string]: any;
 };
 
@@ -55,6 +56,6 @@ export interface LinkSetInput {
   identificationKey: string;
   qualifierPath: string;
   active: boolean;
-  itemDescription: string;
+  description: string;
   responses: LinkSetResponseInput[];
 }

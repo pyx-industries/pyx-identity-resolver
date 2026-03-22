@@ -44,6 +44,12 @@ export function normaliseDocument<T extends Record<string, any>>(
   if (!normalised.versionHistory) normalised.versionHistory = [];
   if (!Array.isArray(normalised.responses)) normalised.responses = [];
 
+  // Normalise deprecated itemDescription → description
+  if (!normalised.description && normalised.itemDescription) {
+    normalised.description = normalised.itemDescription;
+  }
+  delete normalised.itemDescription;
+
   // Ensure all responses have linkIds
   if (normalised.responses.length > 0) {
     normalised.responses = normalised.responses.map((response: any) => ({

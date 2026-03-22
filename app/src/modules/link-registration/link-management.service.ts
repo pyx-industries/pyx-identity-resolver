@@ -109,7 +109,7 @@ export class LinkManagementService {
       namespace: doc.namespace,
       identificationKeyType: doc.identificationKeyType,
       identificationKey: doc.identificationKey,
-      itemDescription: doc.itemDescription,
+      description: doc.description,
       qualifierPath: doc.qualifierPath,
       active: doc.active,
       responses: activeResponses as Response[],
