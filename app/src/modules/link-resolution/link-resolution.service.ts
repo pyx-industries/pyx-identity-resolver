@@ -65,7 +65,7 @@ export class LinkResolutionService {
 
     const id = constructID(standardizedParams);
     const raw = await this.repositoryProvider.one(id);
-    const uriWithId: Uri = normaliseDocument(raw) as Uri;
+    const uriWithId: Uri | null = raw ? (normaliseDocument(raw) as Uri) : null;
 
     if (uriWithId && uriWithId.active) {
       const accessRole = identifierParams.descriptiveAttributes?.accessRole;

@@ -86,7 +86,7 @@ describe('LinkResolutionController (e2e)', () => {
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
-          itemDescription: 'DPP',
+          description: 'DPP',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
           active: true,
           responses: [
@@ -122,7 +122,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '1234567890123499',
           // missing qualifierPath
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -164,7 +164,7 @@ describe('LinkResolutionController (e2e)', () => {
         namespace,
         identificationKeyType,
         identificationKey,
-        itemDescription: 'DPP',
+        description: 'DPP',
         qualifierPath,
         active: true,
         responses: [
@@ -262,7 +262,7 @@ describe('LinkResolutionController (e2e)', () => {
         namespace,
         identificationKeyType,
         identificationKey,
-        itemDescription: 'DPP',
+        description: 'DPP',
         qualifierPath,
         active: true,
         responses: [
@@ -356,7 +356,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -395,7 +395,7 @@ describe('LinkResolutionController (e2e)', () => {
           // missing identificationKeyType
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -440,7 +440,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           // missing identificationKey
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -477,7 +477,7 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    it('should throw an error if itemDescription is not found', async () => {
+    it('should throw an error if description is not found', async () => {
       await request(baseUrl)
         .post('/resolver')
         .send({
@@ -485,7 +485,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          // missing itemDescription
+          // missing description
           active: true,
           responses: [
             {
@@ -511,12 +511,12 @@ describe('LinkResolutionController (e2e)', () => {
           expect(res.body.path).toBe(APP_ROUTE_PREFIX + '/resolver');
           expect(res.body.errors).toEqual([
             {
-              field: 'itemDescription',
-              message: 'itemDescription should not be empty',
+              field: 'description',
+              message: 'description should not be empty',
             },
             {
-              field: 'itemDescription',
-              message: 'itemDescription must be a string',
+              field: 'description',
+              message: 'description must be a string',
             },
           ]);
         });
@@ -530,7 +530,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           // missing active
           responses: [
             {
@@ -571,7 +571,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           // missing responses
         })
@@ -601,7 +601,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: 'invalid', // invalid active
           responses: [
             {
@@ -645,7 +645,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/11/12345678901234567890', // invalid qualifier path
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -691,7 +691,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/1234567890123456789101123123invalid', // invalid qualifier path
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -737,7 +737,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'invalid', // invalid identification key type
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -782,7 +782,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: 'invalid', // invalid identification key
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -828,7 +828,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: 'invalid', // invalid qualifier path
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -869,7 +869,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: 'invalid', // invalid responses
         })
@@ -903,7 +903,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -944,7 +944,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -985,7 +985,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1026,7 +1026,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1067,7 +1067,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1108,7 +1108,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1149,7 +1149,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/UNTPTEST01',
-          itemDescription: 'UNTP Cross-Prefix Test',
+          description: 'UNTP Cross-Prefix Test',
           active: true,
           responses: [
             {
@@ -1184,7 +1184,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1225,7 +1225,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1266,7 +1266,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1307,7 +1307,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1351,7 +1351,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1389,7 +1389,7 @@ describe('LinkResolutionController (e2e)', () => {
           identificationKeyType: 'gtin',
           identificationKey: '12345678901234',
           qualifierPath: '/10/12345678901234567890/22/ABCDE',
-          itemDescription: 'DPP',
+          description: 'DPP',
           active: true,
           responses: [
             {
@@ -1445,7 +1445,7 @@ describe('LinkResolutionController (e2e)', () => {
           namespace,
           identificationKeyType,
           identificationKey,
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath,
           active: true,
           responses: [
@@ -1476,7 +1476,7 @@ describe('LinkResolutionController (e2e)', () => {
           namespace,
           identificationKeyType,
           identificationKey,
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath,
           active: true,
           responses: [
@@ -1507,7 +1507,7 @@ describe('LinkResolutionController (e2e)', () => {
           namespace,
           identificationKeyType,
           identificationKey,
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath,
           active: true,
           responses: [
@@ -1538,7 +1538,7 @@ describe('LinkResolutionController (e2e)', () => {
           namespace,
           identificationKeyType,
           identificationKey,
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath,
           active: true,
           responses: [
@@ -1569,7 +1569,7 @@ describe('LinkResolutionController (e2e)', () => {
           namespace,
           identificationKeyType,
           identificationKey,
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath,
           active: true,
           responses: [

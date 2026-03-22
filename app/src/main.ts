@@ -22,6 +22,7 @@ async function bootstrap() {
       validateCustomDecorators: true,
       exceptionFactory: validationExceptionFactory,
       transform: true,
+      transformOptions: { enableImplicitConversion: false },
     }),
   );
   app.use(helmet());

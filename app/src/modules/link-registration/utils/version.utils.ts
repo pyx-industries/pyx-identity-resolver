@@ -45,7 +45,7 @@ export function normaliseDocument<T extends Record<string, any>>(
   if (!Array.isArray(normalised.responses)) normalised.responses = [];
 
   // Normalise deprecated itemDescription → description
-  if (!normalised.description && normalised.itemDescription) {
+  if (normalised.description == null && normalised.itemDescription) {
     normalised.description = normalised.itemDescription;
   }
   delete normalised.itemDescription;
