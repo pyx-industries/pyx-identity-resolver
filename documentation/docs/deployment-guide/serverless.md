@@ -48,7 +48,7 @@ Key differences from the standard image:
 ### Pulling the serverless image
 
 ```bash
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:2.0.0-serverless
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0-serverless
 ```
 
 The image is built for both `linux/amd64` and `linux/arm64`,

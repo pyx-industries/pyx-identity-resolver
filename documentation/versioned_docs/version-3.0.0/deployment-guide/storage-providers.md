@@ -65,7 +65,7 @@ Here's a trimmed version showing the relevant parts:
 ```yaml
 services:
   identity-resolver:
-    image: ghcr.io/pyx-industries/pyx-identity-resolver:2.0.0
+    image: ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0
     ports:
       - '3000:3000'
     environment:

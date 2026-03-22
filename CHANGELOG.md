@@ -18,10 +18,6 @@
 * **api:** Validate link types against prefix-specific vocabularies ([#88](https://github.com/pyx-industries/pyx-identity-resolver/issues/88)) ([446e954](https://github.com/pyx-industries/pyx-identity-resolver/commit/446e9546267a84cf3792a797015f7fb4d51026c1))
 
 
-### Miscellaneous
-
-* **release:** Prepare release 3.0.0 ([a7ea63d](https://github.com/pyx-industries/pyx-identity-resolver/commit/a7ea63d9acde7a87ca2b6338f1d40c8d96344bbc))
-
 ## [2.0.2](https://github.com/pyx-industries/pyx-identity-resolver/compare/2.0.1...v2.0.2) (2026-02-13)
 
 

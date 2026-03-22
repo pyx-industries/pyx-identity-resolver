@@ -55,8 +55,8 @@ Two image variants are published for every release:
 
 | Image | Tag example | Use case |
 |-------|-------------|----------|
-| Standard | `2.0.0` | Docker, Docker Compose, Kubernetes |
-| Serverless | `2.0.0-serverless` | AWS Lambda container deployments |
+| Standard | `3.0.0` | Docker, Docker Compose, Kubernetes |
+| Serverless | `3.0.0-serverless` | AWS Lambda container deployments |
 
 Both variants are built for **linux/amd64** and **linux/arm64**,
 so they work on Intel/AMD servers and ARM-based hosts (Graviton, Apple Silicon under emulation, etc.).
@@ -65,10 +65,10 @@ so they work on Intel/AMD servers and ARM-based hosts (Graviton, Apple Silicon u
 
 ```bash
 # Standard image
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:2.0.0
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0
 
 # Serverless image (AWS Lambda)
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:2.0.0-serverless
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0-serverless
 ```
 
 ### Tag format
@@ -81,7 +81,7 @@ docker pull ghcr.io/pyx-industries/pyx-identity-resolver:2.0.0-serverless
 | `sha-<commit>` | Build pinned to an exact commit |
 
 :::tip
-Pin to a specific version tag (e.g. `2.0.0`) in production
+Pin to a specific version tag (e.g. `3.0.0`) in production
 rather than `edge` or `latest` to avoid unexpected changes.
 :::
 
@@ -111,7 +111,7 @@ Then run the container with the env file:
 docker run -d \
   -p 3000:3000 \
   --env-file .env \
-  ghcr.io/pyx-industries/pyx-identity-resolver:2.0.0
+  ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0
 ```
 
 :::warning NODE_ENV and the serverless code path

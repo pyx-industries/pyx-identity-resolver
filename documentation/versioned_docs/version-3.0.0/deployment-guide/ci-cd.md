@@ -42,7 +42,7 @@ Once tests pass:
 1. Reads the version from `version.json` at the repository root.
 2. Checks whether a Git tag for that version already exists.
 3. If the tag is new:
-   - Creates an annotated Git tag (e.g. `2.0.0`).
+   - Creates an annotated Git tag (e.g. `3.0.0`).
    - Pushes the tag to the repository.
    - Extracts the relevant section from `CHANGELOG.md`
      and creates a **GitHub Release** with those notes.
@@ -56,7 +56,7 @@ The version is defined in `version.json`:
 
 ```json
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "apiVersion": "1.0.0",
   "docVersion": "1.1.1",
   "dependencies": {}
@@ -72,7 +72,7 @@ The version is defined in `version.json`:
 The project follows [Semantic Versioning](https://semver.org/):
 - **Patch** (1.0.0 -> 1.0.1): backwards-compatible bug fixes.
 - **Minor** (1.0.1 -> 1.1.0): new features, backwards-compatible.
-- **Major** (1.1.0 -> 2.0.0): breaking changes.
+- **Major** (1.1.0 -> 3.0.0): breaking changes.
 
 ## Package workflow
 
@@ -131,8 +131,8 @@ Here's what each one means:
 
 | Tag pattern | Example | When it's created | Recommended use |
 |-------------|---------|-------------------|-----------------|
-| `X.Y.Z` | `2.0.0` | On semver tag push | **Production** --- pin to a specific version. |
-| `X.Y.Z-serverless` | `2.0.0-serverless` | On semver tag push | **Production Lambda** --- pin to a specific version. |
+| `X.Y.Z` | `3.0.0` | On semver tag push | **Production** --- pin to a specific version. |
+| `X.Y.Z-serverless` | `3.0.0-serverless` | On semver tag push | **Production Lambda** --- pin to a specific version. |
 | `edge` | `edge` | On push to `master` | Testing the latest unreleased code. |
 | `edge-serverless` | `edge-serverless` | On push to `master` | Testing the latest unreleased serverless build. |
 | `sha-<hash>` | `sha-abc1234` | Every build | Debugging or pinning to an exact commit. |
@@ -151,7 +151,7 @@ and may introduce unexpected changes.
 
 ```bash
 # Specific version (recommended)
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:2.0.0
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0
 
 # Latest from master
 docker pull ghcr.io/pyx-industries/pyx-identity-resolver:edge
@@ -164,7 +164,7 @@ docker pull ghcr.io/pyx-industries/pyx-identity-resolver:sha-abc1234
 
 ```bash
 # Specific version (recommended)
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:2.0.0-serverless
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:3.0.0-serverless
 
 # Latest from master
 docker pull ghcr.io/pyx-industries/pyx-identity-resolver:edge-serverless
