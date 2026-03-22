@@ -92,8 +92,8 @@ The example files provide sensible defaults for local development:
 | `OBJECT_STORAGE_BUCKET_NAME` | `idr-bucket` | Bucket name (use `idr-bucket-test` for test env) |
 | `OBJECT_STORAGE_PATH_STYLE` | `true` | Required for local MinIO |
 | `IDENTIFIER_PATH` | `identifiers` | Path for identifier operations |
-| `RESOLVER_DOMAIN` | `http://localhost:3000/api/2.0.0` | Base resolver URL |
-| `LINK_TYPE_VOC_DOMAIN` | `http://localhost:3000/api/2.0.0/voc` | Link type vocabulary URL |
+| `RESOLVER_DOMAIN` | `http://localhost:3000/api/3.0.0` | Base resolver URL |
+| `LINK_TYPE_VOC_DOMAIN` | `http://localhost:3000/api/3.0.0/voc` | Link type vocabulary URL |
 | `API_KEY` | `test123` | API key for authenticated endpoints |
 | `APP_NAME` | `IDR` | Application name |
 | `PORT` | `3000` | Server port |

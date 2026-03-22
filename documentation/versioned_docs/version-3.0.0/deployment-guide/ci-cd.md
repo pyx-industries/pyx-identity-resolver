@@ -66,7 +66,7 @@ The version is defined in `version.json`:
 | Field | Purpose |
 |-------|---------|
 | `version` | The release version. Always updated for every release. This becomes the Git tag. |
-| `apiVersion` | The API contract version. Only updated when the API surface changes. Used in the URL path (`/api/2.0.0`). |
+| `apiVersion` | The API contract version. Only updated when the API surface changes. Used in the URL path (`/api/3.0.0`). |
 | `docVersion` | The documentation version. Only updated when docs change. |
 
 The project follows [Semantic Versioning](https://semver.org/):

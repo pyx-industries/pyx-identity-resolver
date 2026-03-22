@@ -78,7 +78,7 @@ services:
       - OBJECT_STORAGE_PATH_STYLE=true
       - IDENTIFIER_PATH=identifiers
       - API_KEY=change-me-in-production
-      - RESOLVER_DOMAIN=https://resolver.example.com/api/2.0.0
+      - RESOLVER_DOMAIN=https://resolver.example.com/api/3.0.0
       - APP_NAME=IDR
       - PORT=3000
     depends_on:

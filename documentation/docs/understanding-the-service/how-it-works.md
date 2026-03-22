@@ -116,7 +116,7 @@ Resolution can happen in two ways:
 A resolution request looks like this:
 
 ```
-https://your-resolver.example.com/api/2.0.0/acme/product/12345/batch/A1B2C3?linkType=acme:sustainabilityInfo
+https://your-resolver.example.com/api/3.0.0/acme/product/12345/batch/A1B2C3?linkType=acme:sustainabilityInfo
 ```
 
 The resolver parses the path, looks up the registered links,
@@ -291,7 +291,7 @@ GS1 uses numeric codes called application identifiers for the URL structure —
 `01` for GTIN and `10` for lot — so a resolution request might look like:
 
 ```
-https://your-resolver.example.com/api/2.0.0/gs1/01/09359502000010/10/ABC123?linkType=gs1:certificationInfo
+https://your-resolver.example.com/api/3.0.0/gs1/01/09359502000010/10/ABC123?linkType=gs1:certificationInfo
 ```
 
 Here, `01` is the GS1 application identifier for GTIN (`gtin`),

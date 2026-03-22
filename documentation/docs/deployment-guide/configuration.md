@@ -20,7 +20,7 @@ see the [Development Setup](../contributing/index.md) page.
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `NODE_ENV` | No | `development` | Set to `production` for serverless (Lambda) deployments. In non-production modes the app starts a standard HTTP server. |
-| `RESOLVER_DOMAIN` | **Yes** | --- | The public base URL of your resolver, including the API version path. Example: `https://resolver.example.com/api/2.0.0` |
+| `RESOLVER_DOMAIN` | **Yes** | --- | The public base URL of your resolver, including the API version path. Example: `https://resolver.example.com/api/3.0.0` |
 | `PORT` | No | `3000` | The port the HTTP server listens on. Only used when `NODE_ENV` is **not** `production`. |
 | `APP_NAME` | **Yes** | --- | A short name for your resolver instance (e.g. `IDR`). Used in API responses and health checks. The app will fail to start if this is empty. |
 | `API_KEY` | **Yes** | --- | Bearer token required for all authenticated endpoints (identifier management, link registration). Anonymous link resolution does not require a key. |
@@ -35,7 +35,7 @@ that appear in linksets and response headers.
 It **must** include the API version path segment.
 
 ```
-https://resolver.example.com/api/2.0.0
+https://resolver.example.com/api/3.0.0
 ```
 
 If you're running behind a reverse proxy or load balancer,
@@ -114,7 +114,7 @@ here's the smallest set of variables you need beyond what `docker-compose.yaml` 
 
 | Variable | Suggested value |
 |----------|-----------------|
-| `RESOLVER_DOMAIN` | `https://resolver.example.com/api/2.0.0` (use your actual host) |
+| `RESOLVER_DOMAIN` | `https://resolver.example.com/api/3.0.0` (use your actual host) |
 | `APP_NAME` | `IDR` |
 | `API_KEY` | Any non-empty string (change for production!) |
 | `OBJECT_STORAGE_ENDPOINT` | `minio` (if using the bundled MinIO) |
