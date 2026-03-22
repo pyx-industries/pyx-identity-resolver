@@ -110,7 +110,7 @@ describe('LinkResolutionService', () => {
       namespace: 'idr',
       identificationKeyType: 'primary',
       identificationKey: '123',
-      itemDescription: '',
+      description: '',
       qualifierPath: '/10/456',
       active: true,
       responses: [
@@ -237,7 +237,7 @@ describe('LinkResolutionService', () => {
         namespace: 'idr',
         identificationKeyType: 'primary',
         identificationKey: '123',
-        itemDescription: '',
+        description: '',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -289,7 +289,7 @@ describe('LinkResolutionService', () => {
         namespace: 'idr',
         identificationKeyType: 'primary',
         identificationKey: '123',
-        itemDescription: '',
+        description: '',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -348,7 +348,7 @@ describe('LinkResolutionService', () => {
       namespace: 'idr',
       identificationKeyType: 'primary',
       identificationKey: '123',
-      itemDescription: '',
+      description: '',
       qualifierPath: '/',
       active: true,
       responses: [
@@ -397,7 +397,10 @@ describe('LinkResolutionService', () => {
           accessRole: ['untp:accessRole#Regulator'],
         },
       ],
-      linkset: { anchor: 'http://localhost:3002/api/1.0.0/idr/01/123' },
+      linkset: {
+        anchor: 'http://localhost:3002/api/1.0.0/idr/01/123',
+        description: '',
+      },
     };
 
     it('should resolve without filtering when no accessRole provided', async () => {

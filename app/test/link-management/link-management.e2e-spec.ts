@@ -87,7 +87,7 @@ describe('LinkManagementController (e2e)', () => {
         namespace: gs1,
         identificationKeyType: 'gtin',
         identificationKey: '09359502000010',
-        itemDescription: 'Test Product',
+        description: 'Test Product',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -304,7 +304,7 @@ describe('LinkManagementController (e2e)', () => {
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -353,7 +353,7 @@ describe('LinkManagementController (e2e)', () => {
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -411,7 +411,7 @@ describe('LinkManagementController (e2e)', () => {
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -531,7 +531,7 @@ describe('LinkManagementController (e2e)', () => {
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -617,7 +617,7 @@ describe('LinkManagementController (e2e)', () => {
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -685,7 +685,7 @@ describe('LinkManagementController (e2e)', () => {
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -779,7 +779,7 @@ describe('LinkManagementController (e2e)', () => {
           namespace: bcNamespace,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
-          itemDescription: 'Backward Compat Product',
+          description: 'Backward Compat Product',
           qualifierPath: '/',
           active: true,
           responses: [
@@ -840,7 +840,7 @@ describe('LinkManagementController (e2e)', () => {
           namespace: gs1,
           identificationKeyType: 'gtin',
           identificationKey: '09359502000010',
-          itemDescription: 'Test Product',
+          description: 'Test Product',
           qualifierPath: '/',
           active: true,
           responses: [

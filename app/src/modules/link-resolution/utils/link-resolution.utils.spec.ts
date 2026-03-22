@@ -26,7 +26,7 @@ describe('Link Resolution Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'gtin',
         identificationKey: '9359502000041',
-        itemDescription: 'DPP',
+        description: 'DPP',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -89,7 +89,7 @@ describe('Link Resolution Utils', () => {
         ],
         linkset: {
           anchor: 'http://localhost:3000/01/09359502000041',
-          itemDescription: 'Passport',
+          description: 'Passport',
           'https://idr.com/voc/defaultLink': [
             {
               href: 'http://example-json.com',

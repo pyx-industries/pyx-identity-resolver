@@ -66,7 +66,7 @@ describe('LinkRegistrationController', () => {
         namespace: '',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [],
@@ -89,7 +89,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: '',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [],
@@ -112,7 +112,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: '',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [],
@@ -135,7 +135,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: 1 as any,
         active: true,
         responses: [],
@@ -153,12 +153,12 @@ describe('LinkRegistrationController', () => {
       }
     });
 
-    it('should throw a bad request error for invalid itemDescription', async () => {
+    it('should throw a bad request error for invalid description', async () => {
       const payload = {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: '',
+        description: '',
         qualifierPath: '/',
         active: true,
         responses: [],
@@ -171,7 +171,7 @@ describe('LinkRegistrationController', () => {
         expect(error.getStatus()).toBe(400);
         // Assert that the error message contains the expected error message
         expect(error.getResponse().message).toContain(
-          'itemDescription should not be empty',
+          'description should not be empty',
         );
       }
     });
@@ -181,7 +181,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: '1' as any,
         responses: [],
@@ -204,7 +204,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: null,
@@ -230,7 +230,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -268,7 +268,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -306,7 +306,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -344,7 +344,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -382,7 +382,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -435,7 +435,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -473,7 +473,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -511,7 +511,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'gs1',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -553,7 +553,7 @@ describe('LinkRegistrationController', () => {
         namespace: 'testNamespace',
         identificationKeyType: 'testKeyType',
         identificationKey: 'testKey',
-        itemDescription: 'testDescription',
+        description: 'testDescription',
         qualifierPath: '',
         active: true,
         responses: [],

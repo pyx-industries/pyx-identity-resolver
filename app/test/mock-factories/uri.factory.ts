@@ -6,7 +6,7 @@ export const mockUris = async (repositoryProvider: IRepositoryProvider) => {
     namespace: 'idr',
     identificationKeyType: 'gtin',
     identificationKey: '9359502000041',
-    itemDescription: 'DPP',
+    description: 'DPP',
     qualifierPath: '/',
     active: true,
     responses: [
@@ -69,7 +69,7 @@ export const mockUris = async (repositoryProvider: IRepositoryProvider) => {
     ],
     linkset: {
       anchor: 'http://localhost:3000/01/09359502000041',
-      itemDescription: 'Passport',
+      description: 'Passport',
       'https://idr.com/voc/defaultLink': [
         {
           href: 'http://example-json.com',
@@ -126,7 +126,7 @@ export const mockUris = async (repositoryProvider: IRepositoryProvider) => {
     namespace: 'idr',
     identificationKeyType: 'gtin',
     identificationKey: '9359502000042',
-    itemDescription: 'DPP',
+    description: 'DPP',
     qualifierPath: '/',
     active: true,
     responses: [
@@ -175,7 +175,7 @@ export const mockUris = async (repositoryProvider: IRepositoryProvider) => {
     ],
     linkset: {
       anchor: 'http://localhost:3000/01/09359502000042',
-      itemDescription: 'Passport',
+      description: 'Passport',
       'https://idr.com/voc/defaultLink': [],
       'https://idr.com/voc/defaultLinkMulti': [],
       'https://idr.com/voc/certificationInfo': [
@@ -202,7 +202,7 @@ export const mockUris = async (repositoryProvider: IRepositoryProvider) => {
     namespace: 'idr',
     identificationKeyType: 'gtin',
     identificationKey: '9359502000043',
-    itemDescription: 'DPP',
+    description: 'DPP',
     qualifierPath: '/',
     active: false,
     responses: [
@@ -251,7 +251,7 @@ export const mockUris = async (repositoryProvider: IRepositoryProvider) => {
     ],
     linkset: {
       anchor: 'http://localhost:3000/01/09359502000043',
-      itemDescription: 'Passport',
+      description: 'Passport',
       'https://idr.com/voc/defaultLink': [],
       'https://idr.com/voc/defaultLinkMulti': [],
       'https://idr.com/voc/certificationInfo': [

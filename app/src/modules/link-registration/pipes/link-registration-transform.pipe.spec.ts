@@ -40,12 +40,37 @@ describe('LinkRegistrationTransformPipe', () => {
   });
 
   describe('transform', () => {
+    const baseInput: CreateLinkRegistrationDto = {
+      namespace: 'testNamespace',
+      identificationKeyType: 'test',
+      identificationKey: 'testKey',
+      description: '',
+      qualifierPath: '',
+      active: false,
+      responses: [
+        {
+          defaultLinkType: false,
+          defaultMimeType: false,
+          fwqs: false,
+          active: false,
+          linkType: 'testType',
+          title: '',
+          targetUrl: 'http://example.com',
+          mimeType: 'text/html',
+          ianaLanguage: 'en',
+          context: 'au',
+          defaultContext: false,
+          defaultIanaLanguage: false,
+        },
+      ],
+    };
+
     it('should combine the incoming data with the existing data', async () => {
       const existingData: CreateLinkRegistrationDto = {
         namespace: 'testNamespace',
         identificationKeyType: 'test',
         identificationKey: 'testKey',
-        itemDescription: '',
+        description: '',
         qualifierPath: '',
         active: false,
         responses: [],
@@ -82,7 +107,7 @@ describe('LinkRegistrationTransformPipe', () => {
         namespace: 'testNamespace',
         identificationKeyType: 'test',
         identificationKey: 'testKey',
-        itemDescription: '',
+        description: '',
         qualifierPath: '',
         active: false,
         responses: [
@@ -107,7 +132,7 @@ describe('LinkRegistrationTransformPipe', () => {
         namespace: 'testNamespace',
         identificationKeyType: 'test',
         identificationKey: 'testKey',
-        itemDescription: '',
+        description: '',
         qualifierPath: '',
         active: false,
         responses: [
@@ -131,6 +156,42 @@ describe('LinkRegistrationTransformPipe', () => {
       const result = await pipe.transform(incomingData);
 
       expect(result).toEqual(expectedResult);
+    });
+
+    it('should delete legacy itemDescription property from the DTO', async () => {
+      const existingData: CreateLinkRegistrationDto = {
+        namespace: 'testNamespace',
+        identificationKeyType: 'test',
+        identificationKey: 'testKey',
+        description: '',
+        qualifierPath: '',
+        active: false,
+        responses: [],
+      };
+      jest
+        .spyOn(identifierManagementService, 'getIdentifier')
+        .mockResolvedValue({
+          namespace: 'testNamespace',
+          applicationIdentifiers: [
+            {
+              ai: '01',
+              shortcode: 'test',
+              regex: '^.*$',
+              type: 'I',
+              qualifiers: ['10'],
+              title: '',
+              label: '',
+            },
+          ],
+        });
+      jest
+        .spyOn(linkRegistrationService, 'one')
+        .mockResolvedValue(existingData);
+
+      const input = { ...baseInput };
+      (input as any).itemDescription = 'Old field';
+      const result = await pipe.transform(input);
+      expect((result as any).itemDescription).toBeUndefined();
     });
   });
 });

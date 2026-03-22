@@ -72,7 +72,7 @@ describe('LinkResolutionController (e2e)', () => {
             namespace: gs1,
             identificationKeyType: 'gtin',
             identificationKey: '09359502000041',
-            itemDescription: 'DPP',
+            description: 'DPP',
             qualifierPath: '/',
             active: true,
             responses: [

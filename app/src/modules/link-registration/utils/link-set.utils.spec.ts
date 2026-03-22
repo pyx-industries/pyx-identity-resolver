@@ -9,7 +9,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -93,6 +93,7 @@ describe('Link Set Utils', () => {
 
       const expectedLinkSetJson = {
         anchor: 'https://resolver.example.com/idr/01/12345',
+        description: 'example',
         'https://linktypevoc.example.com/voc/exampleLinkType': [
           {
             href: 'https://example2.com',
@@ -137,6 +138,26 @@ describe('Link Set Utils', () => {
 
       expect(constructedLinkSetJson).toEqual(expectedLinkSetJson);
     });
+
+    it('should include description in the linkset context object', () => {
+      const result = constructLinkSetJson(
+        {
+          namespace: 'idr',
+          identificationKeyType: 'test',
+          identificationKey: '12345',
+          description: 'example',
+          qualifierPath: '/',
+          active: true,
+          responses: [],
+        },
+        'gtin',
+        {
+          resolverDomain: 'https://resolver.example.com',
+          linkTypeVocDomain: 'https://linktypevoc.example.com/voc',
+        },
+      );
+      expect(result.description).toBe('example');
+    });
   });
 
   describe('UNTP linkset extensions', () => {
@@ -150,7 +171,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -196,7 +217,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -233,7 +254,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -292,7 +313,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -342,7 +363,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -378,7 +399,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -414,7 +435,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -452,7 +473,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -521,7 +542,7 @@ describe('Link Set Utils', () => {
         namespace: 'idr',
         identificationKeyType: 'test',
         identificationKey: '12345',
-        itemDescription: 'example',
+        description: 'example',
         qualifierPath: '/',
         active: true,
         responses: [

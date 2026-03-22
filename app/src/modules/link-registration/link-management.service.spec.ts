@@ -16,7 +16,7 @@ describe('LinkManagementService', () => {
     namespace: 'gs1',
     identificationKeyType: 'gtin',
     identificationKey: '09359502000010',
-    itemDescription: 'Test Product',
+    description: 'Test Product',
     qualifierPath: '/',
     active: true,
     version: 1,
@@ -962,7 +962,7 @@ describe('LinkManagementService', () => {
         namespace: 'gs1',
         identificationKeyType: 'gtin',
         identificationKey: '09359502000010',
-        itemDescription: 'Test Product',
+        description: 'Test Product',
         qualifierPath: '/',
         active: true,
         responses: [
@@ -1022,7 +1022,7 @@ describe('LinkManagementService', () => {
         namespace: 'gs1',
         identificationKeyType: 'gtin',
         identificationKey: '09359502000010',
-        itemDescription: 'Test Product',
+        description: 'Test Product',
         qualifierPath: '/',
         active: true,
         responses: [
