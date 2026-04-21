@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.0.1](https://github.com/pyx-industries/pyx-identity-resolver/compare/3.0.0...v3.0.1) (2026-04-21)
+
+
+### Bug Fixes
+
+* **link-registration:** Normalise deprecated itemDescription alias to description ([#96](https://github.com/pyx-industries/pyx-identity-resolver/issues/96)) ([8e91323](https://github.com/pyx-industries/pyx-identity-resolver/commit/8e91323a7a21c2249237836378c7abd85c15cd17))
+
+
+### Miscellaneous
+
+* **release:** Prepare release 3.0.1 ([6e16ff9](https://github.com/pyx-industries/pyx-identity-resolver/commit/6e16ff9243295a8909e80eff0483135627947bd6))
+
 ## [3.0.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/2.0.2...v3.0.0) (2026-03-22)
 
 
