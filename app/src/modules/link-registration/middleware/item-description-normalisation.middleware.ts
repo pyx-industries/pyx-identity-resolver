@@ -6,8 +6,8 @@ import { NextFunction, Request, Response } from 'express';
  * request bodies before the global ValidationPipe runs. If the payload
  * sets `itemDescription` but omits `description`, the value is copied
  * onto `description`. When both are provided, `description` wins. The
- * alias is left in place so the ValidationPipe (with `whitelist: true`)
- * strips it from the resulting DTO.
+ * alias is left on the body; the route's `ValidationPipe({ whitelist: true })`
+ * and `LinkRegistrationTransformPipe` together strip it before persistence.
  */
 @Injectable()
 export class ItemDescriptionNormalisationMiddleware implements NestMiddleware {

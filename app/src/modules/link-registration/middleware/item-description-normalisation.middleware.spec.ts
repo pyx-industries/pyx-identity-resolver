@@ -39,6 +39,15 @@ describe('ItemDescriptionNormalisationMiddleware', () => {
     expect((body as any).itemDescription).toBe('Legacy value');
   });
 
+  it('does not overwrite an empty-string description with itemDescription', () => {
+    // Empty string is an explicit caller-supplied value, not a missing field.
+    // Downstream @IsNotEmpty validation will reject it with a clear error,
+    // which is preferable to silently replacing it with the deprecated alias.
+    const body = run({ description: '', itemDescription: 'Legacy value' });
+    expect((body as any).description).toBe('');
+    expect((body as any).itemDescription).toBe('Legacy value');
+  });
+
   it('leaves the body untouched when itemDescription is absent', () => {
     const body = run({ description: 'Canonical' });
     expect(body).toEqual({ description: 'Canonical' });

@@ -121,6 +121,7 @@ describe('LinkRegistration — itemDescription backwards compatibility (e2e)', (
 
     const body = JSON.parse(res.text);
     expect(body.linkset[0].description).toBe(canonical);
+    expect(body.linkset[0].itemDescription).toBeUndefined();
   });
 
   it('rejects a registration that omits both description and itemDescription', async () => {
