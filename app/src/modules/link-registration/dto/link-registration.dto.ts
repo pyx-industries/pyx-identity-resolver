@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type, Transform } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
@@ -182,9 +182,6 @@ export class CreateLinkRegistrationDto {
   @ApiProperty({
     description: 'Description of the item being identified',
     example: 'Product description',
-  })
-  @Transform(({ obj }) => obj.description ?? obj.itemDescription, {
-    toClassOnly: true,
   })
   @IsString()
   @IsNotEmpty()

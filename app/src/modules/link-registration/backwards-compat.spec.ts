@@ -8,10 +8,17 @@ import { LinkRegistrationService } from './link-registration.service';
 import { normaliseDocument } from './utils/version.utils';
 
 /**
- * Backwards-compatibility tests for deprecated itemDescription field.
- * TODO(v3.0): Remove when itemDescription support is dropped.
+ * Backwards-compatibility tests for the deprecated itemDescription field.
+ *
+ * The normalisation from itemDescription -> description on inbound requests
+ * is performed by ItemDescriptionNormalisationMiddleware (covered separately
+ * in middleware/item-description-normalisation.middleware.spec.ts). These
+ * tests cover the remaining surfaces:
+ *   - the request-path pipe that strips the leftover itemDescription field,
+ *   - the storage read path that normalises legacy stored documents,
+ *   - the DTO's description constraint (still required post-normalisation).
  */
-describe('itemDescription backwards compatibility (remove in v3.0)', () => {
+describe('itemDescription backwards compatibility', () => {
   let pipe: LinkRegistrationTransformPipe;
 
   const mockIdentifierManagementService = {
@@ -80,53 +87,31 @@ describe('itemDescription backwards compatibility (remove in v3.0)', () => {
     );
   });
 
-  describe('Transform pipe', () => {
-    it('should remove itemDescription from the DTO when only itemDescription is provided', async () => {
+  describe('LinkRegistrationTransformPipe', () => {
+    it('strips the leftover itemDescription field from the DTO', async () => {
+      // By the time the request reaches this pipe the middleware has already
+      // copied itemDescription into description. The pipe is responsible for
+      // removing the deprecated field so it does not reach storage.
       const input = {
         namespace: 'testNamespace',
         identificationKeyType: 'test',
         identificationKey: 'testKey',
-        description: 'Copied from itemDescription by @Transform',
+        description: 'Canonical description',
         qualifierPath: '/',
         active: false,
         responses: baseResponses,
-        itemDescription: 'Old field value',
+        itemDescription: 'Legacy value',
       } as CreateLinkRegistrationDto & { itemDescription?: string };
 
       const result = await pipe.transform(input);
 
       expect((result as any).itemDescription).toBeUndefined();
-    });
-
-    it('should prefer description over itemDescription when both are provided', async () => {
-      // The @Transform on the DTO resolves description ?? itemDescription before the pipe runs.
-      // We simulate the post-transform state: description already holds the winning value.
-      const plain = {
-        namespace: 'testNamespace',
-        identificationKeyType: 'test',
-        identificationKey: 'testKey',
-        description: 'Canonical description',
-        itemDescription: 'Legacy value',
-        qualifierPath: '/',
-        active: false,
-        responses: baseResponses,
-      };
-
-      const dto = plainToClass(CreateLinkRegistrationDto, plain);
-
-      // After class-transformer runs the @Transform, description should be 'Canonical description'
-      // because it uses ?? (nullish coalescing): description is non-null so itemDescription is ignored.
-      expect(dto.description).toBe('Canonical description');
-
-      // The pipe should then strip the leftover itemDescription field.
-      const result = await pipe.transform(dto);
-      expect((result as any).itemDescription).toBeUndefined();
-      expect((result as any).description).toBe('Canonical description');
+      expect(result.description).toBe('Canonical description');
     });
   });
 
   describe('normaliseDocument (storage read path)', () => {
-    it('should convert itemDescription to description when reading a stored document', () => {
+    it('converts itemDescription to description when reading a stored document', () => {
       const doc = {
         itemDescription: 'Legacy stored value',
         responses: [],
@@ -138,7 +123,7 @@ describe('itemDescription backwards compatibility (remove in v3.0)', () => {
       expect((result as any).itemDescription).toBeUndefined();
     });
 
-    it('should not overwrite description with itemDescription when both are present', () => {
+    it('does not overwrite description with itemDescription when both are present', () => {
       const doc = {
         description: 'Current description',
         itemDescription: 'Old legacy value',
@@ -153,12 +138,13 @@ describe('itemDescription backwards compatibility (remove in v3.0)', () => {
   });
 
   describe('DTO validation', () => {
-    it('should fail validation when neither description nor itemDescription is provided', async () => {
+    it('fails validation when description is not populated', async () => {
+      // If the middleware has not copied itemDescription across (e.g. because
+      // neither field was provided) the DTO must still reject the request.
       const plain = {
         namespace: 'testNamespace',
         identificationKeyType: 'test',
         identificationKey: 'testKey',
-        // description omitted, itemDescription omitted
         qualifierPath: '/',
         active: false,
         responses: baseResponses,
@@ -171,24 +157,20 @@ describe('itemDescription backwards compatibility (remove in v3.0)', () => {
       expect(descriptionError).toBeDefined();
     });
 
-    it('should pass validation when description is populated (as the framework does via @Transform from itemDescription)', async () => {
-      // The NestJS ValidationPipe with transform:true fires the @Transform at the HTTP layer,
-      // copying itemDescription → description when only itemDescription is present.
-      // We simulate the post-transform state here: description already holds the copied value.
+    it('passes validation once description is populated (post-middleware state)', async () => {
+      // Simulates the state after ItemDescriptionNormalisationMiddleware has
+      // copied the legacy itemDescription value onto description.
       const plain = {
         namespace: 'testNamespace',
         identificationKeyType: 'test',
         identificationKey: 'testKey',
-        description: 'Legacy value only', // as if copied from itemDescription by the framework
+        description: 'Legacy value only',
         qualifierPath: '/',
         active: false,
         responses: baseResponses,
       };
 
       const dto = plainToClass(CreateLinkRegistrationDto, plain);
-
-      expect(dto.description).toBe('Legacy value only');
-
       const errors = await validate(dto);
       const descriptionError = errors.find((e) => e.property === 'description');
       expect(descriptionError).toBeUndefined();
