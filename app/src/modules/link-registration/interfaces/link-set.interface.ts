@@ -56,6 +56,7 @@ export interface LinkSetResponseInput {
   method?: string;
   /** @see {@link LinkTargetObject.public} */
   public?: boolean;
+  rel?: string[];
   linkId?: string;
 }
 

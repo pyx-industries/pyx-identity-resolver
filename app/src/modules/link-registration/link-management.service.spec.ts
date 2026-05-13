@@ -591,6 +591,62 @@ describe('LinkManagementService', () => {
       },
     );
 
+    it('should persist `rel` through the generic update loop', async () => {
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
+      );
+      repositoryProvider.save.mockResolvedValue(undefined);
+
+      await service.updateLink('abc12345', { rel: ['edit', 'latest-version'] });
+
+      const savedDoc = repositoryProvider.save.mock.calls[0][0];
+      const updatedResponse = savedDoc.responses.find(
+        (r) => r.linkId === 'abc12345',
+      );
+      expect(updatedResponse.rel).toEqual(['edit', 'latest-version']);
+    });
+
+    it('should clear `rel` when an empty array is supplied (replace semantics)', async () => {
+      const docWithRel = JSON.parse(JSON.stringify(mockDocument));
+      docWithRel.responses[0].rel = ['edit'];
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(docWithRel as any),
+      );
+      repositoryProvider.save.mockResolvedValue(undefined);
+
+      await service.updateLink('abc12345', { rel: [] });
+
+      const savedDoc = repositoryProvider.save.mock.calls[0][0];
+      const updatedResponse = savedDoc.responses.find(
+        (r) => r.linkId === 'abc12345',
+      );
+      expect(updatedResponse.rel).toEqual([]);
+    });
+
+    it('should not record any previous* field when only `rel` changes', async () => {
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
+      );
+      repositoryProvider.save.mockResolvedValue(undefined);
+
+      await service.updateLink('abc12345', { rel: ['edit'] });
+
+      const savedDoc = repositoryProvider.save.mock.calls[0][0];
+      const change = savedDoc.versionHistory[0].changes[0];
+      expect(change).toEqual({ linkId: 'abc12345', action: 'updated' });
+      expect(change).not.toHaveProperty('previousTargetUrl');
+      expect(change).not.toHaveProperty('previousLinkType');
+      expect(change).not.toHaveProperty('previousMimeType');
+      expect(change).not.toHaveProperty('previousIanaLanguage');
+      expect(change).not.toHaveProperty('previousContext');
+    });
+
     it('should record previousMimeType in version history when mimeType changes', async () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')

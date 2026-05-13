@@ -130,6 +130,9 @@ const constructLinkTargetObjects = (
           if (firstGroupedResponse.public !== undefined) {
             linkTarget.public = firstGroupedResponse.public;
           }
+          if (firstGroupedResponse.rel?.length > 0) {
+            linkTarget.rel = firstGroupedResponse.rel;
+          }
 
           acc[key].push(linkTarget);
         },

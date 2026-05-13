@@ -56,7 +56,7 @@ export class LinkRegistrationController {
     description: 'Internal Server Error',
   })
   @UsePipes(
-    new ValidationPipe({ whitelist: true }), // ignore extra fields
+    new ValidationPipe({ whitelist: true, transform: true }), // strip extras and run @Transform decorators
     IdentifierSetValidationPipe,
     ISO639ValidationPipe,
     Bcp47ValidationPipe,
