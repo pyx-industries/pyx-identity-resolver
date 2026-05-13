@@ -20,6 +20,8 @@ export interface LinkResponse {
   encryptionMethod?: EncryptionMethod;
   accessRole?: string[];
   method?: string;
+  /** @see {@link LinkTargetObject.public} from `../../link-registration/interfaces/link-set.interface` */
+  public?: boolean;
 }
 
 export interface LinkChange {

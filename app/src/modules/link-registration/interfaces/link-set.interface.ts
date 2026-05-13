@@ -15,6 +15,16 @@ export type LinkTargetObject = {
   accessRole?: string[];
   method?: string;
   rel?: string[];
+  /**
+   * Whether the URL itself is safe to publish in a public directory.
+   * Distinct from `accessRole` and `encryptionMethod`, which govern who
+   * may retrieve or decrypt the *content* at that URL. A target may be
+   * `public: true` while still requiring an authorised role to fetch
+   * the resource.
+   *
+   * @see https://untp.unece.org/docs/specification/IdentityResolver UNTP Identity Resolver Linkset Schema
+   */
+  public?: boolean;
 };
 
 export type InternationalizedTargetAttributes = {
@@ -44,6 +54,8 @@ export interface LinkSetResponseInput {
   encryptionMethod?: string;
   accessRole?: string[];
   method?: string;
+  /** @see {@link LinkTargetObject.public} */
+  public?: boolean;
   linkId?: string;
 }
 

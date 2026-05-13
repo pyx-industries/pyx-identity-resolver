@@ -13,6 +13,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { MimeTypeProperty } from './mime-type-property.decorator';
+import { PublicProperty } from './public-property.decorator';
 import {
   EncryptionMethod,
   ENCRYPTION_METHODS,
@@ -146,6 +147,9 @@ export class Response {
   @IsOptional()
   @IsString()
   method?: string;
+
+  @PublicProperty()
+  public?: boolean;
 }
 
 export class CreateLinkRegistrationDto {
@@ -226,6 +230,7 @@ export class CreateLinkRegistrationDto {
         encryptionMethod: 'none',
         accessRole: ['untp:accessRole#Anonymous'],
         method: 'POST',
+        public: true,
       },
     ],
   })

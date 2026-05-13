@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { OptionalMimeTypeProperty } from './mime-type-property.decorator';
+import { PublicProperty } from './public-property.decorator';
 import {
   EncryptionMethod,
   ENCRYPTION_METHODS,
@@ -326,4 +327,7 @@ export class UpdateLinkDto {
   @IsOptional()
   @IsString()
   method?: string;
+
+  @PublicProperty()
+  public?: boolean;
 }
