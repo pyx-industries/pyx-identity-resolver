@@ -571,6 +571,26 @@ describe('LinkManagementService', () => {
       ).rejects.toThrow('conflict');
     });
 
+    it.each([true, false])(
+      'should persist `public: %s` through the generic update loop',
+      async (publicValue) => {
+        repositoryProvider.one.mockImplementation((id: string) =>
+          id.includes('_index')
+            ? Promise.resolve(mockIndex as any)
+            : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
+        );
+        repositoryProvider.save.mockResolvedValue(undefined);
+
+        await service.updateLink('abc12345', { public: publicValue });
+
+        const savedDoc = repositoryProvider.save.mock.calls[0][0];
+        const updatedResponse = savedDoc.responses.find(
+          (r) => r.linkId === 'abc12345',
+        );
+        expect(updatedResponse.public).toBe(publicValue);
+      },
+    );
+
     it('should record previousMimeType in version history when mimeType changes', async () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')

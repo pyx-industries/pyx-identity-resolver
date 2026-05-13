@@ -127,6 +127,9 @@ const constructLinkTargetObjects = (
           if (firstGroupedResponse.method) {
             linkTarget.method = firstGroupedResponse.method;
           }
+          if (firstGroupedResponse.public !== undefined) {
+            linkTarget.public = firstGroupedResponse.public;
+          }
 
           acc[key].push(linkTarget);
         },

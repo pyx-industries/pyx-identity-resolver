@@ -194,6 +194,7 @@ describe('Link Set Utils', () => {
               'untp:accessRole#Regulator',
             ],
             method: 'POST',
+            public: true,
           },
         ],
       };
@@ -210,7 +211,45 @@ describe('Link Set Utils', () => {
         'untp:accessRole#Regulator',
       ]);
       expect(linkTargets[0].method).toBe('POST');
+      expect(linkTargets[0].public).toBe(true);
     });
+
+    it.each([true, false])(
+      'should emit `public: %s` when explicitly set on response',
+      (publicValue) => {
+        const uri: LinkSetInput = {
+          namespace: 'idr',
+          identificationKeyType: 'test',
+          identificationKey: '12345',
+          description: 'example',
+          qualifierPath: '/',
+          active: true,
+          responses: [
+            {
+              linkType: 'gs1:certificationInfo',
+              targetUrl: 'https://example.com/cert',
+              title: 'Certification',
+              mimeType: 'application/json',
+              ianaLanguage: 'en',
+              context: 'us',
+              active: true,
+              fwqs: false,
+              defaultLinkType: true,
+              defaultIanaLanguage: true,
+              defaultContext: true,
+              defaultMimeType: true,
+              public: publicValue,
+            },
+          ],
+        };
+
+        const result = constructLinkSetJson(uri, '01', attrs);
+        const linkTargets =
+          result['https://linktypevoc.example.com/voc/certificationInfo'];
+
+        expect(linkTargets[0].public).toBe(publicValue);
+      },
+    );
 
     it('should omit UNTP properties when not present on response', () => {
       const uri: LinkSetInput = {
@@ -247,6 +286,7 @@ describe('Link Set Utils', () => {
       expect(linkTargets[0]).not.toHaveProperty('encryptionMethod');
       expect(linkTargets[0]).not.toHaveProperty('accessRole');
       expect(linkTargets[0]).not.toHaveProperty('method');
+      expect(linkTargets[0]).not.toHaveProperty('public');
     });
 
     it('should include predecessor-version entries from version history', () => {
