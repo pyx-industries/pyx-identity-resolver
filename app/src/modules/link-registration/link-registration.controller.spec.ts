@@ -558,10 +558,7 @@ describe('LinkRegistrationController', () => {
         expect(error.getStatus()).toBe(400);
         // Assert that the error message contains the expected error message
         expect(error.getResponse().message).toContain(
-          'responses.0.mimeType must be one of the following values: application/pdf, ' +
-            'application/postscript, application/zip, image/jpeg, image/png, image/gif, ' +
-            'image/bmp, image/svg+xml, text/plain, text/html, text/css, text/csv, ' +
-            'text/javascript, text/xml',
+          'responses.0.mimeType must be a well-formed MIME type per RFC 6838',
         );
       }
     });

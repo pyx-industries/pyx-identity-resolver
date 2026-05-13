@@ -9,7 +9,7 @@ import {
   Matches,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { mockMimeTypes } from '../constants/link-registration.constants';
+import { OptionalMimeTypeProperty } from './mime-type-property.decorator';
 import {
   EncryptionMethod,
   ENCRYPTION_METHODS,
@@ -67,12 +67,7 @@ export class ListLinksQueryDto {
   @IsString()
   linkType?: string;
 
-  @ApiPropertyOptional({
-    description: 'Filter responses by MIME type',
-    example: 'application/json',
-  })
-  @IsOptional()
-  @IsString()
+  @OptionalMimeTypeProperty('Filter responses by MIME type.')
   mimeType?: string;
 
   @ApiPropertyOptional({
@@ -112,15 +107,7 @@ export class LinkResponseDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiPropertyOptional({
-    enum: mockMimeTypes,
-    description: 'The MIME type',
-    example: 'application/json',
-    default: 'text/html',
-  })
-  @IsOptional()
-  @IsString()
-  @IsIn(mockMimeTypes)
+  @OptionalMimeTypeProperty('The MIME type.', { default: 'text/html' })
   mimeType?: string = 'text/html';
 
   @ApiPropertyOptional({
@@ -254,14 +241,7 @@ export class UpdateLinkDto {
   @IsString()
   title?: string;
 
-  @ApiPropertyOptional({
-    enum: mockMimeTypes,
-    description: 'New MIME type',
-    example: 'application/json',
-  })
-  @IsOptional()
-  @IsString()
-  @IsIn(mockMimeTypes)
+  @OptionalMimeTypeProperty('New MIME type.')
   mimeType?: string;
 
   @ApiPropertyOptional({
