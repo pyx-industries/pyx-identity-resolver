@@ -1416,7 +1416,7 @@ describe('LinkResolutionController (e2e)', () => {
           expect(res.body.errors).toEqual([
             {
               field: 'responses.0.mimeType',
-              message: 'mimeType is not in the list of allowed values',
+              message: 'mimeType is not in a valid format',
             },
           ]);
         });
