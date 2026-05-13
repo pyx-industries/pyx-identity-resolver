@@ -54,7 +54,6 @@ export class LinkRegistrationController {
   @ApiInternalServerErrorResponse({
     status: 500,
     description: 'Internal Server Error',
-    type: ApiInternalServerErrorResponse,
   })
   @UsePipes(
     new ValidationPipe({ whitelist: true }), // ignore extra fields

@@ -2,6 +2,7 @@ import { I18nService } from 'nestjs-i18n';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpModule } from '@nestjs/axios';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LinkRegistrationController } from './link-registration.controller';
 import { LinkRegistrationService } from './link-registration.service';
 import { CreateLinkRegistrationDto } from './dto/link-registration.dto';
@@ -11,10 +12,11 @@ import { IdentifierManagementService } from '../identifier-management/identifier
 describe('LinkRegistrationController', () => {
   let controller: LinkRegistrationController;
   let linkRegistrationService: LinkRegistrationService;
+  let module: TestingModule;
 
   beforeEach(async () => {
     // Create a testing module
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       imports: [RepositoryModule, ConfigModule, HttpModule],
       controllers: [LinkRegistrationController],
       providers: [
@@ -58,6 +60,23 @@ describe('LinkRegistrationController', () => {
   it('should be defined', () => {
     // Assert that the controller is defined
     expect(controller).toBeDefined();
+  });
+
+  describe('OpenAPI document', () => {
+    it('does not register a schema with an empty name', async () => {
+      const app = module.createNestApplication();
+      await app.init();
+
+      const document = SwaggerModule.createDocument(
+        app,
+        new DocumentBuilder().setTitle('test').setVersion('test').build(),
+      );
+
+      const schemaNames = Object.keys(document.components?.schemas ?? {});
+      expect(schemaNames).not.toContain('');
+
+      await app.close();
+    });
   });
 
   describe('create', () => {
