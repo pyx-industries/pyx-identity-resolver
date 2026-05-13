@@ -195,6 +195,7 @@ describe('Link Set Utils', () => {
             ],
             method: 'POST',
             public: true,
+            rel: ['edit', 'latest-version'],
           },
         ],
       };
@@ -212,6 +213,7 @@ describe('Link Set Utils', () => {
       ]);
       expect(linkTargets[0].method).toBe('POST');
       expect(linkTargets[0].public).toBe(true);
+      expect(linkTargets[0].rel).toEqual(['edit', 'latest-version']);
     });
 
     it.each([true, false])(
@@ -287,6 +289,64 @@ describe('Link Set Utils', () => {
       expect(linkTargets[0]).not.toHaveProperty('accessRole');
       expect(linkTargets[0]).not.toHaveProperty('method');
       expect(linkTargets[0]).not.toHaveProperty('public');
+      expect(linkTargets[0]).not.toHaveProperty('rel');
+    });
+
+    it('should keep publisher-set rel separate from server-derived predecessor-version', () => {
+      const uri: LinkSetInput = {
+        namespace: 'idr',
+        identificationKeyType: 'test',
+        identificationKey: '12345',
+        description: 'example',
+        qualifierPath: '/',
+        active: true,
+        responses: [
+          {
+            linkId: 'link1',
+            linkType: 'gs1:certificationInfo',
+            targetUrl: 'https://example.com/cert',
+            title: 'Certification',
+            mimeType: 'application/json',
+            ianaLanguage: 'en',
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultIanaLanguage: true,
+            defaultContext: true,
+            defaultMimeType: true,
+            rel: ['edit'],
+          },
+        ],
+      };
+
+      const versionHistory: VersionHistoryEntry[] = [
+        {
+          version: 2,
+          updatedAt: '2024-06-01T00:00:00.000Z',
+          changes: [
+            {
+              linkId: 'link1',
+              action: 'updated' as const,
+              previousTargetUrl: 'https://example.com/old-cert',
+            },
+          ],
+        },
+      ];
+
+      const result = constructLinkSetJson(uri, '01', attrs, versionHistory);
+      const linkTypeEntries =
+        result['https://linktypevoc.example.com/voc/certificationInfo'];
+
+      const current = linkTypeEntries.find(
+        (e: any) => e.href === 'https://example.com/cert',
+      );
+      const predecessor = linkTypeEntries.find(
+        (e: any) => e.href === 'https://example.com/old-cert',
+      );
+
+      expect(current.rel).toEqual(['edit']);
+      expect(predecessor.rel).toEqual(['predecessor-version']);
     });
 
     it('should include predecessor-version entries from version history', () => {

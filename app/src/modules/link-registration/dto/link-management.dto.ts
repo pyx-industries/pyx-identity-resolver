@@ -17,6 +17,7 @@ import {
   UntpAccessRole,
   UNTP_ACCESS_ROLES,
 } from '../constants/untp-enums';
+import { RelProperty } from './rel-property.decorator';
 
 /**
  * Query DTO for listing all links for an identifier.
@@ -330,4 +331,7 @@ export class UpdateLinkDto {
 
   @PublicProperty()
   public?: boolean;
+
+  @RelProperty()
+  rel?: string[];
 }

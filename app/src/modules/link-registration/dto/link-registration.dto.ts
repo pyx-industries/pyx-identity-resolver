@@ -20,6 +20,7 @@ import {
   UntpAccessRole,
   UNTP_ACCESS_ROLES,
 } from '../constants/untp-enums';
+import { RelProperty } from './rel-property.decorator';
 
 export class Response {
   @ApiProperty({
@@ -150,6 +151,9 @@ export class Response {
 
   @PublicProperty()
   public?: boolean;
+
+  @RelProperty()
+  rel?: string[];
 }
 
 export class CreateLinkRegistrationDto {
@@ -231,6 +235,7 @@ export class CreateLinkRegistrationDto {
         accessRole: ['untp:accessRole#Anonymous'],
         method: 'POST',
         public: true,
+        rel: ['edit'],
       },
     ],
   })
