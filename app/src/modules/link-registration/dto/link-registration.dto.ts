@@ -12,7 +12,7 @@ import {
   Matches,
   ValidateNested,
 } from 'class-validator';
-import { mockMimeTypes } from '../constants/link-registration.constants';
+import { MimeTypeProperty } from './mime-type-property.decorator';
 import {
   EncryptionMethod,
   ENCRYPTION_METHODS,
@@ -83,13 +83,7 @@ export class Response {
   @IsNotEmpty()
   targetUrl: string;
 
-  @ApiProperty({
-    enum: mockMimeTypes,
-    description: 'MIME type',
-    example: 'application/json',
-  })
-  @IsString()
-  @IsIn(mockMimeTypes)
+  @MimeTypeProperty('MIME type of the target resource.')
   mimeType: string;
 
   @ApiProperty({
@@ -228,7 +222,7 @@ export class CreateLinkRegistrationDto {
         context: 'au',
         title: 'Certification Information',
         targetUrl: 'https://example.com',
-        mimeType: 'application/json',
+        mimeType: 'application/vc+ld+json',
         encryptionMethod: 'none',
         accessRole: ['untp:accessRole#Anonymous'],
         method: 'POST',
