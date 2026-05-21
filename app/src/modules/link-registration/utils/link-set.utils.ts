@@ -90,8 +90,9 @@ const constructLinkTargetObjects = (
       acc[key] = [];
 
       // Construct the link target objects.
-      // hreflang emission is intentionally absent here; #107 reintroduces
-      // per-variant hreflang reading from the new source field. See ADR 001.
+      // hreflang emission is intentionally absent here; per-variant
+      // hreflang reading is reintroduced when the linkset emission lands
+      // (#107). See `docs/adr/001-link-variant-capability-model.md`.
       Object.values(groupResponsesByMimeTypeTargetUrlAndContext).map(
         (groupedResponses: any) => {
           const firstGroupedResponse = groupedResponses[0];

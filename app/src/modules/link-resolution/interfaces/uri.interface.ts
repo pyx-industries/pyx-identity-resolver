@@ -21,6 +21,7 @@ export interface LinkResponse {
   /** @see {@link LinkTargetObject.public} from `../../link-registration/interfaces/link-set.interface` */
   public?: boolean;
   rel?: string[];
+  /** @see {@link LinkTargetObject.hreflang} from `../../link-registration/interfaces/link-set.interface` */
   hreflang?: string[];
 }
 

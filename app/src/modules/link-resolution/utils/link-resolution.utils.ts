@@ -67,8 +67,6 @@ export const processUri = (
  * 3. linkType, context
  * 4. linkType, defaultContext
  * 5. linkType
- * 7. linkType
- * 8. defaultLinkType
  *
  * @param uri - the URI document containing responses and pre-built linkset
  * @param identifierParams - request parameters including linkType and descriptive attributes
@@ -246,12 +244,15 @@ const matchLinkTypeLanguage = (
   return response;
 };
 
+/**
+ * @deprecated Always returns undefined. Language-aware matching is
+ * reintroduced on hreflang membership when the language-aware cascade
+ * lands (#108).
+ */
 const matchLinkTypeDefaultLanguage = (
   _responses: LinkResponse[],
   _linkType: string,
-): LinkResponse => {
-  // Language-aware matching is reintroduced on hreflang membership in #108.
-  // Until then, this tier never matches and the cascade falls through.
+): LinkResponse | undefined => {
   void _responses;
   void _linkType;
   return undefined;
@@ -270,10 +271,11 @@ const matchDefaultLinkType = (responses: LinkResponse[]): LinkResponse => {
   return response;
 };
 
-// Language-aware matching is reintroduced on hreflang membership in #108.
-// Until then, the helpers degrade: checkIanaLanguageContext matches on
-// context only, and checkIanaLanguage never matches so the cascade falls
-// through to language-blind tiers.
+// Language-aware matching is reintroduced on hreflang membership when
+// the language-aware cascade lands (#108). Until then, the helpers
+// degrade: checkIanaLanguageContext matches on context only, and
+// checkIanaLanguage never matches so the cascade falls through to
+// language-blind tiers.
 const checkIanaLanguageContext = (
   response: LinkResponse,
   ianaLanguageContexts: IanalanguageContext[],

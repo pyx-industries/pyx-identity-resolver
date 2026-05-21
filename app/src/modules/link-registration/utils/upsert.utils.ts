@@ -10,7 +10,7 @@ import { VersionHistoryEntry } from '../interfaces/versioned-uri.interface';
  * Two responses are considered duplicates when they share the same
  * targetUrl, linkType, mimeType, and context. Language (hreflang) is
  * a capability attribute of the variant, not part of its identity;
- * see ADR 001.
+ * see `docs/adr/001-link-variant-capability-model.md`.
  */
 export const buildResponseKey = (response: Response): string =>
   `${response.targetUrl}|${response.linkType}|${response.mimeType}|${response.context}`;
