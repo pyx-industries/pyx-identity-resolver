@@ -32,12 +32,11 @@ const identifierDto = (): IdentifierDto => ({
 const baseResponse = {
   defaultLinkType: true,
   defaultMimeType: true,
-  defaultIanaLanguage: true,
   defaultContext: true,
   fwqs: false,
   active: true,
   linkType: 'gs1:certificationInfo',
-  ianaLanguage: 'en',
+  hreflang: ['en'],
   context: 'au',
   title: 'Certification Information',
   targetUrl: 'https://example.com',

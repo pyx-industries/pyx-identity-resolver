@@ -18,7 +18,6 @@ import {
 import { CreateLinkRegistrationDto } from './dto/link-registration.dto';
 import { LinkRegistrationService } from './link-registration.service';
 import { IdentifierSetValidationPipe } from '../identifier-management/pipes/identifier-set-validation.pipe';
-import { ISO639ValidationPipe } from './pipes/iso639-validation.pipe';
 import { FieldErrorsResponse } from '../../common/dto/errors.dto';
 import { Bcp47ValidationPipe } from './pipes/bcp47-validation.pipe';
 import { LinkRegistrationTransformPipe } from './pipes/link-registration-transform.pipe';
@@ -58,7 +57,6 @@ export class LinkRegistrationController {
   @UsePipes(
     new ValidationPipe({ whitelist: true, transform: true }), // strip extras and run @Transform decorators
     IdentifierSetValidationPipe,
-    ISO639ValidationPipe,
     Bcp47ValidationPipe,
     LinkRegistrationTransformPipe,
     DefaultFlagsTransformPipe,

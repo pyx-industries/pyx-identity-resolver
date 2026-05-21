@@ -68,7 +68,7 @@ describe('LinkResolutionController', () => {
         },
         descriptiveAttributes: {
           linkType: 'idr:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'us',
           mimeType: 'application/json',
         },
@@ -116,7 +116,7 @@ describe('LinkResolutionController', () => {
         },
         descriptiveAttributes: {
           linkType: 'idr:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'us',
           mimeType: 'application/json',
         },

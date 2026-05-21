@@ -42,13 +42,11 @@ export interface LinkSetResponseInput {
   targetUrl: string;
   title: string;
   linkType: string;
-  ianaLanguage: string;
   context: string;
   mimeType: string;
   active: boolean;
   fwqs: boolean;
   defaultLinkType: boolean;
-  defaultIanaLanguage: boolean;
   defaultContext: boolean;
   defaultMimeType: boolean;
   encryptionMethod?: string;
@@ -57,6 +55,7 @@ export interface LinkSetResponseInput {
   /** @see {@link LinkTargetObject.public} */
   public?: boolean;
   rel?: string[];
+  hreflang?: string[];
   linkId?: string;
 }
 

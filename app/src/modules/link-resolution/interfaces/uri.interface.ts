@@ -5,13 +5,11 @@ export interface LinkResponse {
   targetUrl: string;
   title: string;
   linkType: string;
-  ianaLanguage: string;
   context: string;
   mimeType: string;
   active: boolean;
   fwqs: boolean;
   defaultLinkType: boolean;
-  defaultIanaLanguage: boolean;
   defaultContext: boolean;
   defaultMimeType: boolean;
   linkId?: string;
@@ -23,6 +21,7 @@ export interface LinkResponse {
   /** @see {@link LinkTargetObject.public} from `../../link-registration/interfaces/link-set.interface` */
   public?: boolean;
   rel?: string[];
+  hreflang?: string[];
 }
 
 export interface LinkChange {
@@ -31,7 +30,6 @@ export interface LinkChange {
   previousTargetUrl?: string;
   previousLinkType?: string;
   previousMimeType?: string;
-  previousIanaLanguage?: string;
   previousContext?: string;
 }
 

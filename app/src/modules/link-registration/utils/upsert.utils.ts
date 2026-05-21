@@ -8,18 +8,19 @@ import { VersionHistoryEntry } from '../interfaces/versioned-uri.interface';
 /**
  * Builds a composite key for duplicate detection.
  * Two responses are considered duplicates when they share the same
- * targetUrl, linkType, mimeType, ianaLanguage, and context.
+ * targetUrl, linkType, mimeType, and context. Language (hreflang) is
+ * a capability attribute of the variant, not part of its identity;
+ * see ADR 001.
  */
 export const buildResponseKey = (response: Response): string =>
-  `${response.targetUrl}|${response.linkType}|${response.mimeType}|${response.ianaLanguage}|${response.context}`;
+  `${response.targetUrl}|${response.linkType}|${response.mimeType}|${response.context}`;
 
 /**
  * Formats a response's identifying fields for use in error messages.
  */
 export const formatResponseIdentity = (response: Response): string =>
   `linkType='${response.linkType}', mimeType='${response.mimeType}', ` +
-  `ianaLanguage='${response.ianaLanguage}', context='${response.context}', ` +
-  `targetUrl='${response.targetUrl}'`;
+  `context='${response.context}', targetUrl='${response.targetUrl}'`;
 
 /**
  * Builds composite keys from version history entries by combining
@@ -45,7 +46,6 @@ export const buildHistoricalKeys = (
         !change.previousTargetUrl &&
         !change.previousLinkType &&
         !change.previousMimeType &&
-        !change.previousIanaLanguage &&
         !change.previousContext
       )
         continue;
@@ -57,7 +57,6 @@ export const buildHistoricalKeys = (
         `${change.previousTargetUrl ?? currentResponse.targetUrl}|` +
         `${change.previousLinkType ?? currentResponse.linkType}|` +
         `${change.previousMimeType ?? currentResponse.mimeType}|` +
-        `${change.previousIanaLanguage ?? currentResponse.ianaLanguage}|` +
         `${change.previousContext ?? currentResponse.context}`;
       keys.add(key);
     }
@@ -72,7 +71,7 @@ export const buildHistoricalKeys = (
  * to the existing responses (append-only). Throws ConflictException if
  * any incoming response duplicates an existing response or a previous
  * version of a response by composite key
- * (targetUrl + linkType + mimeType + ianaLanguage + context).
+ * (targetUrl + linkType + mimeType + context).
  * @param currentLinkRegistration - The current link registration data.
  * @param entryLinkRegistration - The incoming link registration data.
  * @param versionHistory - Version history from the stored document (optional).

@@ -14,7 +14,6 @@ describe('DefaultFlagsTransformPipe', () => {
   const createResponse = (overrides: Partial<Response> = {}): Response => ({
     defaultLinkType: false,
     defaultMimeType: false,
-    defaultIanaLanguage: false,
     defaultContext: false,
     fwqs: false,
     active: true,
@@ -22,7 +21,7 @@ describe('DefaultFlagsTransformPipe', () => {
     title: 'Test',
     targetUrl: 'https://example.com',
     mimeType: 'application/json',
-    ianaLanguage: 'en',
+    hreflang: ['en'],
     context: 'au',
     ...overrides,
   });
@@ -48,13 +47,11 @@ describe('DefaultFlagsTransformPipe', () => {
 
       // First active response promoted as default in its scope
       expect(result.responses[0].defaultLinkType).toBe(true);
-      expect(result.responses[0].defaultIanaLanguage).toBe(true);
       expect(result.responses[0].defaultContext).toBe(true);
       expect(result.responses[0].defaultMimeType).toBe(true);
 
       // Second response promoted in its own linkType scope
       expect(result.responses[1].defaultLinkType).toBe(false);
-      expect(result.responses[1].defaultIanaLanguage).toBe(true);
       expect(result.responses[1].defaultContext).toBe(true);
       expect(result.responses[1].defaultMimeType).toBe(true);
     });
@@ -63,7 +60,6 @@ describe('DefaultFlagsTransformPipe', () => {
       const dto = createDto([
         createResponse({
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
@@ -73,7 +69,6 @@ describe('DefaultFlagsTransformPipe', () => {
       const result = pipe.transform(dto);
 
       expect(result.responses[0].defaultLinkType).toBe(true);
-      expect(result.responses[0].defaultIanaLanguage).toBe(true);
       expect(result.responses[0].defaultContext).toBe(true);
       expect(result.responses[0].defaultMimeType).toBe(true);
     });
@@ -82,18 +77,16 @@ describe('DefaultFlagsTransformPipe', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:epcis',
-          ianaLanguage: 'fr',
+          hreflang: ['fr'],
           context: 'us',
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
@@ -103,12 +96,10 @@ describe('DefaultFlagsTransformPipe', () => {
 
       // First response keeps all its defaults
       expect(result.responses[0].defaultLinkType).toBe(true);
-      expect(result.responses[0].defaultIanaLanguage).toBe(true);
       expect(result.responses[0].defaultContext).toBe(true);
       expect(result.responses[0].defaultMimeType).toBe(true);
 
       // Second response in different scope also keeps its defaults (except defaultLinkType which is global)
-      expect(result.responses[1].defaultIanaLanguage).toBe(true);
       expect(result.responses[1].defaultContext).toBe(true);
       expect(result.responses[1].defaultMimeType).toBe(true);
     });
@@ -144,58 +135,16 @@ describe('DefaultFlagsTransformPipe', () => {
     });
   });
 
-  describe('defaultIanaLanguage - per linkType scope', () => {
-    it('should keep only the last defaultIanaLanguage true for same linkType', () => {
+  describe('defaultContext - per linkType scope', () => {
+    it('should keep only the last defaultContext true for same linkType', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
-          defaultIanaLanguage: true,
-        }),
-        createResponse({
-          linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'fr',
-          defaultIanaLanguage: true,
-        }),
-      ]);
-
-      const result = pipe.transform(dto);
-
-      expect(result.responses[0].defaultIanaLanguage).toBe(false);
-      expect(result.responses[1].defaultIanaLanguage).toBe(true);
-    });
-
-    it('should allow different linkTypes to each have their own defaultIanaLanguage', () => {
-      const dto = createDto([
-        createResponse({
-          linkType: 'gs1:certificationInfo',
-          defaultIanaLanguage: true,
-        }),
-        createResponse({
-          linkType: 'gs1:epcis',
-          defaultIanaLanguage: true,
-        }),
-      ]);
-
-      const result = pipe.transform(dto);
-
-      expect(result.responses[0].defaultIanaLanguage).toBe(true);
-      expect(result.responses[1].defaultIanaLanguage).toBe(true);
-    });
-  });
-
-  describe('defaultContext - per linkType + ianaLanguage scope', () => {
-    it('should keep only the last defaultContext true for same linkType and language', () => {
-      const dto = createDto([
-        createResponse({
-          linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
           context: 'au',
           defaultContext: true,
         }),
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
           context: 'us',
           defaultContext: true,
         }),
@@ -207,23 +156,15 @@ describe('DefaultFlagsTransformPipe', () => {
       expect(result.responses[1].defaultContext).toBe(true);
     });
 
-    it('should allow different linkType+language combinations to each have their own defaultContext', () => {
+    it('should allow different linkTypes to each have their own defaultContext', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
-          context: 'au',
-          defaultContext: true,
-        }),
-        createResponse({
-          linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'fr',
           context: 'au',
           defaultContext: true,
         }),
         createResponse({
           linkType: 'gs1:epcis',
-          ianaLanguage: 'en',
           context: 'au',
           defaultContext: true,
         }),
@@ -233,23 +174,22 @@ describe('DefaultFlagsTransformPipe', () => {
 
       expect(result.responses[0].defaultContext).toBe(true);
       expect(result.responses[1].defaultContext).toBe(true);
-      expect(result.responses[2].defaultContext).toBe(true);
     });
   });
 
-  describe('defaultMimeType - per linkType + ianaLanguage + context scope', () => {
+  describe('defaultMimeType - per linkType + context scope', () => {
     it('should keep only the last defaultMimeType true for same full scope', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultMimeType: true,
@@ -266,14 +206,14 @@ describe('DefaultFlagsTransformPipe', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'us',
           mimeType: 'application/json',
           defaultMimeType: true,
@@ -288,40 +228,18 @@ describe('DefaultFlagsTransformPipe', () => {
   });
 
   describe('case insensitivity', () => {
-    it('should treat ianaLanguage case-insensitively for defaultContext scope', () => {
-      const dto = createDto([
-        createResponse({
-          linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'EN',
-          context: 'au',
-          defaultContext: true,
-        }),
-        createResponse({
-          linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
-          context: 'us',
-          defaultContext: true,
-        }),
-      ]);
-
-      const result = pipe.transform(dto);
-
-      expect(result.responses[0].defaultContext).toBe(false);
-      expect(result.responses[1].defaultContext).toBe(true);
-    });
-
     it('should treat context case-insensitively for defaultMimeType scope', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'AU',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultMimeType: true,
@@ -332,26 +250,6 @@ describe('DefaultFlagsTransformPipe', () => {
 
       expect(result.responses[0].defaultMimeType).toBe(false);
       expect(result.responses[1].defaultMimeType).toBe(true);
-    });
-
-    it('should treat ianaLanguage case-insensitively for defaultIanaLanguage scope', () => {
-      const dto = createDto([
-        createResponse({
-          linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'EN',
-          defaultIanaLanguage: true,
-        }),
-        createResponse({
-          linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
-          defaultIanaLanguage: true,
-        }),
-      ]);
-
-      const result = pipe.transform(dto);
-
-      expect(result.responses[0].defaultIanaLanguage).toBe(false);
-      expect(result.responses[1].defaultIanaLanguage).toBe(true);
     });
   });
 
@@ -368,7 +266,6 @@ describe('DefaultFlagsTransformPipe', () => {
       const dto = createDto([
         createResponse({
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
@@ -377,7 +274,6 @@ describe('DefaultFlagsTransformPipe', () => {
       const result = pipe.transform(dto);
 
       expect(result.responses[0].defaultLinkType).toBe(true);
-      expect(result.responses[0].defaultIanaLanguage).toBe(true);
       expect(result.responses[0].defaultContext).toBe(true);
       expect(result.responses[0].defaultMimeType).toBe(true);
     });
@@ -386,20 +282,18 @@ describe('DefaultFlagsTransformPipe', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:certificationInfo',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
@@ -409,13 +303,11 @@ describe('DefaultFlagsTransformPipe', () => {
 
       // First response loses all defaults
       expect(result.responses[0].defaultLinkType).toBe(false);
-      expect(result.responses[0].defaultIanaLanguage).toBe(false);
       expect(result.responses[0].defaultContext).toBe(false);
       expect(result.responses[0].defaultMimeType).toBe(false);
 
       // Second response keeps all defaults (last in each scope)
       expect(result.responses[1].defaultLinkType).toBe(true);
-      expect(result.responses[1].defaultIanaLanguage).toBe(true);
       expect(result.responses[1].defaultContext).toBe(true);
       expect(result.responses[1].defaultMimeType).toBe(true);
     });
