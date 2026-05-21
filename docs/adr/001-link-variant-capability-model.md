@@ -1,8 +1,7 @@
 # ADR 001: Link target variants as capability advertisement
 
-## Status
-
-accepted
+- **Date:** 2026-05-21
+- **Status:** accepted
 
 ## Context
 
