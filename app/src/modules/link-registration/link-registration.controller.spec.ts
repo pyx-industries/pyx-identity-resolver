@@ -262,10 +262,9 @@ describe('LinkRegistrationController', () => {
             title: 'testLinkTitle',
             targetUrl: 'https://test.com',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             defaultContext: true,
-            defaultIanaLanguage: true,
           },
         ],
       };
@@ -300,10 +299,9 @@ describe('LinkRegistrationController', () => {
             title: 'testLinkTitle',
             targetUrl: 'https://test.com',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             defaultContext: true,
-            defaultIanaLanguage: true,
           },
         ],
       };
@@ -338,10 +336,9 @@ describe('LinkRegistrationController', () => {
             title: 'testLinkTitle',
             targetUrl: 'https://test.com',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             defaultContext: true,
-            defaultIanaLanguage: true,
           },
         ],
       };
@@ -376,10 +373,9 @@ describe('LinkRegistrationController', () => {
             title: 'testLinkTitle',
             targetUrl: 'https://test.com',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             defaultContext: true,
-            defaultIanaLanguage: true,
           },
         ],
       };
@@ -414,10 +410,9 @@ describe('LinkRegistrationController', () => {
             title: 'testLinkTitle',
             targetUrl: 'https://test.com',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             defaultContext: true,
-            defaultIanaLanguage: true,
           },
         ],
       };
@@ -467,10 +462,9 @@ describe('LinkRegistrationController', () => {
             title: '', // cannot be empty
             targetUrl: 'https://test.com',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             defaultContext: true,
-            defaultIanaLanguage: true,
           },
         ],
       };
@@ -505,10 +499,9 @@ describe('LinkRegistrationController', () => {
             title: 'testLinkTitle',
             targetUrl: 'invalidUrl', // invalid URL
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             defaultContext: true,
-            defaultIanaLanguage: true,
           },
         ],
       };
@@ -543,10 +536,9 @@ describe('LinkRegistrationController', () => {
             title: 'testLinkTitle',
             targetUrl: 'https://test.com',
             mimeType: 'invalidMimeType', // invalid MIME type
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             defaultContext: true,
-            defaultIanaLanguage: true,
           },
         ],
       };

@@ -71,13 +71,6 @@ export class LinkManagementController {
     description: 'Filter by MIME type',
     example: 'application/json',
   })
-  @ApiQuery({
-    name: 'ianaLanguage',
-    required: false,
-    type: String,
-    description: 'Filter by IANA language tag',
-    example: 'en',
-  })
   @ApiOkResponse({
     status: 200,
     description: 'Links retrieved successfully',

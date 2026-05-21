@@ -6,12 +6,11 @@ import { UpdateLinkDto } from './link-management.dto';
 const baseResponse = {
   defaultLinkType: true,
   defaultMimeType: true,
-  defaultIanaLanguage: true,
   defaultContext: true,
   fwqs: false,
   active: true,
   linkType: 'example-identifier-scheme:certificationInfo',
-  ianaLanguage: 'en',
+  hreflang: ['en'],
   context: 'au',
   title: 'Certification Information',
   targetUrl: 'https://example.com',

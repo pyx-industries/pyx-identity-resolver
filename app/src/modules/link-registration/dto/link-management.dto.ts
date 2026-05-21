@@ -17,6 +17,7 @@ import {
   UntpAccessRole,
   UNTP_ACCESS_ROLES,
 } from '../constants/untp-enums';
+import { HreflangProperty } from './hreflang-property.decorator';
 import { RelProperty } from './rel-property.decorator';
 
 /**
@@ -71,14 +72,6 @@ export class ListLinksQueryDto {
 
   @OptionalMimeTypeProperty('Filter responses by MIME type.')
   mimeType?: string;
-
-  @ApiPropertyOptional({
-    description: 'Filter responses by IANA language tag',
-    example: 'en',
-  })
-  @IsOptional()
-  @IsString()
-  ianaLanguage?: string;
 }
 
 /**
@@ -113,15 +106,6 @@ export class LinkResponseDto {
   mimeType?: string = 'text/html';
 
   @ApiPropertyOptional({
-    description: 'The IANA language tag',
-    example: 'en',
-    default: 'en',
-  })
-  @IsOptional()
-  @IsString()
-  ianaLanguage?: string = 'en';
-
-  @ApiPropertyOptional({
     description: 'The context code',
     example: 'au',
     default: 'us',
@@ -153,14 +137,6 @@ export class LinkResponseDto {
   @IsOptional()
   @IsBoolean()
   defaultLinkType?: boolean = false;
-
-  @ApiPropertyOptional({
-    description: 'Whether this is the default IANA language',
-    default: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  defaultIanaLanguage?: boolean = false;
 
   @ApiPropertyOptional({
     description: 'Whether this is the default context',
@@ -247,15 +223,6 @@ export class UpdateLinkDto {
   mimeType?: string;
 
   @ApiPropertyOptional({
-    description: 'New IANA language tag',
-    example: 'en',
-  })
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  ianaLanguage?: string;
-
-  @ApiPropertyOptional({
     description: 'New context code',
     example: 'au',
   })
@@ -278,13 +245,6 @@ export class UpdateLinkDto {
   @IsOptional()
   @IsBoolean()
   defaultLinkType?: boolean;
-
-  @ApiPropertyOptional({
-    description: 'Whether this is the default IANA language',
-  })
-  @IsOptional()
-  @IsBoolean()
-  defaultIanaLanguage?: boolean;
 
   @ApiPropertyOptional({ description: 'Whether this is the default context' })
   @IsOptional()
@@ -334,4 +294,7 @@ export class UpdateLinkDto {
 
   @RelProperty()
   rel?: string[];
+
+  @HreflangProperty()
+  hreflang?: string[];
 }

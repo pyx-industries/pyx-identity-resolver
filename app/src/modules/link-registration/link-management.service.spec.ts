@@ -30,12 +30,11 @@ describe('LinkManagementService', () => {
         linkType: 'gs1:pip',
         title: 'Product Information',
         mimeType: 'text/html',
-        ianaLanguage: 'en',
+        hreflang: ['en'],
         context: 'us',
         active: true,
         fwqs: false,
         defaultLinkType: true,
-        defaultIanaLanguage: true,
         defaultContext: true,
         defaultMimeType: true,
         createdAt: '2024-01-01T00:00:00.000Z',
@@ -143,12 +142,11 @@ describe('LinkManagementService', () => {
             linkType: 'gs1:pip',
             title: 'Inactive Link',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             active: false,
             fwqs: false,
             defaultLinkType: false,
-            defaultIanaLanguage: false,
             defaultContext: false,
             defaultMimeType: false,
             createdAt: '2024-01-01T00:00:00.000Z',
@@ -192,12 +190,11 @@ describe('LinkManagementService', () => {
             linkType: 'gs1:pip',
             title: 'Product Information',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             active: true,
             fwqs: false,
             defaultLinkType: true,
-            defaultIanaLanguage: true,
             defaultContext: true,
             defaultMimeType: true,
             createdAt: '2024-01-01T00:00:00.000Z',
@@ -209,12 +206,11 @@ describe('LinkManagementService', () => {
             linkType: 'gs1:pip',
             title: 'Product Information (JSON)',
             mimeType: 'application/json',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             active: true,
             fwqs: false,
             defaultLinkType: false,
-            defaultIanaLanguage: false,
             defaultContext: false,
             defaultMimeType: false,
             createdAt: '2024-01-01T00:00:00.000Z',
@@ -226,12 +222,11 @@ describe('LinkManagementService', () => {
             linkType: 'gs1:certificationInfo',
             title: 'Certification Info',
             mimeType: 'text/html',
-            ianaLanguage: 'fr',
+            hreflang: ['fr'],
             context: 'fr',
             active: true,
             fwqs: false,
             defaultLinkType: false,
-            defaultIanaLanguage: false,
             defaultContext: false,
             defaultMimeType: false,
             createdAt: '2024-01-01T00:00:00.000Z',
@@ -281,22 +276,6 @@ describe('LinkManagementService', () => {
         expect(result.map((r) => r.linkId).sort()).toEqual(
           ['resp1', 'resp3'].sort(),
         );
-      });
-
-      it('should filter responses by ianaLanguage', async () => {
-        repositoryProvider.one.mockResolvedValue({
-          ...multiResponseDoc,
-          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
-        });
-
-        const result = await service.listLinks({
-          ...baseQuery,
-          ianaLanguage: 'fr',
-        });
-
-        expect(result).toHaveLength(1);
-        expect(result[0].linkId).toBe('resp3');
-        expect(result[0].ianaLanguage).toBe('fr');
       });
 
       it('should apply multiple filters simultaneously', async () => {
@@ -492,7 +471,7 @@ describe('LinkManagementService', () => {
             targetUrl: 'https://example.com/product',
             linkType: 'gs1:pip',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
           },
           {
@@ -501,7 +480,7 @@ describe('LinkManagementService', () => {
             targetUrl: 'https://example.com/cert',
             linkType: 'gs1:certificationInfo',
             mimeType: 'application/json',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
           },
         ],
@@ -591,6 +570,23 @@ describe('LinkManagementService', () => {
       },
     );
 
+    it('should persist `hreflang` through the generic update loop', async () => {
+      repositoryProvider.one.mockImplementation((id: string) =>
+        id.includes('_index')
+          ? Promise.resolve(mockIndex as any)
+          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
+      );
+      repositoryProvider.save.mockResolvedValue(undefined);
+
+      await service.updateLink('abc12345', { hreflang: ['en', 'fr'] });
+
+      const savedDoc = repositoryProvider.save.mock.calls[0][0];
+      const updatedResponse = savedDoc.responses.find(
+        (r) => r.linkId === 'abc12345',
+      );
+      expect(updatedResponse.hreflang).toEqual(['en', 'fr']);
+    });
+
     it('should persist `rel` through the generic update loop', async () => {
       repositoryProvider.one.mockImplementation((id: string) =>
         id.includes('_index')
@@ -665,28 +661,6 @@ describe('LinkManagementService', () => {
           linkId: 'abc12345',
           action: 'updated',
           previousMimeType: 'text/html',
-        }),
-      );
-    });
-
-    it('should record previousIanaLanguage in version history when ianaLanguage changes', async () => {
-      repositoryProvider.one.mockImplementation((id: string) =>
-        id.includes('_index')
-          ? Promise.resolve(mockIndex as any)
-          : Promise.resolve(JSON.parse(JSON.stringify(mockDocument)) as any),
-      );
-      repositoryProvider.save.mockResolvedValue(undefined);
-
-      await service.updateLink('abc12345', {
-        ianaLanguage: 'fr',
-      });
-
-      const savedDoc = repositoryProvider.save.mock.calls[0][0];
-      expect(savedDoc.versionHistory[0].changes[0]).toEqual(
-        expect.objectContaining({
-          linkId: 'abc12345',
-          action: 'updated',
-          previousIanaLanguage: 'en',
         }),
       );
     });
@@ -1047,12 +1021,11 @@ describe('LinkManagementService', () => {
             linkType: 'gs1:pip',
             title: 'Product Information',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             active: true,
             fwqs: false,
             defaultLinkType: true,
-            defaultIanaLanguage: true,
             defaultContext: true,
             defaultMimeType: true,
           },
@@ -1107,12 +1080,11 @@ describe('LinkManagementService', () => {
             linkType: 'gs1:pip',
             title: 'Product Information',
             mimeType: 'text/html',
-            ianaLanguage: 'en',
+            hreflang: ['en'],
             context: 'us',
             active: true,
             fwqs: false,
             defaultLinkType: true,
-            defaultIanaLanguage: true,
             defaultContext: true,
             defaultMimeType: true,
           },
@@ -1149,12 +1121,11 @@ describe('LinkManagementService', () => {
           linkType: 'gs1:pip',
           title: 'Product Information',
           mimeType: 'text/html',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'us',
           active: true,
           fwqs: false,
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
           createdAt: '2024-01-01T00:00:00.000Z',
@@ -1166,12 +1137,11 @@ describe('LinkManagementService', () => {
           linkType: 'gs1:pip',
           title: 'Certification Info',
           mimeType: 'text/html',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'us',
           active: true,
           fwqs: false,
           defaultLinkType: false,
-          defaultIanaLanguage: false,
           defaultContext: false,
           defaultMimeType: false,
           createdAt: '2024-01-01T00:00:00.000Z',
@@ -1205,31 +1175,6 @@ describe('LinkManagementService', () => {
         expect(link2.defaultLinkType).toBe(true);
       });
 
-      it('should unset other defaults when setting defaultIanaLanguage to true in same scope', async () => {
-        repositoryProvider.one.mockImplementation((id: string) =>
-          id.includes('_index')
-            ? Promise.resolve(mockIndex as any)
-            : Promise.resolve(
-                JSON.parse(JSON.stringify(twoResponseDoc)) as any,
-              ),
-        );
-        repositoryProvider.save.mockResolvedValue(undefined);
-
-        await service.updateLink('def67890', { defaultIanaLanguage: true });
-
-        const savedDoc = repositoryProvider.save.mock.calls[0][0];
-        const link1 = savedDoc.responses.find(
-          (r: any) => r.linkId === 'abc12345',
-        );
-        const link2 = savedDoc.responses.find(
-          (r: any) => r.linkId === 'def67890',
-        );
-
-        // Both are same linkType, so last one (def67890) wins
-        expect(link1.defaultIanaLanguage).toBe(false);
-        expect(link2.defaultIanaLanguage).toBe(true);
-      });
-
       it('should recalculate both scopes when linkType changes', async () => {
         const twoLinkTypeDoc = {
           ...mockDocument,
@@ -1241,12 +1186,11 @@ describe('LinkManagementService', () => {
               linkType: 'gs1:pip',
               title: 'Product Information',
               mimeType: 'text/html',
-              ianaLanguage: 'en',
+              hreflang: ['en'],
               context: 'us',
               active: true,
               fwqs: false,
               defaultLinkType: true,
-              defaultIanaLanguage: true,
               defaultContext: true,
               defaultMimeType: true,
               createdAt: '2024-01-01T00:00:00.000Z',
@@ -1258,12 +1202,11 @@ describe('LinkManagementService', () => {
               linkType: 'gs1:certificationInfo',
               title: 'Certification Info',
               mimeType: 'text/html',
-              ianaLanguage: 'en',
+              hreflang: ['en'],
               context: 'us',
               active: true,
               fwqs: false,
               defaultLinkType: false,
-              defaultIanaLanguage: true,
               defaultContext: true,
               defaultMimeType: true,
               createdAt: '2024-01-01T00:00:00.000Z',
@@ -1292,11 +1235,11 @@ describe('LinkManagementService', () => {
           (r: any) => r.linkId === 'def67890',
         );
 
-        // Both now in same linkType scope — only one should have defaultIanaLanguage
-        const defaultIanaCount = [link1, link2].filter(
-          (l: any) => l.defaultIanaLanguage,
+        // Both now in same linkType scope — only one should retain defaultContext
+        const defaultContextCount = [link1, link2].filter(
+          (l: any) => l.defaultContext,
         ).length;
-        expect(defaultIanaCount).toBe(1);
+        expect(defaultContextCount).toBe(1);
       });
 
       it('should recalculate defaults when reactivating a soft-deleted link', async () => {
@@ -1310,12 +1253,11 @@ describe('LinkManagementService', () => {
               linkType: 'gs1:pip',
               title: 'Product Information',
               mimeType: 'text/html',
-              ianaLanguage: 'en',
+              hreflang: ['en'],
               context: 'us',
               active: false,
               fwqs: false,
               defaultLinkType: false,
-              defaultIanaLanguage: false,
               defaultContext: false,
               defaultMimeType: false,
               createdAt: '2024-01-01T00:00:00.000Z',
@@ -1343,7 +1285,6 @@ describe('LinkManagementService', () => {
         // Reactivated link should be promoted as the only active response
         expect(link.active).toBe(true);
         expect(link.defaultLinkType).toBe(true);
-        expect(link.defaultIanaLanguage).toBe(true);
         expect(link.defaultContext).toBe(true);
         expect(link.defaultMimeType).toBe(true);
       });
@@ -1370,13 +1311,11 @@ describe('LinkManagementService', () => {
 
         // link1 should keep all its defaults
         expect(link1.defaultLinkType).toBe(true);
-        expect(link1.defaultIanaLanguage).toBe(true);
         expect(link1.defaultContext).toBe(true);
         expect(link1.defaultMimeType).toBe(true);
 
         // link2 should remain without defaults
         expect(link2.defaultLinkType).toBe(false);
-        expect(link2.defaultIanaLanguage).toBe(false);
         expect(link2.defaultContext).toBe(false);
         expect(link2.defaultMimeType).toBe(false);
       });
@@ -1407,13 +1346,11 @@ describe('LinkManagementService', () => {
         // Soft-deleted link loses all defaults
         expect(link1.active).toBe(false);
         expect(link1.defaultLinkType).toBe(false);
-        expect(link1.defaultIanaLanguage).toBe(false);
         expect(link1.defaultContext).toBe(false);
         expect(link1.defaultMimeType).toBe(false);
 
         // Remaining active link gets promoted
         expect(link2.defaultLinkType).toBe(true);
-        expect(link2.defaultIanaLanguage).toBe(true);
         expect(link2.defaultContext).toBe(true);
         expect(link2.defaultMimeType).toBe(true);
       });
@@ -1479,7 +1416,6 @@ describe('LinkManagementService', () => {
           (r: any) => r.linkId === 'def67890',
         );
         expect(link2.defaultLinkType).toBe(true);
-        expect(link2.defaultIanaLanguage).toBe(true);
         expect(link2.defaultContext).toBe(true);
         expect(link2.defaultMimeType).toBe(true);
       });

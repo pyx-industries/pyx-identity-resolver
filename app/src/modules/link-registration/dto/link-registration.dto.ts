@@ -12,6 +12,7 @@ import {
   Matches,
   ValidateNested,
 } from 'class-validator';
+import { HreflangProperty } from './hreflang-property.decorator';
 import { MimeTypeProperty } from './mime-type-property.decorator';
 import { PublicProperty } from './public-property.decorator';
 import {
@@ -89,14 +90,6 @@ export class Response {
   mimeType: string;
 
   @ApiProperty({
-    description: 'IANA language',
-    example: 'en',
-  })
-  @IsString()
-  @IsNotEmpty()
-  ianaLanguage: string;
-
-  @ApiProperty({
     description: 'Context',
     example: 'au',
   })
@@ -110,13 +103,6 @@ export class Response {
   })
   @IsBoolean()
   defaultContext: boolean;
-
-  @ApiProperty({
-    description: 'Default IANA language',
-    example: true,
-  })
-  @IsBoolean()
-  defaultIanaLanguage: boolean;
 
   @ApiPropertyOptional({
     description:
@@ -154,6 +140,9 @@ export class Response {
 
   @RelProperty()
   rel?: string[];
+
+  @HreflangProperty()
+  hreflang?: string[];
 }
 
 export class CreateLinkRegistrationDto {
@@ -221,12 +210,11 @@ export class CreateLinkRegistrationDto {
       {
         defaultLinkType: true,
         defaultMimeType: true,
-        defaultIanaLanguage: true,
         defaultContext: true,
         fwqs: false,
         active: true,
         linkType: 'example-identifier-scheme:certificationInfo',
-        ianaLanguage: 'en',
+        hreflang: ['en'],
         context: 'au',
         title: 'Certification Information',
         targetUrl: 'https://example.com',

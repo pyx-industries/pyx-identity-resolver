@@ -8,13 +8,12 @@ describe('recalculateDefaultFlags', () => {
     targetUrl: 'https://example.com',
     title: 'Test',
     linkType: 'gs1:pip',
-    ianaLanguage: 'en',
+    hreflang: ['en'],
     context: 'us',
     mimeType: 'text/html',
     active: true,
     fwqs: false,
     defaultLinkType: false,
-    defaultIanaLanguage: false,
     defaultContext: false,
     defaultMimeType: false,
     ...overrides,
@@ -37,7 +36,6 @@ describe('recalculateDefaultFlags', () => {
       recalculateDefaultFlags(responses);
 
       expect(responses[0].defaultLinkType).toBe(true);
-      expect(responses[0].defaultIanaLanguage).toBe(true);
       expect(responses[0].defaultContext).toBe(true);
       expect(responses[0].defaultMimeType).toBe(true);
     });
@@ -60,7 +58,6 @@ describe('recalculateDefaultFlags', () => {
         createResponse({
           active: false,
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
@@ -70,7 +67,6 @@ describe('recalculateDefaultFlags', () => {
       recalculateDefaultFlags(responses);
 
       expect(responses[0].defaultLinkType).toBe(false);
-      expect(responses[0].defaultIanaLanguage).toBe(false);
       expect(responses[0].defaultContext).toBe(false);
       expect(responses[0].defaultMimeType).toBe(false);
     });
@@ -81,7 +77,6 @@ describe('recalculateDefaultFlags', () => {
           linkId: 'link1',
           active: false,
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
@@ -95,13 +90,11 @@ describe('recalculateDefaultFlags', () => {
 
       // Inactive link loses all defaults
       expect(responses[0].defaultLinkType).toBe(false);
-      expect(responses[0].defaultIanaLanguage).toBe(false);
       expect(responses[0].defaultContext).toBe(false);
       expect(responses[0].defaultMimeType).toBe(false);
 
       // Active link gets promoted
       expect(responses[1].defaultLinkType).toBe(true);
-      expect(responses[1].defaultIanaLanguage).toBe(true);
       expect(responses[1].defaultContext).toBe(true);
       expect(responses[1].defaultMimeType).toBe(true);
     });
@@ -149,86 +142,16 @@ describe('recalculateDefaultFlags', () => {
     });
   });
 
-  describe('defaultIanaLanguage - per linkType scope', () => {
-    it('should keep only the last default for the same linkType', () => {
+  describe('defaultContext - per linkType scope', () => {
+    it('should keep only the last default for same linkType', () => {
       const responses = [
         createResponse({
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
-          defaultIanaLanguage: true,
-        }),
-        createResponse({
-          linkType: 'gs1:pip',
-          ianaLanguage: 'fr',
-          defaultIanaLanguage: true,
-        }),
-      ];
-
-      recalculateDefaultFlags(responses);
-
-      expect(responses[0].defaultIanaLanguage).toBe(false);
-      expect(responses[1].defaultIanaLanguage).toBe(true);
-    });
-
-    it('should allow different linkTypes to each have their own default', () => {
-      const responses = [
-        createResponse({
-          linkType: 'gs1:pip',
-          defaultIanaLanguage: true,
-        }),
-        createResponse({
-          linkType: 'gs1:epcis',
-          defaultIanaLanguage: true,
-        }),
-      ];
-
-      recalculateDefaultFlags(responses);
-
-      expect(responses[0].defaultIanaLanguage).toBe(true);
-      expect(responses[1].defaultIanaLanguage).toBe(true);
-    });
-
-    it('should promote first active in scope when default is removed', () => {
-      const responses = [
-        createResponse({
-          linkId: 'link1',
-          linkType: 'gs1:pip',
-          ianaLanguage: 'en',
-          active: false,
-          defaultIanaLanguage: true,
-        }),
-        createResponse({
-          linkId: 'link2',
-          linkType: 'gs1:pip',
-          ianaLanguage: 'fr',
-        }),
-        createResponse({
-          linkId: 'link3',
-          linkType: 'gs1:pip',
-          ianaLanguage: 'de',
-        }),
-      ];
-
-      recalculateDefaultFlags(responses);
-
-      expect(responses[0].defaultIanaLanguage).toBe(false);
-      expect(responses[1].defaultIanaLanguage).toBe(true);
-      expect(responses[2].defaultIanaLanguage).toBe(false);
-    });
-  });
-
-  describe('defaultContext - per linkType + ianaLanguage scope', () => {
-    it('should keep only the last default for same linkType and language', () => {
-      const responses = [
-        createResponse({
-          linkType: 'gs1:pip',
-          ianaLanguage: 'en',
           context: 'au',
           defaultContext: true,
         }),
         createResponse({
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
           context: 'us',
           defaultContext: true,
         }),
@@ -239,43 +162,21 @@ describe('recalculateDefaultFlags', () => {
       expect(responses[0].defaultContext).toBe(false);
       expect(responses[1].defaultContext).toBe(true);
     });
-
-    it('should allow different linkType+language combinations to each have defaults', () => {
-      const responses = [
-        createResponse({
-          linkType: 'gs1:pip',
-          ianaLanguage: 'en',
-          context: 'au',
-          defaultContext: true,
-        }),
-        createResponse({
-          linkType: 'gs1:pip',
-          ianaLanguage: 'fr',
-          context: 'au',
-          defaultContext: true,
-        }),
-      ];
-
-      recalculateDefaultFlags(responses);
-
-      expect(responses[0].defaultContext).toBe(true);
-      expect(responses[1].defaultContext).toBe(true);
-    });
   });
 
-  describe('defaultMimeType - per linkType + ianaLanguage + context scope', () => {
+  describe('defaultMimeType - per linkType + context scope', () => {
     it('should keep only the last default for same full scope', () => {
       const responses = [
         createResponse({
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultMimeType: true,
@@ -292,13 +193,13 @@ describe('recalculateDefaultFlags', () => {
       const responses = [
         createResponse({
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'us',
           defaultMimeType: true,
         }),
@@ -312,60 +213,18 @@ describe('recalculateDefaultFlags', () => {
   });
 
   describe('case insensitivity', () => {
-    it('should treat linkType case-insensitively for defaultIanaLanguage scope', () => {
-      const responses = [
-        createResponse({
-          linkType: 'GS1:PIP',
-          ianaLanguage: 'en',
-          defaultIanaLanguage: true,
-        }),
-        createResponse({
-          linkType: 'gs1:pip',
-          ianaLanguage: 'fr',
-          defaultIanaLanguage: true,
-        }),
-      ];
-
-      recalculateDefaultFlags(responses);
-
-      expect(responses[0].defaultIanaLanguage).toBe(false);
-      expect(responses[1].defaultIanaLanguage).toBe(true);
-    });
-
-    it('should treat ianaLanguage case-insensitively for defaultContext scope', () => {
-      const responses = [
-        createResponse({
-          linkType: 'gs1:pip',
-          ianaLanguage: 'EN',
-          context: 'au',
-          defaultContext: true,
-        }),
-        createResponse({
-          linkType: 'gs1:pip',
-          ianaLanguage: 'en',
-          context: 'us',
-          defaultContext: true,
-        }),
-      ];
-
-      recalculateDefaultFlags(responses);
-
-      expect(responses[0].defaultContext).toBe(false);
-      expect(responses[1].defaultContext).toBe(true);
-    });
-
     it('should treat context case-insensitively for defaultMimeType scope', () => {
       const responses = [
         createResponse({
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'AU',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultMimeType: true,
@@ -386,13 +245,13 @@ describe('recalculateDefaultFlags', () => {
         createResponse({
           linkId: 'link2',
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'us',
         }),
         createResponse({
           linkId: 'link3',
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
         }),
       ];
@@ -403,11 +262,7 @@ describe('recalculateDefaultFlags', () => {
       expect(responses[0].defaultLinkType).toBe(true);
       expect(responses[1].defaultLinkType).toBe(false);
 
-      // First active in linkType scope promoted for defaultIanaLanguage
-      expect(responses[0].defaultIanaLanguage).toBe(true);
-      expect(responses[1].defaultIanaLanguage).toBe(false);
-
-      // Both in same linkType+lang scope, first promoted for defaultContext
+      // Both in same linkType scope, first promoted for defaultContext
       expect(responses[0].defaultContext).toBe(true);
       expect(responses[1].defaultContext).toBe(false);
 
@@ -422,14 +277,13 @@ describe('recalculateDefaultFlags', () => {
           linkId: 'link1',
           active: false,
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
         createResponse({
           linkId: 'link2',
           linkType: 'gs1:pip',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'us',
         }),
       ];
@@ -437,12 +291,10 @@ describe('recalculateDefaultFlags', () => {
       recalculateDefaultFlags(responses);
 
       expect(responses[0].defaultLinkType).toBe(false);
-      expect(responses[0].defaultIanaLanguage).toBe(false);
       expect(responses[0].defaultContext).toBe(false);
       expect(responses[0].defaultMimeType).toBe(false);
 
       expect(responses[1].defaultLinkType).toBe(true);
-      expect(responses[1].defaultIanaLanguage).toBe(true);
       expect(responses[1].defaultContext).toBe(true);
       expect(responses[1].defaultMimeType).toBe(true);
     });
@@ -454,7 +306,6 @@ describe('recalculateDefaultFlags', () => {
         createResponse({
           linkId: 'link1',
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
         }),
@@ -472,7 +323,6 @@ describe('recalculateDefaultFlags', () => {
       expect(responses[1].defaultLinkType).toBe(true);
 
       // link1 keeps scoped defaults where link2 doesn't claim them
-      expect(responses[0].defaultIanaLanguage).toBe(true);
       expect(responses[0].defaultContext).toBe(true);
 
       // For defaultMimeType: both are in same linkType+lang+context scope
@@ -486,7 +336,6 @@ describe('recalculateDefaultFlags', () => {
         createResponse({
           linkId: 'link1',
           defaultLinkType: true,
-          defaultIanaLanguage: true,
           defaultContext: true,
           defaultMimeType: true,
           title: 'Updated Title',
@@ -501,13 +350,11 @@ describe('recalculateDefaultFlags', () => {
 
       // link1 keeps its defaults
       expect(responses[0].defaultLinkType).toBe(true);
-      expect(responses[0].defaultIanaLanguage).toBe(true);
       expect(responses[0].defaultContext).toBe(true);
       expect(responses[0].defaultMimeType).toBe(true);
 
       // link2 is in a different linkType scope, gets its own scoped defaults
       expect(responses[1].defaultLinkType).toBe(false);
-      expect(responses[1].defaultIanaLanguage).toBe(true);
       expect(responses[1].defaultContext).toBe(true);
       expect(responses[1].defaultMimeType).toBe(true);
     });

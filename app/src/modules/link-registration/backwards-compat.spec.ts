@@ -60,10 +60,9 @@ describe('itemDescription backwards compatibility', () => {
       title: 'Test',
       targetUrl: 'http://example.com',
       mimeType: 'text/html',
-      ianaLanguage: 'en',
+      hreflang: ['en'],
       context: 'au',
       defaultContext: false,
-      defaultIanaLanguage: false,
     },
   ];
 

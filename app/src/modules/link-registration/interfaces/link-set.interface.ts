@@ -9,6 +9,14 @@ export type LinkTargetObject = {
   title?: string;
   'title*'?: InternationalizedTargetAttributes[];
   type?: string;
+  /**
+   * The human language(s) of the target resource as BCP 47 tags.
+   * Optional; a variant with no `hreflang` advertises no specific
+   * language coverage. The target service is responsible for
+   * per-request content negotiation (RFC 9110 §12).
+   *
+   * @see https://untp.unece.org/docs/specification/IdentityResolver UNTP Identity Resolver LinksetSchema (`hreflang`)
+   */
   hreflang?: string[];
   media?: string;
   encryptionMethod?: string;
@@ -42,13 +50,11 @@ export interface LinkSetResponseInput {
   targetUrl: string;
   title: string;
   linkType: string;
-  ianaLanguage: string;
   context: string;
   mimeType: string;
   active: boolean;
   fwqs: boolean;
   defaultLinkType: boolean;
-  defaultIanaLanguage: boolean;
   defaultContext: boolean;
   defaultMimeType: boolean;
   encryptionMethod?: string;
@@ -57,6 +63,8 @@ export interface LinkSetResponseInput {
   /** @see {@link LinkTargetObject.public} */
   public?: boolean;
   rel?: string[];
+  /** @see {@link LinkTargetObject.hreflang} */
+  hreflang?: string[];
   linkId?: string;
 }
 

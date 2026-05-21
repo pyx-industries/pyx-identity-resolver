@@ -17,13 +17,12 @@ const buildResponse = (
   targetUrl: 'https://example.com/target',
   title: 'Example',
   linkType: 'gs1:pip',
-  ianaLanguage: 'en',
+  hreflang: ['en'],
   context: 'au',
   mimeType: 'application/json',
   active: true,
   fwqs: false,
   defaultLinkType: false,
-  defaultIanaLanguage: false,
   defaultContext: false,
   defaultMimeType: false,
   ...overrides,
@@ -497,7 +496,7 @@ describe('LinkHeaderUtils', () => {
           targetUrl: 'https://example.com/passport',
           linkType: 'gs1:certificationInfo',
           mimeType: 'application/json',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           title: 'Digital Passport',
         }),
       ];
@@ -505,7 +504,7 @@ describe('LinkHeaderUtils', () => {
       const result = constructLinkHeader(responses, baseCtx);
 
       expect(result.linkHeaderText).toContain(
-        '<https://example.com/passport>; rel="gs1:certificationInfo"; type="application/json"; hreflang="en"; title="Digital Passport"',
+        '<https://example.com/passport>; rel="gs1:certificationInfo"; type="application/json"; title="Digital Passport"',
       );
     });
 

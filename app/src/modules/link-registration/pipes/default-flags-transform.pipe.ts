@@ -16,9 +16,8 @@ import { LinkResponse } from '../../link-resolution/interfaces/uri.interface';
  *
  * Scope definitions:
  * - defaultLinkType: entire registration (global)
- * - defaultIanaLanguage: per linkType
- * - defaultContext: per linkType + ianaLanguage
- * - defaultMimeType: per linkType + ianaLanguage + context
+ * - defaultContext: per linkType
+ * - defaultMimeType: per linkType + context
  */
 export class DefaultFlagsTransformPipe
   implements

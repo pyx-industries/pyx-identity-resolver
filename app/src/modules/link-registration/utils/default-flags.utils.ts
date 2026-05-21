@@ -7,9 +7,8 @@ import { LinkResponse } from '../../link-resolution/interfaces/uri.interface';
  *
  * Scope definitions:
  * - `defaultLinkType`: global (entire responses array)
- * - `defaultIanaLanguage`: per linkType
- * - `defaultContext`: per linkType + ianaLanguage
- * - `defaultMimeType`: per linkType + ianaLanguage + context
+ * - `defaultContext`: per linkType
+ * - `defaultMimeType`: per linkType + context
  *
  * Rules:
  * - Only active responses (where `active !== false`) may hold a default flag.
@@ -32,14 +31,12 @@ export function recalculateDefaultFlags(
   for (const response of responses) {
     if (response.active === false) {
       response.defaultLinkType = false;
-      response.defaultIanaLanguage = false;
       response.defaultContext = false;
       response.defaultMimeType = false;
     }
   }
 
   enforceDefaultLinkType(responses);
-  enforceDefaultIanaLanguage(responses);
   enforceDefaultContext(responses);
   enforceDefaultMimeType(responses);
 
@@ -83,34 +80,22 @@ function enforceDefaultLinkType(responses: LinkResponse[]): void {
 }
 
 /**
- * Ensures exactly one active response has `defaultIanaLanguage: true` per linkType.
+ * Ensures exactly one active response has `defaultContext: true` per linkType.
  */
-function enforceDefaultIanaLanguage(responses: LinkResponse[]): void {
-  enforceScopedDefault(responses, 'defaultIanaLanguage', (r) =>
+function enforceDefaultContext(responses: LinkResponse[]): void {
+  enforceScopedDefault(responses, 'defaultContext', (r) =>
     normaliseKey(r.linkType),
   );
 }
 
 /**
- * Ensures exactly one active response has `defaultContext: true` per linkType + ianaLanguage.
- */
-function enforceDefaultContext(responses: LinkResponse[]): void {
-  enforceScopedDefault(
-    responses,
-    'defaultContext',
-    (r) => `${normaliseKey(r.linkType)}|${normaliseKey(r.ianaLanguage)}`,
-  );
-}
-
-/**
- * Ensures exactly one active response has `defaultMimeType: true` per linkType + ianaLanguage + context.
+ * Ensures exactly one active response has `defaultMimeType: true` per linkType + context.
  */
 function enforceDefaultMimeType(responses: LinkResponse[]): void {
   enforceScopedDefault(
     responses,
     'defaultMimeType',
-    (r) =>
-      `${normaliseKey(r.linkType)}|${normaliseKey(r.ianaLanguage)}|${normaliseKey(r.context)}`,
+    (r) => `${normaliseKey(r.linkType)}|${normaliseKey(r.context)}`,
   );
 }
 
@@ -124,7 +109,7 @@ function enforceDefaultMimeType(responses: LinkResponse[]): void {
  */
 function enforceScopedDefault(
   responses: LinkResponse[],
-  flag: 'defaultIanaLanguage' | 'defaultContext' | 'defaultMimeType',
+  flag: 'defaultContext' | 'defaultMimeType',
   scopeKeyFn: (r: LinkResponse) => string,
 ): void {
   // Group active response indices by scope

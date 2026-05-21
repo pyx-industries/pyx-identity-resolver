@@ -256,11 +256,6 @@ export class LinkManagementService {
     if (query.mimeType) {
       responses = responses.filter((r) => r.mimeType === query.mimeType);
     }
-    if (query.ianaLanguage) {
-      responses = responses.filter(
-        (r) => r.ianaLanguage === query.ianaLanguage,
-      );
-    }
     return responses;
   }
 
@@ -302,12 +297,6 @@ export class LinkManagementService {
     }
     if (dto.mimeType && dto.mimeType !== existingResponse.mimeType) {
       change.previousMimeType = existingResponse.mimeType;
-    }
-    if (
-      dto.ianaLanguage &&
-      dto.ianaLanguage !== existingResponse.ianaLanguage
-    ) {
-      change.previousIanaLanguage = existingResponse.ianaLanguage;
     }
     if (dto.context && dto.context !== existingResponse.context) {
       change.previousContext = existingResponse.context;

@@ -89,7 +89,10 @@ const constructLinkTargetObjects = (
 
       acc[key] = [];
 
-      // Construct the link target objects
+      // Construct the link target objects.
+      // hreflang emission is intentionally absent here; per-variant
+      // hreflang reading is reintroduced when the linkset emission lands
+      // (#107). See `docs/adr/001-link-variant-capability-model.md`.
       Object.values(groupResponsesByMimeTypeTargetUrlAndContext).map(
         (groupedResponses: any) => {
           const firstGroupedResponse = groupedResponses[0];
@@ -100,22 +103,10 @@ const constructLinkTargetObjects = (
               : '';
           const title = firstGroupedResponse.title;
 
-          let titles = groupedResponses
-            .filter((res) => res.ianaLanguage && res.ianaLanguage !== 'xx')
-            .map((res) => ({ value: res.title, language: res.ianaLanguage }));
-
-          // Remove duplicates on language
-          titles = Object.values(
-            _.groupBy(titles, (title) => title.language),
-          ).map((title) => title[0]);
-          const hreflang = titles.map((title) => title.language);
-
           const linkTarget: LinkTargetObject = {
             href,
             title,
             type,
-            hreflang,
-            'title*': titles,
           };
 
           if (firstGroupedResponse.encryptionMethod) {
@@ -150,21 +141,12 @@ const constructLinkTargetObjects = (
                 continue;
 
               const prevMimeType = change.previousMimeType ?? response.mimeType;
-              const prevIanaLanguage =
-                change.previousIanaLanguage ?? response.ianaLanguage;
 
               acc[key].push({
                 href: change.previousTargetUrl,
                 rel: ['predecessor-version'],
                 title: response.title,
                 type: prevMimeType !== 'xx' ? prevMimeType : '',
-                hreflang: [prevIanaLanguage],
-                'title*': [
-                  {
-                    value: response.title,
-                    language: prevIanaLanguage,
-                  },
-                ],
               });
             }
           }

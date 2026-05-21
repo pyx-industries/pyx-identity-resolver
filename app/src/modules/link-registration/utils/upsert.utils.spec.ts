@@ -24,7 +24,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example.com',
           linkType: 'type',
           mimeType: 'type',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'context',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -32,7 +32,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: false,
           title: '',
           defaultContext: false,
-          defaultIanaLanguage: false,
         },
       ],
     };
@@ -59,7 +58,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example.com',
           linkType: 'type',
           mimeType: 'type',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'context',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -67,7 +66,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: false,
           title: '',
           defaultContext: false,
-          defaultIanaLanguage: false,
         },
       ],
     };
@@ -84,7 +82,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example2.com',
           linkType: 'type',
           mimeType: 'type',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'context',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -92,7 +90,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: false,
           title: '',
           defaultContext: false,
-          defaultIanaLanguage: false,
         },
       ],
     };
@@ -115,7 +112,7 @@ describe('processEntryLinkRegistrationData', () => {
       targetUrl: 'http://example.com',
       linkType: 'type',
       mimeType: 'type',
-      ianaLanguage: 'en',
+      hreflang: ['en'],
       context: 'context',
       defaultLinkType: false,
       defaultMimeType: false,
@@ -123,7 +120,6 @@ describe('processEntryLinkRegistrationData', () => {
       active: false,
       title: '',
       defaultContext: false,
-      defaultIanaLanguage: false,
     };
 
     currentLinkRegistration = {
@@ -159,7 +155,7 @@ describe('processEntryLinkRegistrationData', () => {
       targetUrl: 'http://example.com/cert',
       linkType: 'gs1:certificationInfo',
       mimeType: 'application/json',
-      ianaLanguage: 'en',
+      hreflang: ['en'],
       context: 'au',
       defaultLinkType: false,
       defaultMimeType: false,
@@ -167,7 +163,6 @@ describe('processEntryLinkRegistrationData', () => {
       active: true,
       title: 'Cert',
       defaultContext: false,
-      defaultIanaLanguage: false,
     };
 
     currentLinkRegistration = {
@@ -211,7 +206,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example.com/v2',
           linkType: 'type',
           mimeType: 'application/json',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -219,7 +214,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: true,
           title: '',
           defaultContext: false,
-          defaultIanaLanguage: false,
           linkId: 'link-1',
         },
       ],
@@ -238,7 +232,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example.com/v1',
           linkType: 'type',
           mimeType: 'application/json',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -246,7 +240,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: true,
           title: '',
           defaultContext: false,
-          defaultIanaLanguage: false,
         },
       ],
     };
@@ -287,7 +280,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example.com/v2',
           linkType: 'type',
           mimeType: 'application/json',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'au',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -295,7 +288,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: true,
           title: '',
           defaultContext: false,
-          defaultIanaLanguage: false,
           linkId: 'link-1',
         },
       ],
@@ -314,7 +306,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example.com/new',
           linkType: 'different-type',
           mimeType: 'text/html',
-          ianaLanguage: 'fr',
+          hreflang: ['fr'],
           context: 'ca',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -322,7 +314,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: true,
           title: '',
           defaultContext: false,
-          defaultIanaLanguage: false,
         },
       ],
     };
@@ -355,7 +346,7 @@ describe('processEntryLinkRegistrationData', () => {
       targetUrl: 'http://example.com',
       linkType: 'type',
       mimeType: 'type',
-      ianaLanguage: 'en',
+      hreflang: ['en'],
       context: 'context',
       defaultLinkType: false,
       defaultMimeType: false,
@@ -363,7 +354,6 @@ describe('processEntryLinkRegistrationData', () => {
       active: false,
       title: '',
       defaultContext: false,
-      defaultIanaLanguage: false,
     };
 
     currentLinkRegistration = {
@@ -401,7 +391,7 @@ describe('processEntryLinkRegistrationData', () => {
       targetUrl: 'http://example.com',
       linkType: 'type',
       mimeType: 'type',
-      ianaLanguage: 'en',
+      hreflang: ['en'],
       context: 'context',
       defaultLinkType: false,
       defaultMimeType: false,
@@ -409,7 +399,6 @@ describe('processEntryLinkRegistrationData', () => {
       active: false,
       title: '',
       defaultContext: false,
-      defaultIanaLanguage: false,
       linkId: 'existing-link-id-123',
       createdAt: '2024-01-01T00:00:00.000Z',
     };
@@ -436,7 +425,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example2.com',
           linkType: 'type2',
           mimeType: 'type2',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'context2',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -444,7 +433,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: true,
           title: 'New',
           defaultContext: false,
-          defaultIanaLanguage: false,
         },
       ],
     };
@@ -476,7 +464,7 @@ describe('processEntryLinkRegistrationData', () => {
           targetUrl: 'http://example.com',
           linkType: 'type',
           mimeType: 'type',
-          ianaLanguage: 'en',
+          hreflang: ['en'],
           context: 'context',
           defaultLinkType: false,
           defaultMimeType: false,
@@ -484,7 +472,6 @@ describe('processEntryLinkRegistrationData', () => {
           active: false,
           title: '',
           defaultContext: false,
-          defaultIanaLanguage: false,
         },
       ],
     };
@@ -512,12 +499,12 @@ describe('processEntryLinkRegistrationData', () => {
 });
 
 describe('buildResponseKey', () => {
-  it('should build a composite key from targetUrl, linkType, mimeType, ianaLanguage, and context', () => {
+  it('should build a composite key from targetUrl, linkType, mimeType, and context', () => {
     const response = {
       targetUrl: 'http://example.com',
       linkType: 'gs1:certificationInfo',
       mimeType: 'application/json',
-      ianaLanguage: 'en',
+      hreflang: ['en'],
       context: 'au',
       defaultLinkType: false,
       defaultMimeType: false,
@@ -525,20 +512,19 @@ describe('buildResponseKey', () => {
       active: true,
       title: 'Cert',
       defaultContext: false,
-      defaultIanaLanguage: false,
     };
 
     expect(buildResponseKey(response)).toBe(
-      'http://example.com|gs1:certificationInfo|application/json|en|au',
+      'http://example.com|gs1:certificationInfo|application/json|au',
     );
   });
 
-  it('should produce different keys when any field differs', () => {
+  it('should produce different keys when any key field differs', () => {
     const base = {
       targetUrl: 'http://example.com',
       linkType: 'type',
       mimeType: 'type',
-      ianaLanguage: 'en',
+      hreflang: ['en'],
       context: 'au',
       defaultLinkType: false,
       defaultMimeType: false,
@@ -546,16 +532,35 @@ describe('buildResponseKey', () => {
       active: true,
       title: '',
       defaultContext: false,
-      defaultIanaLanguage: false,
     };
 
     const withDifferentUrl = { ...base, targetUrl: 'http://other.com' };
-    const withDifferentLang = { ...base, ianaLanguage: 'fr' };
+    const withDifferentContext = { ...base, context: 'us' };
 
     expect(buildResponseKey(base)).not.toBe(buildResponseKey(withDifferentUrl));
     expect(buildResponseKey(base)).not.toBe(
-      buildResponseKey(withDifferentLang),
+      buildResponseKey(withDifferentContext),
     );
+  });
+
+  it('should produce the same key when only a non-key field differs (ianaLanguage)', () => {
+    const base = {
+      targetUrl: 'http://example.com',
+      linkType: 'type',
+      mimeType: 'type',
+      hreflang: ['en'],
+      context: 'au',
+      defaultLinkType: false,
+      defaultMimeType: false,
+      fwqs: false,
+      active: true,
+      title: '',
+      defaultContext: false,
+    };
+
+    const withDifferentLang = { ...base, hreflang: ['fr'] };
+
+    expect(buildResponseKey(base)).toBe(buildResponseKey(withDifferentLang));
   });
 });
 
@@ -564,7 +569,7 @@ describe('buildHistoricalKeys', () => {
     targetUrl: 'http://example.com/v2',
     linkType: 'gs1:certificationInfo',
     mimeType: 'application/json',
-    ianaLanguage: 'fr',
+    hreflang: ['fr'],
     context: 'us',
     defaultLinkType: false,
     defaultMimeType: false,
@@ -572,7 +577,6 @@ describe('buildHistoricalKeys', () => {
     active: true,
     title: '',
     defaultContext: false,
-    defaultIanaLanguage: false,
     linkId: 'link-1',
   };
 
@@ -597,7 +601,7 @@ describe('buildHistoricalKeys', () => {
     expect(keys.size).toBe(1);
     expect(
       keys.has(
-        'http://example.com/v1|gs1:certificationInfo|application/json|fr|us',
+        'http://example.com/v1|gs1:certificationInfo|application/json|us',
       ),
     ).toBe(true);
   });
@@ -622,33 +626,7 @@ describe('buildHistoricalKeys', () => {
 
     expect(keys.size).toBe(1);
     expect(
-      keys.has('http://example.com/v2|gs1:certificationInfo|text/html|fr|us'),
-    ).toBe(true);
-  });
-
-  it('should reconstruct historical key when previousIanaLanguage is present', () => {
-    const responses = [baseResponse];
-    const versionHistory = [
-      {
-        version: 2,
-        updatedAt: '2024-06-01T00:00:00.000Z',
-        changes: [
-          {
-            linkId: 'link-1',
-            action: 'updated' as const,
-            previousIanaLanguage: 'en',
-          },
-        ],
-      },
-    ];
-
-    const keys = buildHistoricalKeys(responses, versionHistory);
-
-    expect(keys.size).toBe(1);
-    expect(
-      keys.has(
-        'http://example.com/v2|gs1:certificationInfo|application/json|en|us',
-      ),
+      keys.has('http://example.com/v2|gs1:certificationInfo|text/html|us'),
     ).toBe(true);
   });
 
@@ -673,7 +651,7 @@ describe('buildHistoricalKeys', () => {
     expect(keys.size).toBe(1);
     expect(
       keys.has(
-        'http://example.com/v2|gs1:certificationInfo|application/json|fr|au',
+        'http://example.com/v2|gs1:certificationInfo|application/json|au',
       ),
     ).toBe(true);
   });
@@ -691,7 +669,6 @@ describe('buildHistoricalKeys', () => {
             previousTargetUrl: 'http://example.com/v1',
             previousLinkType: 'gs1:productInfo',
             previousMimeType: 'text/html',
-            previousIanaLanguage: 'en',
             previousContext: 'au',
           },
         ],
@@ -701,9 +678,9 @@ describe('buildHistoricalKeys', () => {
     const keys = buildHistoricalKeys(responses, versionHistory);
 
     expect(keys.size).toBe(1);
-    expect(
-      keys.has('http://example.com/v1|gs1:productInfo|text/html|en|au'),
-    ).toBe(true);
+    expect(keys.has('http://example.com/v1|gs1:productInfo|text/html|au')).toBe(
+      true,
+    );
   });
 
   it('should skip history entries with no previous fields', () => {

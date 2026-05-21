@@ -64,7 +64,7 @@ export const buildParentLinksetRefs = (ctx: ResolutionContext): string[] => {
  * Build a single target link entry from a {@link LinkResponse}.
  */
 const buildTargetEntry = (response: LinkResponse): string =>
-  `<${response.targetUrl}>; rel="${response.linkType}"; type="${response.mimeType}"; hreflang="${response.ianaLanguage}"; title="${response.title}"`;
+  `<${response.targetUrl}>; rel="${response.linkType}"; type="${response.mimeType}"; title="${response.title}"`;
 
 /**
  * Construct both variants of the HTTP Link header for a resolved identifier.

@@ -59,15 +59,14 @@ export const processUri = (
 
 /**
  * Process the URI and return the appropriate response.
- * The response is determined by the linkType, ianaLanguage, and mimeType with the following order of precedence:
- * 1. linkType, ianaLanguage, context, mimeType
- * 2. linkType, ianaLanguage, context, defaultMimeType
- * 3. linkType, ianaLanguage, context
- * 4. linkType, ianaLanguage, defaultContext
- * 5. linkType, ianaLanguage
- * 6. linkType, defaultIanaLanguage
- * 7. linkType
- * 8. defaultLinkType
+ * The response is determined by linkType, context, and mimeType with the
+ * following order of precedence (language-aware matching on hreflang is
+ * reintroduced in #108):
+ * 1. linkType, context, mimeType
+ * 2. linkType, context, defaultMimeType
+ * 3. linkType, context
+ * 4. linkType, defaultContext
+ * 5. linkType
  *
  * @param uri - the URI document containing responses and pre-built linkset
  * @param identifierParams - request parameters including linkType and descriptive attributes
@@ -245,14 +244,18 @@ const matchLinkTypeLanguage = (
   return response;
 };
 
+/**
+ * @deprecated Always returns undefined. Language-aware matching is
+ * reintroduced on hreflang membership when the language-aware cascade
+ * lands (#108).
+ */
 const matchLinkTypeDefaultLanguage = (
-  responses: LinkResponse[],
-  linkType: string,
-): LinkResponse => {
-  const response = responses.find(
-    (res) => res.linkType === linkType && res.defaultIanaLanguage,
-  );
-  return response;
+  _responses: LinkResponse[],
+  _linkType: string,
+): LinkResponse | undefined => {
+  void _responses;
+  void _linkType;
+  return undefined;
 };
 
 const matchLinkType = (
@@ -268,15 +271,17 @@ const matchDefaultLinkType = (responses: LinkResponse[]): LinkResponse => {
   return response;
 };
 
+// Language-aware matching is reintroduced on hreflang membership when
+// the language-aware cascade lands (#108). Until then, the helpers
+// degrade: checkIanaLanguageContext matches on context only, and
+// checkIanaLanguage never matches so the cascade falls through to
+// language-blind tiers.
 const checkIanaLanguageContext = (
   response: LinkResponse,
   ianaLanguageContexts: IanalanguageContext[],
 ) => {
   return ianaLanguageContexts.some(
     (ianaLanguageContext) =>
-      ianaLanguageContext.ianaLanguage &&
-      response.ianaLanguage.toLowerCase() ===
-        ianaLanguageContext.ianaLanguage.toLowerCase() &&
       ianaLanguageContext.context &&
       response.context.toLowerCase() ===
         ianaLanguageContext.context.toLowerCase(),
@@ -284,15 +289,12 @@ const checkIanaLanguageContext = (
 };
 
 const checkIanaLanguage = (
-  response: LinkResponse,
-  ianaLanguageContexts: IanalanguageContext[],
+  _response: LinkResponse,
+  _ianaLanguageContexts: IanalanguageContext[],
 ) => {
-  return ianaLanguageContexts.some(
-    (ianaLanguageContext) =>
-      ianaLanguageContext.ianaLanguage &&
-      response.ianaLanguage.toLowerCase() ===
-        ianaLanguageContext.ianaLanguage.toLowerCase(),
-  );
+  void _response;
+  void _ianaLanguageContexts;
+  return false;
 };
 
 const constructResolvedLinkForResponse = (
