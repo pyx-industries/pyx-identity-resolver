@@ -89,10 +89,6 @@ const constructLinkTargetObjects = (
 
       acc[key] = [];
 
-      // Construct the link target objects.
-      // hreflang emission is intentionally absent here; per-variant
-      // hreflang reading is reintroduced when the linkset emission lands
-      // (#107). See `docs/adr/001-link-variant-capability-model.md`.
       Object.values(groupResponsesByMimeTypeTargetUrlAndContext).map(
         (groupedResponses: any) => {
           const firstGroupedResponse = groupedResponses[0];
@@ -124,6 +120,7 @@ const constructLinkTargetObjects = (
           if (firstGroupedResponse.rel?.length > 0) {
             linkTarget.rel = firstGroupedResponse.rel;
           }
+          linkTarget.hreflang = firstGroupedResponse.hreflang ?? [];
 
           acc[key].push(linkTarget);
         },

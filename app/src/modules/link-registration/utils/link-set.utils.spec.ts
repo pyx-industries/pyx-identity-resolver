@@ -94,11 +94,13 @@ describe('Link Set Utils', () => {
             href: 'https://example2.com',
             title: 'example2',
             type: 'application/json',
+            hreflang: ['en'],
           },
           {
             href: 'https://example.com',
             title: 'example',
             type: 'application/json',
+            hreflang: ['en'],
           },
         ],
         'https://linktypevoc.example.com/voc/exampleLinkType2': [
@@ -106,11 +108,13 @@ describe('Link Set Utils', () => {
             href: 'https://example4.com',
             title: 'example4',
             type: '',
+            hreflang: [],
           },
           {
             href: 'https://example3.com',
             title: 'example3',
             type: 'application/json',
+            hreflang: ['en'],
           },
         ],
       };
@@ -197,6 +201,7 @@ describe('Link Set Utils', () => {
       expect(linkTargets[0].method).toBe('POST');
       expect(linkTargets[0].public).toBe(true);
       expect(linkTargets[0].rel).toEqual(['edit', 'latest-version']);
+      expect(linkTargets[0].hreflang).toEqual(['en']);
     });
 
     it.each([true, false])(
@@ -249,7 +254,6 @@ describe('Link Set Utils', () => {
             targetUrl: 'https://example.com/cert',
             title: 'Certification',
             mimeType: 'application/json',
-            hreflang: ['en'],
             context: 'us',
             active: true,
             fwqs: false,
@@ -271,6 +275,39 @@ describe('Link Set Utils', () => {
       expect(linkTargets[0]).not.toHaveProperty('method');
       expect(linkTargets[0]).not.toHaveProperty('public');
       expect(linkTargets[0]).not.toHaveProperty('rel');
+      expect(linkTargets[0].hreflang).toEqual([]);
+    });
+
+    it('should emit an empty `hreflang` array when explicitly set on the variant', () => {
+      const uri: LinkSetInput = {
+        namespace: 'idr',
+        identificationKeyType: 'test',
+        identificationKey: '12345',
+        description: 'example',
+        qualifierPath: '/',
+        active: true,
+        responses: [
+          {
+            linkType: 'gs1:certificationInfo',
+            targetUrl: 'https://example.com/cert',
+            title: 'Certification',
+            mimeType: 'application/json',
+            hreflang: [],
+            context: 'us',
+            active: true,
+            fwqs: false,
+            defaultLinkType: true,
+            defaultContext: true,
+            defaultMimeType: true,
+          },
+        ],
+      };
+
+      const result = constructLinkSetJson(uri, '01', attrs);
+      const linkTargets =
+        result['https://linktypevoc.example.com/voc/certificationInfo'];
+
+      expect(linkTargets[0].hreflang).toEqual([]);
     });
 
     it('should keep publisher-set rel separate from server-derived predecessor-version', () => {
