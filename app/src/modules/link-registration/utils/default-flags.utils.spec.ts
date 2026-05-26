@@ -169,14 +169,12 @@ describe('recalculateDefaultFlags', () => {
       const responses = [
         createResponse({
           linkType: 'gs1:pip',
-          hreflang: ['en'],
           context: 'au',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:pip',
-          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultMimeType: true,
@@ -189,17 +187,15 @@ describe('recalculateDefaultFlags', () => {
       expect(responses[1].defaultMimeType).toBe(true);
     });
 
-    it('should allow different full scopes to each have their own default', () => {
+    it('should allow different contexts within a linkType to each have their own default', () => {
       const responses = [
         createResponse({
           linkType: 'gs1:pip',
-          hreflang: ['en'],
           context: 'au',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:pip',
-          hreflang: ['en'],
           context: 'us',
           defaultMimeType: true,
         }),
@@ -217,14 +213,12 @@ describe('recalculateDefaultFlags', () => {
       const responses = [
         createResponse({
           linkType: 'gs1:pip',
-          hreflang: ['en'],
           context: 'AU',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:pip',
-          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultMimeType: true,
@@ -325,8 +319,8 @@ describe('recalculateDefaultFlags', () => {
       // link1 keeps scoped defaults where link2 doesn't claim them
       expect(responses[0].defaultContext).toBe(true);
 
-      // For defaultMimeType: both are in same linkType+lang+context scope
-      // link1 had it, link2 didn't claim it, so link1 keeps it
+      // For defaultMimeType: both are in same linkType+context scope;
+      // link1 had it, link2 didn't claim it, so link1 keeps it.
       expect(responses[0].defaultMimeType).toBe(true);
       expect(responses[1].defaultMimeType).toBe(false);
     });

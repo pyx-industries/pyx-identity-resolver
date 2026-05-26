@@ -17,7 +17,10 @@ import {
   UntpAccessRole,
   UNTP_ACCESS_ROLES,
 } from '../constants/untp-enums';
-import { HreflangProperty } from './hreflang-property.decorator';
+import {
+  HreflangProperty,
+  HreflangQueryProperty,
+} from './hreflang-property.decorator';
 import { RelProperty } from './rel-property.decorator';
 
 /**
@@ -72,6 +75,9 @@ export class ListLinksQueryDto {
 
   @OptionalMimeTypeProperty('Filter responses by MIME type.')
   mimeType?: string;
+
+  @HreflangQueryProperty()
+  hreflang?: string;
 }
 
 /**

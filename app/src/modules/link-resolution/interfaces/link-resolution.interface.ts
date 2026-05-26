@@ -18,8 +18,3 @@ export interface ResolutionContext {
   accessRole?: string;
   linkHeaderMaxSize: number;
 }
-
-export type IanalanguageContext = {
-  ianaLanguage: string;
-  context: string;
-};

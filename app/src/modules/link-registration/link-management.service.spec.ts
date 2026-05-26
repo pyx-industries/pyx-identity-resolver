@@ -296,6 +296,90 @@ describe('LinkManagementService', () => {
         expect(result[0].mimeType).toBe('text/html');
       });
 
+      it('should filter responses whose hreflang[] contains the supplied tag', async () => {
+        repositoryProvider.one.mockResolvedValue({
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
+        });
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          hreflang: 'fr',
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0].linkId).toBe('resp3');
+        expect(result[0].hreflang).toContain('fr');
+      });
+
+      it('should combine hreflang with other filters', async () => {
+        repositoryProvider.one.mockResolvedValue({
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
+        });
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          linkType: 'gs1:pip',
+          hreflang: 'en',
+        });
+
+        expect(result).toHaveLength(2);
+        expect(result.every((r) => r.hreflang?.includes('en'))).toBe(true);
+      });
+
+      it('should return empty when hreflang tag matches nothing', async () => {
+        repositoryProvider.one.mockResolvedValue({
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r) => ({ ...r })),
+        });
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          hreflang: 'de',
+        });
+
+        expect(result).toHaveLength(0);
+      });
+
+      it('should match hreflang case-insensitively on both sides per RFC 4647', async () => {
+        const docCased = {
+          ...multiResponseDoc,
+          responses: multiResponseDoc.responses.map((r, i) =>
+            i === 2 ? { ...r, hreflang: ['FR-fr'] } : { ...r },
+          ),
+        };
+        repositoryProvider.one.mockResolvedValue(docCased);
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          hreflang: 'fr-FR',
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0].linkId).toBe('resp3');
+      });
+
+      it('should skip variants with undefined or empty hreflang when filtering', async () => {
+        const docMissing = {
+          ...multiResponseDoc,
+          responses: [
+            { ...multiResponseDoc.responses[0], hreflang: undefined },
+            { ...multiResponseDoc.responses[1], hreflang: [] },
+            { ...multiResponseDoc.responses[2] },
+          ],
+        };
+        repositoryProvider.one.mockResolvedValue(docMissing);
+
+        const result = await service.listLinks({
+          ...baseQuery,
+          hreflang: 'en',
+        });
+
+        // Only resp2 has hreflang ['en']; resp1 is undefined, resp3 is ['fr']
+        expect(result).toHaveLength(0);
+      });
+
       it('should return empty array when no responses match filter', async () => {
         repositoryProvider.one.mockResolvedValue({
           ...multiResponseDoc,

@@ -167,86 +167,100 @@ and their descriptions.
 
 When a user resolves an identifier with a specific link type,
 the resolver needs to choose the single best response to return.
-Since the same link type might have responses registered in different languages,
-contexts, and formats,
-the resolver follows a precedence chain
-to find the most specific match.
+Since the same link type might have variants registered with different
+languages, mime types, and publisher contexts,
+the resolver follows a precedence chain to find the most specific match.
 
 ### A scenario
 
 Imagine a consumer in Australia scans a product code on their phone.
-Their phone's language is set to English,
-and their region is Australia.
-The scanning app resolves the identifier, requesting `acme:sustainabilityInfo`
-and passing along `en` as the language and `au` as the context.
+Their phone's language is set to Australian English (the browser sends
+`Accept-Language: en-AU`),
+and they ask for `acme:sustainabilityInfo`.
+The scanning app wants HTML (`Accept: text/html`).
 
 The resolver has **two distinct branches** depending on whether
 a link type was provided in the request:
 
 **When a link type is provided** (as in this scenario),
-the resolver works through steps 1-7, progressively relaxing specificity:
+the resolver works through steps 1-5, progressively relaxing specificity:
 
-1. First, it looks for a response matching the exact link type (`acme:sustainabilityInfo`),
-   language (`en`), context (`au`), and the requested MIME type.
+1. First, it looks for a variant matching the exact link type
+   (`acme:sustainabilityInfo`), whose `hreflang[]` contains `en-AU`,
+   and whose `mimeType` matches the requested MIME.
    If it finds one, it returns it. Done.
 
-2. If no exact MIME type match exists,
-   it looks for a response with the same link type, language, and context
-   that is marked as the **default MIME type**.
+2. If no exact MIME match exists for any en-AU variant, it returns the
+   first en-AU variant flagged `defaultMimeType: true`. The flag scope is
+   per (link type + context) at registration time, so a link type can
+   have multiple flagged variants (one per context). The cascade picks
+   the first language-matching one it finds; the variant's context
+   itself is not consulted because the request carries no context signal.
 
-3. If that does not exist either,
-   it broadens the search — same link type, language, and context,
-   any MIME type.
+3. If no en-AU variant carries `defaultMimeType: true` either, it returns
+   any en-AU variant (ignoring MIME).
 
-4. Still no match?
-   It tries the same link type and language,
-   but with the **default context**.
+4. If no variant matches the requested language at all, the cascade
+   gives up on the client's preferences and returns the variant flagged
+   `defaultContext: true` for the link type. This is the publisher's
+   pre-declared canonical default.
 
-5. Then just the link type and language, ignoring context entirely.
+5. As a belt-and-braces fallback (which registration enforcement should
+   make unreachable), it returns any variant matching the link type.
 
-6. Then the link type with the **default language**.
-
-7. Then just the link type, with no language or context preference.
-
-If none of steps 1-7 produce a match,
+If none of steps 1-5 produce a match,
 the resolver returns no result.
 It does **not** fall through to the default link type —
 the user asked for a specific link type and it was not found.
 
 **When no link type is provided**,
-the resolver skips steps 1-7 entirely and goes straight to step 8:
+the resolver skips steps 1-5 entirely and goes straight to step 6:
 
-8. It returns whichever response is marked as the **default link type**.
+6. It returns whichever response is marked as the **default link type**.
+
+### Hreflang membership
+
+A variant matches the request when **any** of the client's preferred
+BCP 47 tags (parsed from `Accept-Language` in q-weight order) appears
+in the variant's `hreflang[]` array. Matching is case-insensitive on
+both sides per RFC 4647 §2.1, but the resolver does not perform BCP 47
+lookup fallback (e.g. `en-GB` does not match a variant tagged `en`).
+
+### `defaultContext` is a fallback, not a filter
+
+The cascade's first three tiers honour the client's expressed preferences
+(language, MIME). `defaultContext` is consulted only at tier 4, once
+those preferences have been exhausted. Setting `defaultContext: true`
+on a variant declares "use me when nothing else matches"; it does not
+gate matching at the front of the cascade.
 
 ### Precedence table
 
 | Priority | Match criteria |
 |----------|---------------|
-| 1 | linkType + language + context + mimeType |
-| 2 | linkType + language + context + default mimeType |
-| 3 | linkType + language + context |
-| 4 | linkType + language + default context |
-| 5 | linkType + language |
-| 6 | linkType + default language |
-| 7 | linkType |
-| 8 | default linkType |
+| 1 | linkType + hreflang match + mimeType match |
+| 2 | linkType + hreflang match + variant flagged `defaultMimeType: true` |
+| 3 | linkType + hreflang match |
+| 4 | linkType + `defaultContext` |
+| 5 | linkType |
+| 6 | `defaultLinkType` |
 
 :::tip Two branches, not one chain
-Steps 1-7 and step 8 are **separate branches**, not a single fallback chain.
-If a user requests a specific link type and no response matches (steps 1-7),
+Steps 1-5 and step 6 are **separate branches**, not a single fallback chain.
+If a user requests a specific link type and no response matches (steps 1-5),
 the resolver returns no result — it does not fall through to the default link type.
-Step 8 only applies when no link type is specified at all.
+Step 6 only applies when no link type is specified at all.
 :::
 
 The implication is straightforward:
 the more specific your registrations, the more targeted the responses.
 If you register responses for specific language and context combinations,
 users in those regions get exactly the right content.
-Within the link-type branch (steps 1-7),
+Within the link-type branch (steps 1-5),
 fallback ensures that users get the best available match
 even when a perfect one is not available.
 And when no link type is specified at all,
-the default link type (step 8) ensures the user still gets a useful response.
+the default link type (step 6) ensures the user still gets a useful response.
 
 ## Default flags
 
@@ -256,10 +270,9 @@ These flags tell the resolver
 
 | Default flag | Scope | Meaning |
 |--------------|-------|---------|
-| `defaultLinkType` | Entire registration | Use this response when no link type is specified at all |
-| `defaultIanaLanguage` | Per link type | Use this response when a link type matches but no language preference is given |
-| `defaultContext` | Per link type + language | Use this response when link type and language match but no context preference is given |
-| `defaultMimeType` | Per link type + language + context | Use this response when everything else matches but no MIME type preference is given |
+| `defaultLinkType` | Entire registration | Returned when no link type is specified at all (separate branch from the linkType cascade) |
+| `defaultContext` | Per link type | The publisher's canonical fallback for a link type. Returned by tier 4 when no variant matches the requested language. |
+| `defaultMimeType` | Per link type + context (registration only) | Registration enforces uniqueness within each (link type, context) group, so a link type can carry multiple flagged variants. At resolution time the cascade does not consult context; tier 2 simply returns the first language-matching variant whose flag is set. |
 
 :::warning Only one default per scope
 Only one response can hold each default flag within its scope.

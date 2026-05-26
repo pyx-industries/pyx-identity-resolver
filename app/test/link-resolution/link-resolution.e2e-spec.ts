@@ -225,8 +225,7 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    // Language-aware resolution is reintroduced in #108 on hreflang membership.
-    it.skip('when linkType is certificationInfo language is en, context is unknown, and mimeType is unknown', () => {
+    it('when linkType is certificationInfo language is en, context is unknown, and mimeType is unknown', () => {
       return request(baseUrl)
         .get(`/${gs1}/01/09359502000041?linkType=gs1%3AcertificationInfo`)
         .set('Accept-Language', 'en')
@@ -247,8 +246,7 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    // Language-aware resolution is reintroduced in #108 on hreflang membership.
-    it.skip('when linkType is certificationInfo language is unknown, context is unknown, and mimeType is unknown', () => {
+    it('when linkType is certificationInfo language is unknown, context is unknown, and mimeType is unknown', () => {
       return request(baseUrl)
         .get(`/${gs1}/01/09359502000041?linkType=gs1%3AcertificationInfo`)
         .expect(302)
@@ -268,15 +266,11 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    // Language-aware resolution is reintroduced in #108 on hreflang membership.
-    it.skip('when linkType is unknown, language is unknown, context is unknown, and mimeType is unknown', () => {
+    it('when no linkType is supplied, falls back to defaultLinkType', () => {
       return request(baseUrl)
-        .get(`/${gs1}/01/09359502000041?linkType=gs1%3AcertificationInfo`)
+        .get(`/${gs1}/01/09359502000041`)
         .expect(302)
-        .expect(
-          'Location',
-          `https://example-json.com?linkType=gs1:certificationInfo`,
-        )
+        .expect('Location', 'https://example-json.com')
         .expect((res) => {
           const link = res.headers['link'];
           expect(link).toBeDefined();

@@ -202,12 +202,11 @@ curl -X POST https://your-resolver.example.com/api/3.0.0/resolver \
       {
         "defaultLinkType": true,
         "defaultMimeType": true,
-        "defaultIanaLanguage": true,
         "defaultContext": true,
         "fwqs": false,
         "active": true,
         "linkType": "acme:sustainabilityInfo",
-        "ianaLanguage": "en",
+        "hreflang": ["en"],
         "context": "au",
         "title": "Sustainability Information",
         "targetUrl": "https://acme.example.com/products/12345/sustainability",
@@ -216,12 +215,11 @@ curl -X POST https://your-resolver.example.com/api/3.0.0/resolver \
       {
         "defaultLinkType": false,
         "defaultMimeType": true,
-        "defaultIanaLanguage": true,
         "defaultContext": true,
         "fwqs": false,
         "active": true,
         "linkType": "acme:productDatasheet",
-        "ianaLanguage": "en",
+        "hreflang": ["en"],
         "context": "au",
         "title": "Product Datasheet",
         "targetUrl": "https://acme.example.com/products/12345/datasheet",
@@ -265,7 +263,9 @@ If a registration already exists for the same namespace, key type, key, and qual
 the new responses are appended to the existing ones.
 
 Each response is identified by a composite key of
-`targetUrl`, `linkType`, `mimeType`, `ianaLanguage`, and `context`.
+`targetUrl`, `linkType`, `mimeType`, and `context`.
+Language (`hreflang`) is not part of the key; a single variant can
+advertise multiple BCP 47 tags via its `hreflang[]` array.
 If any incoming response matches an existing composite key
 (or a historical key from a previous version),
 the request is **rejected with a `409 Conflict` error** --
@@ -314,9 +314,8 @@ see [How It Works](../understanding-the-service/how-it-works).
 | Flag | Scope | Purpose |
 |---|---|---|
 | `defaultLinkType` | Entire registration | Used when no `linkType` is specified in a resolution request |
-| `defaultIanaLanguage` | Per link type | Used when a `linkType` is specified but no language preference |
-| `defaultContext` | Per link type + language | Used when link type and language are known but no context |
-| `defaultMimeType` | Per link type + language + context | Used when all other parameters are known but no MIME preference |
+| `defaultContext` | Per link type | The publisher's canonical fallback for a link type. Returned when no variant matches the client's requested language. |
+| `defaultMimeType` | Per link type + context (registration only) | The scope prevents two variants in the same (link type, context) group from both claiming the default. The resolver does not consult context at resolution time; tier 2 returns the first language-matching variant whose flag is set. |
 
 Only one response can hold a given default flag within its scope.
 If you register a new response with a default flag set to `true`,
@@ -366,7 +365,7 @@ You can narrow the results with optional filters:
 | `qualifierPath` | Filter by qualifier path (e.g. `/10/A1B2C3`) |
 | `linkType` | Filter by link type |
 | `mimeType` | Filter by MIME type |
-| `ianaLanguage` | Filter by language tag |
+| `hreflang` | Filter to responses whose `hreflang[]` contains the supplied BCP 47 tag |
 
 ### Get a single link
 
@@ -394,12 +393,12 @@ curl -X PUT https://your-resolver.example.com/api/3.0.0/resolver/links/a1b2c3d4-
 ```
 
 All fields from the original registration are updatable,
-including `targetUrl`, `linkType`, `mimeType`, `ianaLanguage`, `context`,
+including `targetUrl`, `linkType`, `mimeType`, `hreflang`, `context`,
 `active`, `fwqs`, and the default flags.
 
 :::info Composite key conflict checks
 If you update fields that form part of the composite key
-(`targetUrl`, `linkType`, `mimeType`, `ianaLanguage`, `context`),
+(`targetUrl`, `linkType`, `mimeType`, `context`),
 the service checks for conflicts
 against other current responses and historical keys
 from previous versions.
@@ -446,7 +445,7 @@ Each history entry captures:
   (`created`, `updated`, `soft_deleted`, or `hard_deleted`),
   and -- for updates that change composite key fields --
   the **previous values** of `targetUrl`, `linkType`, `mimeType`,
-  `ianaLanguage`, and `context`.
+  and `context`.
 
 This history has two effects:
 
@@ -532,20 +531,22 @@ curl -v https://your-resolver.example.com/api/3.0.0/acme/01/12345/10/A1B2C3?link
 ### Content negotiation via Accept-Language
 
 The resolver reads the standard HTTP `Accept-Language` header
-to match against the `ianaLanguage` and `context` fields on registered responses.
-The language subtag maps to `ianaLanguage`
-and the region subtag maps to `context`.
+and matches each requested BCP 47 tag, in q-weight order,
+against the `hreflang[]` array on each registered variant.
+A variant matches when any of the client's tags appears in its `hreflang[]`.
+Matching is exact-string per RFC 4647;
+BCP 47 lookup fallback (e.g. `en-GB` matching a variant tagged `en`)
+is not yet implemented.
 
-For example, to request the Australian English variant:
+For example, to request a variant that advertises Australian English:
 
 ```bash
 curl -v https://your-resolver.example.com/api/3.0.0/acme/01/12345?linkType=acme:sustainabilityInfo \
   -H "Accept-Language: en-AU"
 ```
 
-If a response is registered with `ianaLanguage: "en"` and `context: "au"`,
-the resolver will prefer it.
-When no exact match is found,
+A variant registered with `hreflang: ["en-AU"]` will match.
+When no variant matches any preferred tag,
 the resolver falls back through its
 [precedence chain](../understanding-the-service/how-it-works)
 until it finds a suitable response.

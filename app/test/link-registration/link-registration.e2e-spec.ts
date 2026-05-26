@@ -1394,10 +1394,7 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    // Language-aware resolver cascade is reintroduced in #108 on hreflang
-    // membership. Skipping until then; the test asserts on default-language
-    // semantics that no longer apply.
-    it.skip('should auto-unset existing defaults when new response sets same defaults', async () => {
+    it('should auto-unset existing defaults when new response sets same defaults', async () => {
       // Create a unique namespace for this test
       const namespace = `e2e-${environment}-mock-auto-unset`;
       const identifierDto = createIdentifierDto();
@@ -1580,34 +1577,38 @@ describe('LinkResolutionController (e2e)', () => {
         .expect(302)
         .expect('Location', 'https://response-b.com');
 
-      // 2. Verify defaultIanaLanguage: when linkType=certificationInfo but no language header,
-      // it should resolve to response C (which has defaultIanaLanguage: true for certificationInfo)
+      // 2. Verify defaultContext: when linkType=certificationInfo and no language header,
+      // the cascade picks the variant that holds defaultContext=true after auto-unset
+      // (response D was the last to claim it for certificationInfo, so C's flag was flipped).
       await request(baseUrl)
         .get(
           `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .expect(302)
-        .expect('Location', 'https://response-c.com');
+        .expect('Location', 'https://response-d.com');
 
-      // 3. Verify defaultContext: when linkType=certificationInfo and language=en (no region),
-      // it should resolve to response D (which has defaultContext: true for certificationInfo+en)
+      // 3. Verify tier 2 (linkType + hreflang + defaultMimeType): both D and E
+      // match hreflang 'en' and no specific mime was requested. E was the
+      // last registration to claim defaultMimeType=true, so per the (linkType)
+      // scope E now holds that flag and tier 2 returns E.
       await request(baseUrl)
         .get(
           `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept-Language', 'en')
         .expect(302)
-        .expect('Location', 'https://response-d.com');
+        .expect('Location', 'https://response-e.com');
 
-      // 4. Verify defaultMimeType: when linkType=certificationInfo, language=en-AU (full context),
-      // but no Accept header, it should resolve to response E (which has defaultMimeType: true for certificationInfo+en+au)
+      // 4. Verify fallback: en-AU does not match any variant's hreflang[] exactly
+      // (BCP 47 lookup fallback is tracked as a follow-up), so tiers 1-3 fail
+      // and tier 4 returns the defaultContext variant (D).
       await request(baseUrl)
         .get(
           `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept-Language', 'en-AU')
         .expect(302)
-        .expect('Location', 'https://response-e.com');
+        .expect('Location', 'https://response-d.com');
 
       // cleanup
       await request(baseUrl)

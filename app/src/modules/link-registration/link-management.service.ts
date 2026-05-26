@@ -256,6 +256,12 @@ export class LinkManagementService {
     if (query.mimeType) {
       responses = responses.filter((r) => r.mimeType === query.mimeType);
     }
+    if (query.hreflang) {
+      const wanted = query.hreflang.toLowerCase();
+      responses = responses.filter((r) =>
+        r.hreflang?.some((tag) => tag.toLowerCase() === wanted),
+      );
+    }
     return responses;
   }
 

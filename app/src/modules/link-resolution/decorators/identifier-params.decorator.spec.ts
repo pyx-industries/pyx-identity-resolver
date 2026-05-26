@@ -66,16 +66,7 @@ describe('IdentifierParams', () => {
       descriptiveAttributes: {
         linkType: 'idr:certificationInfo',
         mimeTypes: ['application/json'],
-        ianaLanguageContexts: [
-          {
-            ianaLanguage: 'en',
-            context: 'US',
-          },
-          {
-            ianaLanguage: 'fr',
-            context: 'xx',
-          },
-        ],
+        hreflangPreferences: ['en-US', 'fr'],
       },
     });
   });
@@ -120,16 +111,7 @@ describe('IdentifierParams', () => {
       descriptiveAttributes: {
         linkType: 'idr:certificationInfo',
         mimeTypes: ['application/json'],
-        ianaLanguageContexts: [
-          {
-            ianaLanguage: 'en',
-            context: 'US',
-          },
-          {
-            ianaLanguage: 'fr',
-            context: 'xx',
-          },
-        ],
+        hreflangPreferences: ['en-US', 'fr'],
       },
     });
   });
