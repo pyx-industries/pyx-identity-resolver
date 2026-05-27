@@ -32,6 +32,7 @@ export interface LinkChange {
   previousLinkType?: string;
   previousMimeType?: string;
   previousContext?: string;
+  previousHreflang?: string[];
 }
 
 export interface VersionHistoryEntry {
