@@ -9,6 +9,7 @@ import {
 import { gs1LinkTypes } from '../link-registration/constants/gs1-link-types';
 import { untpLinkTypes } from '../link-registration/constants/untp-link-types';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
+import { buildApiBaseUrl } from '../../common/utils/config.utils';
 
 @Injectable()
 export class CommonService {
@@ -28,31 +29,27 @@ export class CommonService {
       throw new Error('APP_NAME is not defined');
     }
 
-    const appEndpoint = this.configService.get('RESOLVER_DOMAIN');
-    if (!appEndpoint) {
-      // TODO: refactor to use a custom exception
-      throw new Error('RESOLVER_DOMAIN is not defined');
-    }
+    const apiBaseUrl = buildApiBaseUrl(this.configService);
 
     return {
-      name: this.configService.get('APP_NAME'),
-      resolverRoot: this.configService.get('RESOLVER_DOMAIN'),
-      supportedLinkType: this.mapSupportedLinkTypes(),
+      name: appName,
+      resolverRoot: apiBaseUrl,
+      supportedLinkType: this.mapSupportedLinkTypes(apiBaseUrl),
       supportedPrimaryKeys: ['all'],
     };
   }
 
-  private mapSupportedLinkTypes(): SupportedLinkType[] {
+  private mapSupportedLinkTypes(apiBaseUrl: string): SupportedLinkType[] {
     return [
       {
         namespace: 'http://gs1.org/voc/',
         prefix: 'gs1:',
-        profile: `${this.configService.get('RESOLVER_DOMAIN')}/voc/?show=linktypes`,
+        profile: `${apiBaseUrl}/voc/?show=linktypes`,
       },
       {
         namespace: 'https://vocabulary.uncefact.org/untp/linkType#',
         prefix: 'untp:',
-        profile: `${this.configService.get('RESOLVER_DOMAIN')}/voc/?show=linktypes`,
+        profile: `${apiBaseUrl}/voc/?show=linktypes`,
       },
     ];
   }

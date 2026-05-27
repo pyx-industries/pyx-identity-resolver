@@ -1,5 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { buildApiBaseUrl } from '../../common/utils/config.utils';
 import { LinkResolutionDto } from './dto/link-resolution.dto';
 import { IRepositoryProvider } from '../../repository/providers/provider.repository.interface';
 import { constructID, convertAICode } from '../shared/utils/uri.utils';
@@ -93,16 +94,15 @@ export class LinkResolutionService {
         };
       }
 
-      const resolverDomain =
-        this.configService.getOrThrow<string>('RESOLVER_DOMAIN');
+      const apiBaseUrl = buildApiBaseUrl(this.configService);
       const linkTypeVocDomain =
         identifier.namespaceURI && identifier.namespaceURI !== ''
           ? identifier.namespaceURI
-          : resolverDomain + '/voc';
+          : `${apiBaseUrl}/voc`;
 
       const context: ResolutionContext = {
         identificationKeyCode: standardizedParams.identifiers.primary.qualifier,
-        resolverDomain,
+        resolverDomain: apiBaseUrl,
         linkTypeVocDomain,
         namespace: standardizedParams.namespace,
         identificationKey: standardizedParams.identifiers.primary.id,

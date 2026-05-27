@@ -1,6 +1,6 @@
 {
-  "version": "3.0.1",
-  "apiVersion": "3.0.0",
+  "version": "4.0.0",
+  "apiVersion": "4.0",
   "docVersion": "3.0.0",
   "dependencies": {}
 }

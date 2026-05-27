@@ -4,7 +4,7 @@ import { gs1LinkTypes } from '../../src/modules/link-registration/constants/gs1-
 import { untpLinkTypes } from '../../src/modules/link-registration/constants/untp-link-types';
 import { APP_ROUTE_PREFIX } from '../../src/common/utils/config.utils';
 
-const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
+const baseUrl = process.env.RESOLVER_DOMAIN + APP_ROUTE_PREFIX;
 const appName = process.env.APP_NAME;
 
 describe('CommonController (e2e)', () => {
@@ -15,17 +15,18 @@ describe('CommonController (e2e)', () => {
         .expect(HttpStatus.OK);
 
       expect(response.body.name).toBe(appName);
+      expect(response.body.resolverRoot).toBe(baseUrl);
       expect(response.body.supportedPrimaryKeys).toEqual(['all']);
       expect(response.body.supportedLinkType).toEqual([
         {
           namespace: 'http://gs1.org/voc/',
           prefix: 'gs1:',
-          profile: expect.stringContaining('/voc/?show=linktypes'),
+          profile: `${baseUrl}/voc/?show=linktypes`,
         },
         {
           namespace: 'https://vocabulary.uncefact.org/untp/linkType#',
           prefix: 'untp:',
-          profile: expect.stringContaining('/voc/?show=linktypes'),
+          profile: `${baseUrl}/voc/?show=linktypes`,
         },
       ]);
     });

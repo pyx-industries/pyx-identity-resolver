@@ -36,7 +36,7 @@ Replace them with values appropriate to your deployment.
 
 | Placeholder | Meaning |
 |---|---|
-| `https://your-resolver.example.com/api/3.0.0` | Your resolver's base URL (global prefix included) |
+| `https://your-resolver.example.com/api/v4` | Your resolver's base URL (global prefix included) |
 | `YOUR_API_KEY` | A valid API key for authenticated endpoints |
 | `acme` | An example namespace |
 | `product` | An example primary identifier **shortcode** -- used in Link Registration (`identificationKeyType`) |
@@ -92,7 +92,7 @@ Register a namespace called `acme` with two application identifiers:
 a primary identifier `product` (type `I`) and a qualifier `batch` (type `Q`).
 
 ```bash
-curl -X POST https://your-resolver.example.com/api/3.0.0/identifiers \
+curl -X POST https://your-resolver.example.com/api/v4/identifiers \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -138,7 +138,7 @@ That is why it returns `200` rather than `201`.
 Fetch the scheme you just created:
 
 ```bash
-curl https://your-resolver.example.com/api/3.0.0/identifiers?namespace=acme \
+curl https://your-resolver.example.com/api/v4/identifiers?namespace=acme \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -162,7 +162,7 @@ before you call this endpoint.**
 :::
 
 ```bash
-curl -X DELETE https://your-resolver.example.com/api/3.0.0/identifiers?namespace=acme \
+curl -X DELETE https://your-resolver.example.com/api/v4/identifiers?namespace=acme \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -188,7 +188,7 @@ Register two responses for product `12345` in the `acme` namespace:
 a sustainability information page and a product datasheet.
 
 ```bash
-curl -X POST https://your-resolver.example.com/api/3.0.0/resolver \
+curl -X POST https://your-resolver.example.com/api/v4/resolver \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -282,7 +282,7 @@ A common use case is passing a `decryptionKey`
 to a target that hosts encrypted content:
 
 ```
-GET /api/3.0.0/acme/01/12345?linkType=acme:certificationInfo&decryptionKey=a3f2b8c1
+GET /api/v4/acme/01/12345?linkType=acme:certificationInfo&decryptionKey=a3f2b8c1
 ```
 
 If the matched response has `fwqs: true`,
@@ -354,7 +354,7 @@ and live under `/resolver/links`.
 Retrieve all responses for a given identifier:
 
 ```bash
-curl "https://your-resolver.example.com/api/3.0.0/resolver/links?namespace=acme&identificationKeyType=product&identificationKey=12345" \
+curl "https://your-resolver.example.com/api/v4/resolver/links?namespace=acme&identificationKeyType=product&identificationKey=12345" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -372,7 +372,7 @@ You can narrow the results with optional filters:
 Retrieve a specific response by its `linkId`:
 
 ```bash
-curl https://your-resolver.example.com/api/3.0.0/resolver/links/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
+curl https://your-resolver.example.com/api/v4/resolver/links/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -383,7 +383,7 @@ Only the fields you include in the body are changed --
 everything else stays as it is:
 
 ```bash
-curl -X PUT https://your-resolver.example.com/api/3.0.0/resolver/links/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
+curl -X PUT https://your-resolver.example.com/api/v4/resolver/links/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -413,7 +413,7 @@ the response is marked as inactive
 but remains in the document and its composite key stays protected:
 
 ```bash
-curl -X DELETE https://your-resolver.example.com/api/3.0.0/resolver/links/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
+curl -X DELETE https://your-resolver.example.com/api/v4/resolver/links/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -421,7 +421,7 @@ To permanently remove the response and free its composite key,
 pass `?hard=true`:
 
 ```bash
-curl -X DELETE "https://your-resolver.example.com/api/3.0.0/resolver/links/a1b2c3d4-e5f6-7890-abcd-ef1234567890?hard=true" \
+curl -X DELETE "https://your-resolver.example.com/api/v4/resolver/links/a1b2c3d4-e5f6-7890-abcd-ef1234567890?hard=true" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -499,7 +499,7 @@ see [How It Works](../understanding-the-service/how-it-works).
 Request the sustainability information for product `12345`:
 
 ```bash
-curl -v https://your-resolver.example.com/api/3.0.0/acme/01/12345?linkType=acme:sustainabilityInfo
+curl -v https://your-resolver.example.com/api/v4/acme/01/12345?linkType=acme:sustainabilityInfo
 ```
 
 The resolver responds with a **307 redirect** to the target URL:
@@ -507,7 +507,7 @@ The resolver responds with a **307 redirect** to the target URL:
 ```
 < HTTP/1.1 307 Temporary Redirect
 < Location: https://acme.example.com/products/12345/sustainability
-< Link: <https://your-resolver.example.com/api/3.0.0/acme/01/12345?linkType=all>; rel="linkset"; type="application/linkset+json"
+< Link: <https://your-resolver.example.com/api/v4/acme/01/12345?linkType=all>; rel="linkset"; type="application/linkset+json"
 ```
 
 Note the `Link` header --
@@ -517,7 +517,7 @@ The path structure is `/{namespace}/{identifierKeyType AI}/{identifierKey}`.
 For qualified identifiers, append the qualifier segments:
 
 ```bash
-curl -v https://your-resolver.example.com/api/3.0.0/acme/01/12345/10/A1B2C3?linkType=acme:sustainabilityInfo
+curl -v https://your-resolver.example.com/api/v4/acme/01/12345/10/A1B2C3?linkType=acme:sustainabilityInfo
 ```
 
 #### Additional query parameters
@@ -541,7 +541,7 @@ is not yet implemented.
 For example, to request a variant that advertises Australian English:
 
 ```bash
-curl -v https://your-resolver.example.com/api/3.0.0/acme/01/12345?linkType=acme:sustainabilityInfo \
+curl -v https://your-resolver.example.com/api/v4/acme/01/12345?linkType=acme:sustainabilityInfo \
   -H "Accept-Language: en-AU"
 ```
 
@@ -559,7 +559,7 @@ to match against the `mimeType` field on registered responses.
 For example, to prefer a PDF version:
 
 ```bash
-curl -v https://your-resolver.example.com/api/3.0.0/acme/01/12345?linkType=acme:sustainabilityInfo \
+curl -v https://your-resolver.example.com/api/v4/acme/01/12345?linkType=acme:sustainabilityInfo \
   -H "Accept: application/pdf"
 ```
 
@@ -585,7 +585,7 @@ the resolver returns a linkset
 containing every active link for the identifier:
 
 ```bash
-curl https://your-resolver.example.com/api/3.0.0/acme/01/12345?linkType=all
+curl https://your-resolver.example.com/api/v4/acme/01/12345?linkType=all
 ```
 
 A **linkset** is a structured JSON document
@@ -598,8 +598,8 @@ Example response:
 {
   "linkset": [
     {
-      "anchor": "https://your-resolver.example.com/api/3.0.0/acme/01/12345",
-      "https://your-resolver.example.com/api/3.0.0/voc/sustainabilityInfo": [
+      "anchor": "https://your-resolver.example.com/api/v4/acme/01/12345",
+      "https://your-resolver.example.com/api/v4/voc/sustainabilityInfo": [
         {
           "href": "https://acme.example.com/products/12345/sustainability",
           "title": "Sustainability Information",
@@ -607,7 +607,7 @@ Example response:
           "hreflang": ["en"]
         }
       ],
-      "https://your-resolver.example.com/api/3.0.0/voc/productDatasheet": [
+      "https://your-resolver.example.com/api/v4/voc/productDatasheet": [
         {
           "href": "https://acme.example.com/products/12345/datasheet",
           "title": "Product Datasheet",
@@ -622,7 +622,7 @@ Example response:
 
 :::info Link type URLs in the linkset
 Notice that the link type keys in the linkset are full URLs
-(e.g., `https://your-resolver.example.com/api/3.0.0/voc/sustainabilityInfo`),
+(e.g., `https://your-resolver.example.com/api/v4/voc/sustainabilityInfo`),
 not the prefixed form you used during registration (`acme:sustainabilityInfo`).
 The resolver automatically expands the namespace prefix
 into the full vocabulary URL when building the linkset.
@@ -635,7 +635,7 @@ which namespaces it supports, which link type vocabularies it uses,
 and its root URL:
 
 ```bash
-curl https://your-resolver.example.com/api/3.0.0/.well-known/resolver
+curl https://your-resolver.example.com/api/v4/.well-known/resolver
 ```
 
 Example response:
@@ -643,7 +643,7 @@ Example response:
 ```json
 {
   "name": "My Identity Resolver",
-  "resolverRoot": "https://your-resolver.example.com/api/3.0.0",
+  "resolverRoot": "https://your-resolver.example.com/api/v4",
   "supportedLinkType": [
     {
       "namespace": "https://acme.example.com/voc/",
