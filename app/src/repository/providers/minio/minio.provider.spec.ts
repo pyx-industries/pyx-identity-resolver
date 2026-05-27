@@ -89,6 +89,43 @@ describe('MinioProvider', () => {
     ]);
   });
 
+  it('lists objects recursively under the given prefix', async () => {
+    const listSpy = jest
+      .spyOn(minioClient, 'listObjects')
+      .mockImplementation(() => [] as any);
+
+    await provider.all('users');
+
+    expect(listSpy).toHaveBeenCalledWith('test', 'users', true);
+  });
+
+  it('skips folder-style entries that have no name when listing', async () => {
+    jest.spyOn(minioClient, 'listObjects').mockImplementation(() => {
+      return [
+        { name: 'users/a.json' },
+        { prefix: 'users/sub/' } as any,
+        { name: 'users/sub/b.json' },
+      ] as any;
+    });
+
+    jest.spyOn(minioClient, 'getObject').mockImplementation((_, objectName) => {
+      const promise = new Promise<Readable>((resolve) => {
+        const stream = new Readable();
+        stream.push(JSON.stringify({ id: String(objectName) }));
+        stream.push(null);
+        resolve(stream);
+      });
+      return promise;
+    });
+
+    const results = await provider.all<{ id: string }>('users');
+
+    expect(results.map((r) => r.id).sort()).toEqual([
+      'users/a.json',
+      'users/sub/b.json',
+    ]);
+  });
+
   it('should delete an item by ID', async () => {
     const id = 'test.json';
     jest

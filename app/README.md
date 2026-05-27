@@ -110,8 +110,7 @@ cp .env.development.local.example .env.development.local
 - `OBJECT_STORAGE_BUCKET_NAME`: The MinIO bucket name for storing data.
 - `OBJECT_STORAGE_PATH_STYLE`: Enable or disable path-style requests for MinIO. Set to `false` for cloud providers. Set to `true` if you are using MinIO Gateway. By default, it is set to `true`.
 - `IDENTIFIER_PATH`: The path to the identifier data file.
-- `RESOLVER_DOMAIN`: The domain name for this resolver service.
-- `LINK_TYPE_VOC_DOMAIN`: The domain name for the link type vocabulary.
+- `RESOLVER_DOMAIN`: Externally-reachable base URL for this resolver service (scheme + host, no path, no trailing slash). The service appends the API path prefix (`/api/v4`) internally based on `apiVersion` in `version.json`. The link-type vocabulary URL is derived from `RESOLVER_DOMAIN` + the API path prefix + `/voc`, and can be overridden per identifier by setting `namespaceURI` on the identifier record.
 - `API_KEY`: The API key for accessing any protected endpoints in this service.
 - `APP_NAME`: The name of this application.
 

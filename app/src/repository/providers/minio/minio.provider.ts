@@ -69,13 +69,19 @@ export class MinioProvider implements IRepositoryProvider {
   }
 
   async all<T>(category: string): Promise<T[]> {
+    // Recursive listing: surfaces every object under the prefix, not just
+    // direct children. Without `recursive=true`, hierarchical prefixes are
+    // returned as folder entries (no `.name`), which both breaks
+    // `this.one(undefined)` below and hides nested objects.
     const dataStream = this.minioClient.listObjects(
       this.options.bucket,
       category,
+      true,
     );
     const data: T[] = [];
 
     for await (const obj of dataStream) {
+      if (!obj?.name) continue;
       const singleData = await this.one<T>(obj.name);
       if (singleData) {
         data.push(singleData);
