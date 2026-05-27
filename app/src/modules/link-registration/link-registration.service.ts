@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { CreateLinkRegistrationDto } from './dto/link-registration.dto';
 import { IRepositoryProvider } from '../../repository/providers/provider.repository.interface';
@@ -6,6 +6,7 @@ import { constructLinkSetJson } from './utils/link-set.utils';
 import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
 import { convertAICode } from '../shared/utils/uri.utils';
 import { ConfigService } from '@nestjs/config';
+import { buildApiBaseUrl } from '../../common/utils/config.utils';
 import { getObjectName } from './utils/link-registration.utils';
 import {
   generateLinkId,
@@ -18,8 +19,6 @@ import { writeLinkIndex } from './utils/link-index.utils';
  * Service responsible for creating new registrations and validating registration payloads.
  */
 export class LinkRegistrationService {
-  private readonly logger = new Logger(LinkRegistrationService.name);
-
   constructor(
     @Inject('RepositoryProvider')
     private readonly repositoryProvider: IRepositoryProvider,
@@ -80,19 +79,11 @@ export class LinkRegistrationService {
       }
     }
 
-    // Construct link set and link header text
-    const resolverDomain = this.configService.get<string>('RESOLVER_DOMAIN');
+    const apiBaseUrl = buildApiBaseUrl(this.configService);
     const linkTypeVocDomain =
       identifier.namespaceURI && identifier.namespaceURI !== ''
         ? identifier.namespaceURI
-        : resolverDomain + '/voc';
-
-    if (!resolverDomain) {
-      throw new Error('Missing configuration for RESOLVER_DOMAIN');
-    }
-    if (!linkTypeVocDomain) {
-      throw new Error('Missing configuration for LINK_TYPE_VOC_DOMAIN');
-    }
+        : `${apiBaseUrl}/voc`;
     const activePayload = {
       ...payload,
       responses: payload.responses.filter((r) => r.active !== false),
@@ -100,7 +91,7 @@ export class LinkRegistrationService {
     const linkset = constructLinkSetJson(
       activePayload,
       aiCode,
-      { resolverDomain, linkTypeVocDomain },
+      { resolverDomain: apiBaseUrl, linkTypeVocDomain },
       versionHistory,
     );
     await this.repositoryProvider.save({

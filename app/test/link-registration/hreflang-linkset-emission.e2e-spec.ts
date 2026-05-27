@@ -3,7 +3,7 @@ import request from 'supertest';
 import { APP_ROUTE_PREFIX } from '../../src/common/utils/config.utils';
 import { IdentifierDto } from 'src/modules/identifier-management/dto/identifier.dto';
 
-const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
+const baseUrl = process.env.RESOLVER_DOMAIN + APP_ROUTE_PREFIX;
 const environment = process.env.NODE_ENV;
 const apiKey = process.env.API_KEY;
 

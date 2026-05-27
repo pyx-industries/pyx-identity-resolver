@@ -3,7 +3,7 @@ import { IdentifierDto } from '../../src/modules/identifier-management/dto/ident
 import request from 'supertest';
 import { APP_ROUTE_PREFIX } from '../../src/common/utils/config.utils';
 
-const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
+const baseUrl = process.env.RESOLVER_DOMAIN + APP_ROUTE_PREFIX;
 const environment = process.env.NODE_ENV;
 
 // Define namespaces for e2e testing to avoid data pollution

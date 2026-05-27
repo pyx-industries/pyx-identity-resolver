@@ -5,6 +5,7 @@ import { gs1LinkTypes } from '../link-registration/constants/gs1-link-types';
 import { untpLinkTypes } from '../link-registration/constants/untp-link-types';
 import { I18nService } from 'nestjs-i18n';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
+import { APP_ROUTE_PREFIX } from '../../common/utils/config.utils';
 
 const RESOLVER_DOMAIN = 'http://localhost:3000';
 const APP_NAME = 'Test App';
@@ -47,19 +48,20 @@ describe('CommonService', () => {
     });
 
     const result = await service.transformResolverData();
+    const apiBaseUrl = `${RESOLVER_DOMAIN}${APP_ROUTE_PREFIX}`;
     expect(result).toEqual({
       name: APP_NAME,
-      resolverRoot: RESOLVER_DOMAIN,
+      resolverRoot: apiBaseUrl,
       supportedLinkType: [
         {
           namespace: 'http://gs1.org/voc/',
           prefix: 'gs1:',
-          profile: `${RESOLVER_DOMAIN}/voc/?show=linktypes`,
+          profile: `${apiBaseUrl}/voc/?show=linktypes`,
         },
         {
           namespace: 'https://vocabulary.uncefact.org/untp/linkType#',
           prefix: 'untp:',
-          profile: `${RESOLVER_DOMAIN}/voc/?show=linktypes`,
+          profile: `${apiBaseUrl}/voc/?show=linktypes`,
         },
       ],
       supportedPrimaryKeys: ['all'],
@@ -119,7 +121,7 @@ describe('CommonService', () => {
     });
 
     await expect(service.transformResolverData()).rejects.toThrowError(
-      'RESOLVER_DOMAIN is not defined',
+      'Missing configuration for RESOLVER_DOMAIN',
     );
   });
 

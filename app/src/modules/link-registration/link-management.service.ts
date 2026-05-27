@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ConfigService } from '@nestjs/config';
+import { buildApiBaseUrl } from '../../common/utils/config.utils';
 import { IRepositoryProvider } from '../../repository/providers/provider.repository.interface';
 import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
 import { GeneralErrorException } from '../../common/exceptions/general-error.exception';
@@ -80,8 +81,10 @@ export class LinkManagementService {
       });
     }
 
-    const resolverDomain = this.configService.get<string>('RESOLVER_DOMAIN');
-    if (!resolverDomain) {
+    let apiBaseUrl: string;
+    try {
+      apiBaseUrl = buildApiBaseUrl(this.configService);
+    } catch {
       throw new GeneralErrorException(
         this.i18n,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -91,8 +94,8 @@ export class LinkManagementService {
 
     const linkTypeVocDomain = identifier.namespaceURI
       ? identifier.namespaceURI
-      : resolverDomain + '/voc';
-    return { aiCode, resolverDomain, linkTypeVocDomain };
+      : `${apiBaseUrl}/voc`;
+    return { aiCode, resolverDomain: apiBaseUrl, linkTypeVocDomain };
   }
 
   /**

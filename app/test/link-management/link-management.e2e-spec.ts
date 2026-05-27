@@ -7,7 +7,7 @@ import {
   UntpAccessRole,
 } from '../../src/modules/link-registration/constants/untp-enums';
 
-const baseUrl = process.env.API_BASE_URL + APP_ROUTE_PREFIX;
+const baseUrl = process.env.RESOLVER_DOMAIN + APP_ROUTE_PREFIX;
 const environment = process.env.NODE_ENV;
 const apiKey = process.env.API_KEY;
 

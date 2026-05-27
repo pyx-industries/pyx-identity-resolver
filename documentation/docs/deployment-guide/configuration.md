@@ -20,26 +20,27 @@ see the [Development Setup](../contributing/index.md) page.
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `NODE_ENV` | No | `development` | Set to `production` for serverless (Lambda) deployments. In non-production modes the app starts a standard HTTP server. |
-| `RESOLVER_DOMAIN` | **Yes** | --- | The public base URL of your resolver, including the API version path. Example: `https://resolver.example.com/api/3.0.0` |
+| `RESOLVER_DOMAIN` | **Yes** | --- | The externally-reachable **base URL** of your resolver (scheme + host, no path, no trailing slash). The IDR appends its API path prefix (e.g. `/api/v4`) itself, so the value should NOT include `/api/...`. Example: `https://resolver.example.com` |
 | `PORT` | No | `3000` | The port the HTTP server listens on. Only used when `NODE_ENV` is **not** `production`. |
 | `APP_NAME` | **Yes** | --- | A short name for your resolver instance (e.g. `IDR`). Used in API responses and health checks. The app will fail to start if this is empty. |
 | `API_KEY` | **Yes** | --- | Bearer token required for all authenticated endpoints (identifier management, link registration). Anonymous link resolution does not require a key. |
-| `LINK_TYPE_VOC_DOMAIN` | No | Derived at runtime | Base URL for the link type vocabulary endpoint. At runtime the IDR uses the identifier's `namespaceURI` first; if that is empty it falls back to `{RESOLVER_DOMAIN}/voc`. You only need to set this variable explicitly if you host your vocabulary at a different domain. |
 | `LINK_HEADER_MAX_SIZE` | No | `8192` | Maximum size in bytes of the `Link` response header. Must be a positive integer. If the assembled header exceeds this limit, optional entries are dropped to stay within budget. Recommended maximum: `65536` (64 KB). |
-| `API_BASE_URL` | No | `http://localhost:3000` | Base URL used by the Swagger UI server definition. Set this to your public URL so the "Try it out" feature in Swagger works correctly. |
 
 ### `RESOLVER_DOMAIN` explained
 
 This variable tells the IDR how to construct canonical URIs
-that appear in linksets and response headers.
-It **must** include the API version path segment.
+that appear in linksets, response headers, and Swagger documentation.
+It **must NOT** include the API version path segment;
+the IDR appends `/api/v<MAJOR>` itself based on `apiVersion` in `version.json`.
 
 ```
-https://resolver.example.com/api/3.0.0
+https://resolver.example.com
 ```
 
 If you're running behind a reverse proxy or load balancer,
-set this to the externally reachable URL --- not the internal container address.
+set this to the externally-reachable URL (not the internal container address).
+The same value is used to construct the `server` URL in the Swagger UI,
+so the "Try it out" feature hits the public host correctly.
 
 ### Access control
 
@@ -114,7 +115,7 @@ here's the smallest set of variables you need beyond what `docker-compose.yaml` 
 
 | Variable | Suggested value |
 |----------|-----------------|
-| `RESOLVER_DOMAIN` | `https://resolver.example.com/api/3.0.0` (use your actual host) |
+| `RESOLVER_DOMAIN` | `https://resolver.example.com` (use your actual host) |
 | `APP_NAME` | `IDR` |
 | `API_KEY` | Any non-empty string (change for production!) |
 | `OBJECT_STORAGE_ENDPOINT` | `minio` (if using the bundled MinIO) |
