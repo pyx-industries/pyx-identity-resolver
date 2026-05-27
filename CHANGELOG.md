@@ -1,5 +1,44 @@
 # Changelog
 
+## [4.0.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/v3.0.1...v4.0.0) (2026-05-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **link-registration:** replace `ianaLanguage` with `hreflang` on link target variants ([#120](https://github.com/pyx-industries/pyx-identity-resolver/issues/120))
+* **link-resolution:** match against `hreflang[]` membership with `defaultContext` fallback ([#122](https://github.com/pyx-industries/pyx-identity-resolver/issues/122))
+* **api:** major-only API URL versioning and tag-based release flow ([#125](https://github.com/pyx-industries/pyx-identity-resolver/issues/125))
+
+
+### Features
+
+* **link-registration:** add `public` flag to link target variants ([d208afe](https://github.com/pyx-industries/pyx-identity-resolver/commit/d208afe))
+* **link-registration:** add `rel` field to link target variants ([3812031](https://github.com/pyx-industries/pyx-identity-resolver/commit/3812031))
+* **link-registration:** replace `ianaLanguage` with `hreflang` on link target variants ([#120](https://github.com/pyx-industries/pyx-identity-resolver/issues/120))
+* **link-registration:** emit per-variant `hreflang` on linkset targets ([#121](https://github.com/pyx-industries/pyx-identity-resolver/issues/121))
+* **link-resolution:** match against `hreflang[]` membership with `defaultContext` fallback ([#122](https://github.com/pyx-industries/pyx-identity-resolver/issues/122))
+* **api:** major-only API URL versioning and tag-based release flow ([#125](https://github.com/pyx-industries/pyx-identity-resolver/issues/125))
+* **migration:** v4 data migration for the 4-tuple key model ([#126](https://github.com/pyx-industries/pyx-identity-resolver/issues/126))
+
+
+### Bug Fixes
+
+* **link-registration:** accept any well-formed MIME type ([5a63239](https://github.com/pyx-industries/pyx-identity-resolver/commit/5a63239))
+* **link-registration:** add i18n entry for matches validator ([f3a67c2](https://github.com/pyx-industries/pyx-identity-resolver/commit/f3a67c2))
+* **link-registration:** remove invalid type arg from 500 decorator ([f0541f1](https://github.com/pyx-industries/pyx-identity-resolver/commit/f0541f1))
+
+
+### Documentation
+
+* **adr:** accept ADR 001 link variant capability model ([#119](https://github.com/pyx-industries/pyx-identity-resolver/issues/119))
+* **adr:** add ADR 002 major-only API URL versioning ([#125](https://github.com/pyx-industries/pyx-identity-resolver/issues/125))
+* **migration:** add v4 migration guide ([#126](https://github.com/pyx-industries/pyx-identity-resolver/issues/126))
+
+
+### Miscellaneous
+
+* **release:** prepare release 4.0.0
+
 ## [3.0.1](https://github.com/pyx-industries/pyx-identity-resolver/compare/3.0.0...v3.0.1) (2026-04-21)
 
 
