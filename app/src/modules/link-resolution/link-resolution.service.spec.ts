@@ -99,9 +99,8 @@ describe('LinkResolutionService', () => {
       },
       descriptiveAttributes: {
         linkType: 'idr:certificationInfo',
-        hreflang: ['en'],
-        context: 'us',
-        mimeType: 'application/json',
+        hreflangPreferences: ['en'],
+        mimeTypes: ['application/json'],
       },
     };
 

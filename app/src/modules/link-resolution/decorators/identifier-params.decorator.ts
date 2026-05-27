@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import Negotiator from 'negotiator';
 import { LinkResolutionDto } from '../dto/link-resolution.dto';
-import { IanalanguageContext } from '../interfaces/link-resolution.interface';
 import { constructQualifiersFromQualifierPath } from '../../shared/utils/uri.utils';
 
 export const IdentifierParams = createParamDecorator(
@@ -18,29 +17,12 @@ export const IdentifierParams = createParamDecorator(
         identifierKey,
         secondaryIdentifiersPath,
       } = request.params;
-      const query = request.query;
 
       const wildCardPath = request.params['0'] || secondaryIdentifiersPath;
       const negotiator = new Negotiator(request);
 
       const mimeTypes = negotiator.mediaTypes();
-
-      const languageTags = negotiator.languages();
-      const ianaLanguageContexts: IanalanguageContext[] = languageTags.map(
-        (languageTag) => {
-          const langTagArray = languageTag.split('-');
-          const ianaLanguageContext = {
-            ianaLanguage: langTagArray[0],
-            context: 'xx',
-          };
-
-          // If the language tag has a region code, use it as the context value, otherwise use 'xx'
-          if (langTagArray[1] && langTagArray[1].length === 2) {
-            ianaLanguageContext.context = langTagArray[1];
-          }
-          return ianaLanguageContext;
-        },
-      );
+      const hreflangPreferences = negotiator.languages();
 
       const parameters: LinkResolutionDto = {
         namespace,
@@ -52,9 +34,9 @@ export const IdentifierParams = createParamDecorator(
           secondaries: constructQualifiersFromQualifierPath(wildCardPath),
         },
         descriptiveAttributes: {
-          ...query,
-          mimeTypes: mimeTypes,
-          ianaLanguageContexts: ianaLanguageContexts,
+          ...request.query,
+          mimeTypes,
+          hreflangPreferences,
         },
       };
       return parameters;

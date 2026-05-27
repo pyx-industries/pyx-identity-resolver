@@ -83,7 +83,7 @@ describe('LinkResolutionController (e2e)', () => {
                 fwqs: true,
                 active: true,
                 linkType: 'gs1:certificationInfo',
-                hreflang: ['en'],
+                hreflang: ['en-US', 'en'],
                 context: 'us',
                 title: 'Certification Information',
                 targetUrl: 'https://example-json.com',
@@ -96,7 +96,7 @@ describe('LinkResolutionController (e2e)', () => {
                 fwqs: true,
                 active: true,
                 linkType: 'gs1:certificationInfo',
-                hreflang: ['en'],
+                hreflang: ['en-US', 'en'],
                 context: 'us',
                 title: 'Certification Information',
                 targetUrl: 'https://example-html.com',
@@ -109,7 +109,7 @@ describe('LinkResolutionController (e2e)', () => {
                 fwqs: false,
                 active: true,
                 linkType: 'gs1:certificationInfo',
-                hreflang: ['en'],
+                hreflang: ['en-AU', 'en'],
                 context: 'au',
                 title: 'Certification Information',
                 targetUrl: 'https://example-json.com',
@@ -122,7 +122,7 @@ describe('LinkResolutionController (e2e)', () => {
                 fwqs: false,
                 active: true,
                 linkType: 'gs1:certificationInfo',
-                hreflang: ['en'],
+                hreflang: ['en-AU', 'en'],
                 context: 'au',
                 title: 'Certification Information',
                 targetUrl: 'https://example-html.com',
@@ -135,7 +135,7 @@ describe('LinkResolutionController (e2e)', () => {
                 fwqs: false,
                 active: false,
                 linkType: 'gs1:certificationInfo',
-                hreflang: ['en'],
+                hreflang: ['en-GB', 'en'],
                 context: 'gb',
                 title: 'Certification Information',
                 targetUrl: 'https://example-html.com',
@@ -225,16 +225,17 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    // Language-aware resolution is reintroduced in #108 on hreflang membership.
-    it.skip('when linkType is certificationInfo language is en, context is unknown, and mimeType is unknown', () => {
+    it('when linkType is certificationInfo language is en, context is unknown, and mimeType is unknown', () => {
+      // Tier 2 (linkType + hreflang + defaultMime). Both V0 (cert+us,
+      // defaultMime=true, fwqs=true) and V2 (cert+au, defaultMime=true,
+      // fwqs=false) match `en` via their generic 'en' hreflang entry.
+      // Reverse iteration picks V2 first; fwqs=false so no query string
+      // is forwarded.
       return request(baseUrl)
         .get(`/${gs1}/01/09359502000041?linkType=gs1%3AcertificationInfo`)
         .set('Accept-Language', 'en')
         .expect(302)
-        .expect(
-          'Location',
-          `https://example-json.com?linkType=gs1:certificationInfo`,
-        )
+        .expect('Location', 'https://example-json.com')
         .expect((res) => {
           const link = res.headers['link'];
           expect(link).toBeDefined();
@@ -247,8 +248,7 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    // Language-aware resolution is reintroduced in #108 on hreflang membership.
-    it.skip('when linkType is certificationInfo language is unknown, context is unknown, and mimeType is unknown', () => {
+    it('when linkType is certificationInfo language is unknown, context is unknown, and mimeType is unknown', () => {
       return request(baseUrl)
         .get(`/${gs1}/01/09359502000041?linkType=gs1%3AcertificationInfo`)
         .expect(302)
@@ -268,15 +268,11 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    // Language-aware resolution is reintroduced in #108 on hreflang membership.
-    it.skip('when linkType is unknown, language is unknown, context is unknown, and mimeType is unknown', () => {
+    it('when no linkType is supplied, falls back to defaultLinkType', () => {
       return request(baseUrl)
-        .get(`/${gs1}/01/09359502000041?linkType=gs1%3AcertificationInfo`)
+        .get(`/${gs1}/01/09359502000041`)
         .expect(302)
-        .expect(
-          'Location',
-          `https://example-json.com?linkType=gs1:certificationInfo`,
-        )
+        .expect('Location', 'https://example-json.com')
         .expect((res) => {
           const link = res.headers['link'];
           expect(link).toBeDefined();

@@ -543,7 +543,7 @@ describe('buildResponseKey', () => {
     );
   });
 
-  it('should produce the same key when only a non-key field differs (ianaLanguage)', () => {
+  it('should produce the same key when only a non-key field differs (hreflang)', () => {
     const base = {
       targetUrl: 'http://example.com',
       linkType: 'type',

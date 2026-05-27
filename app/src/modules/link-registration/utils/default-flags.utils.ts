@@ -89,7 +89,16 @@ function enforceDefaultContext(responses: LinkResponse[]): void {
 }
 
 /**
- * Ensures exactly one active response has `defaultMimeType: true` per linkType + context.
+ * Ensures exactly one active response has `defaultMimeType: true` per
+ * (linkType + context).
+ *
+ * The scope key is a registration-time uniqueness rule: a publisher
+ * cannot claim two defaults within the same (linkType + context) group.
+ * The resolution cascade does not derive a context from the request,
+ * so this scope is NOT consulted at resolve time. Its effect is purely
+ * to allow multiple variants per linkType to carry the flag (one per
+ * context group), giving tier 2 of the cascade more candidates when
+ * looking for a hreflang-matching variant with `defaultMimeType: true`.
  */
 function enforceDefaultMimeType(responses: LinkResponse[]): void {
   enforceScopedDefault(

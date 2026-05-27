@@ -2,7 +2,6 @@ import { LinkContextObject } from '../../link-registration/interfaces/link-set.i
 import { constructLinkSetJson } from '../../link-registration/utils/link-set.utils';
 import { LinkResolutionDto } from '../dto/link-resolution.dto';
 import {
-  IanalanguageContext,
   ResolvedLink,
   ResolutionContext,
 } from '../interfaces/link-resolution.interface';
@@ -58,15 +57,34 @@ export const processUri = (
 };
 
 /**
- * Process the URI and return the appropriate response.
- * The response is determined by linkType, context, and mimeType with the
- * following order of precedence (language-aware matching on hreflang is
- * reintroduced in #108):
- * 1. linkType, context, mimeType
- * 2. linkType, context, defaultMimeType
- * 3. linkType, context
- * 4. linkType, defaultContext
+ * Pick the response that should be served for a specific linkType request.
+ *
+ * Cascade (most specific wins) when `linkType` is supplied:
+ * 1. linkType + hreflang match + requested mimeType
+ * 2. linkType + hreflang match + variant flagged `defaultMimeType: true`
+ *    (the cascade picks the first hreflang-matching variant whose
+ *    `defaultMimeType` flag is set; the variant's `context` field is
+ *    not consulted at resolution time, since the request carries no
+ *    context signal)
+ * 3. linkType + hreflang match
+ * 4. linkType + defaultContext
  * 5. linkType
+ *
+ * When `linkType` is omitted entirely, the cascade is skipped and the
+ * single `defaultLinkType` variant is returned instead.
+ *
+ * "hreflang match" = any of the client's preferred BCP 47 tags appears
+ * in the variant's `hreflang[]` array. Matching is case-insensitive on
+ * both sides per RFC 4647 §2.1, but no subtag fallback is performed
+ * (e.g. en-GB does not match a variant tagged `en`); BCP 47 lookup
+ * fallback is tracked separately in #117.
+ *
+ * `defaultContext` is a pure fallback signal, not a filter on the
+ * front tiers. The publisher flags one variant per linkType as
+ * `defaultContext: true`. Tier 4 returns that variant when no variant
+ * matches the requested language. Tier 5 is a belt-and-braces
+ * fallback for the (registration-enforced impossible) case where no
+ * defaultContext exists.
  *
  * @param uri - the URI document containing responses and pre-built linkset
  * @param identifierParams - request parameters including linkType and descriptive attributes
@@ -81,35 +99,29 @@ const processUriForSpecificLinkType = (
   const responses = uri.responses.filter((res) => res.active).reverse();
   const {
     linkType,
-    ianaLanguageContexts = [],
+    hreflangPreferences = [],
     mimeTypes = [],
   } = identifierParams.descriptiveAttributes;
 
-  let response: LinkResponse;
+  let response: LinkResponse | undefined;
 
   if (!linkType) {
     response = matchDefaultLinkType(responses);
   } else {
     response =
-      matchLinkTypeLanguageContextMimeType(
+      matchLinkTypeHreflangMimeType(
         responses,
         linkType,
-        ianaLanguageContexts,
+        hreflangPreferences,
         mimeTypes,
-      ) ||
-      matchLinkTypeLanguageContextDefaultMimeType(
+      ) ??
+      matchLinkTypeHreflangDefaultMimeType(
         responses,
         linkType,
-        ianaLanguageContexts,
-      ) ||
-      matchLinkTypeLanguageContext(responses, linkType, ianaLanguageContexts) ||
-      matchLinkTypeLanguageDefaultContext(
-        responses,
-        linkType,
-        ianaLanguageContexts,
-      ) ||
-      matchLinkTypeLanguage(responses, linkType, ianaLanguageContexts) ||
-      matchLinkTypeDefaultLanguage(responses, linkType) ||
+        hreflangPreferences,
+      ) ??
+      matchLinkTypeHreflang(responses, linkType, hreflangPreferences) ??
+      matchLinkTypeDefaultContext(responses, linkType) ??
       matchLinkType(responses, linkType);
   }
 
@@ -122,7 +134,6 @@ const processUriForSpecificLinkType = (
     ? buildLinksetFromResponses(uri, context).linkset
     : uri.linkset;
 
-  // The resolved linkType for header filtering is the matched response's linkType
   const { linkHeaderText, linkHeaderTextFull } = constructLinkHeader(
     responses,
     context,
@@ -173,128 +184,78 @@ const processUriForLinkTypeAll = (uri: Uri, context: ResolutionContext) => {
   );
 };
 
-const matchLinkTypeLanguageContextMimeType = (
-  responses: LinkResponse[],
-  linkType: string,
-  ianaLanguageContexts: IanalanguageContext[],
-  mimeTypes: string[],
-): LinkResponse => {
-  const response = responses.find((res) => {
-    return (
-      res.linkType === linkType &&
-      checkIanaLanguageContext(res, ianaLanguageContexts) &&
-      mimeTypes
-        .map((mimeType) => mimeType.toLowerCase())
-        .includes(res.mimeType.toLowerCase())
-    );
-  });
-  return response;
+const hreflangMatches = (
+  response: LinkResponse,
+  hreflangPreferences: string[],
+): boolean => {
+  if (!response.hreflang || response.hreflang.length === 0) {
+    return false;
+  }
+  const variantTags = response.hreflang.map((t) => t.toLowerCase());
+  return hreflangPreferences.some((tag) =>
+    variantTags.includes(tag.toLowerCase()),
+  );
 };
 
-const matchLinkTypeLanguageContextDefaultMimeType = (
+const matchLinkTypeHreflangMimeType = (
   responses: LinkResponse[],
   linkType: string,
-  ianaLanguageContexts: IanalanguageContext[],
-): LinkResponse => {
-  const response = responses.find(
+  hreflangPreferences: string[],
+  mimeTypes: string[],
+): LinkResponse | undefined => {
+  const requestedMimes = mimeTypes.map((m) => m.toLowerCase());
+  return responses.find(
     (res) =>
       res.linkType === linkType &&
-      checkIanaLanguageContext(res, ianaLanguageContexts) &&
+      hreflangMatches(res, hreflangPreferences) &&
+      requestedMimes.includes(res.mimeType.toLowerCase()),
+  );
+};
+
+const matchLinkTypeHreflangDefaultMimeType = (
+  responses: LinkResponse[],
+  linkType: string,
+  hreflangPreferences: string[],
+): LinkResponse | undefined => {
+  return responses.find(
+    (res) =>
+      res.linkType === linkType &&
+      hreflangMatches(res, hreflangPreferences) &&
       res.defaultMimeType,
   );
-  return response;
 };
 
-const matchLinkTypeLanguageContext = (
+const matchLinkTypeHreflang = (
   responses: LinkResponse[],
   linkType: string,
-  ianaLanguageContexts: IanalanguageContext[],
-): LinkResponse => {
-  const response = responses.find(
-    (res) =>
-      res.linkType === linkType &&
-      checkIanaLanguageContext(res, ianaLanguageContexts),
-  );
-  return response;
-};
-
-const matchLinkTypeLanguageDefaultContext = (
-  responses: LinkResponse[],
-  linkType: string,
-  ianaLanguageContexts: { ianaLanguage: string; context: string }[],
-): LinkResponse => {
-  const response = responses.find(
-    (res) =>
-      res.linkType === linkType &&
-      checkIanaLanguage(res, ianaLanguageContexts) &&
-      res.defaultContext,
-  );
-  return response;
-};
-
-const matchLinkTypeLanguage = (
-  responses: LinkResponse[],
-  linkType: string,
-  ianaLanguageContexts: IanalanguageContext[],
-): LinkResponse => {
-  const response = responses.find(
-    (res) =>
-      res.linkType === linkType && checkIanaLanguage(res, ianaLanguageContexts),
-  );
-  return response;
-};
-
-/**
- * @deprecated Always returns undefined. Language-aware matching is
- * reintroduced on hreflang membership when the language-aware cascade
- * lands (#108).
- */
-const matchLinkTypeDefaultLanguage = (
-  _responses: LinkResponse[],
-  _linkType: string,
+  hreflangPreferences: string[],
 ): LinkResponse | undefined => {
-  void _responses;
-  void _linkType;
-  return undefined;
+  return responses.find(
+    (res) =>
+      res.linkType === linkType && hreflangMatches(res, hreflangPreferences),
+  );
+};
+
+const matchLinkTypeDefaultContext = (
+  responses: LinkResponse[],
+  linkType: string,
+): LinkResponse | undefined => {
+  return responses.find(
+    (res) => res.linkType === linkType && res.defaultContext,
+  );
 };
 
 const matchLinkType = (
   responses: LinkResponse[],
   linkType: string,
-): LinkResponse => {
-  const response = responses.find((res) => res.linkType === linkType);
-  return response;
+): LinkResponse | undefined => {
+  return responses.find((res) => res.linkType === linkType);
 };
 
-const matchDefaultLinkType = (responses: LinkResponse[]): LinkResponse => {
-  const response = responses.find((res) => res.defaultLinkType);
-  return response;
-};
-
-// Language-aware matching is reintroduced on hreflang membership when
-// the language-aware cascade lands (#108). Until then, the helpers
-// degrade: checkIanaLanguageContext matches on context only, and
-// checkIanaLanguage never matches so the cascade falls through to
-// language-blind tiers.
-const checkIanaLanguageContext = (
-  response: LinkResponse,
-  ianaLanguageContexts: IanalanguageContext[],
-) => {
-  return ianaLanguageContexts.some(
-    (ianaLanguageContext) =>
-      ianaLanguageContext.context &&
-      response.context.toLowerCase() ===
-        ianaLanguageContext.context.toLowerCase(),
-  );
-};
-
-const checkIanaLanguage = (
-  _response: LinkResponse,
-  _ianaLanguageContexts: IanalanguageContext[],
-) => {
-  void _response;
-  void _ianaLanguageContexts;
-  return false;
+const matchDefaultLinkType = (
+  responses: LinkResponse[],
+): LinkResponse | undefined => {
+  return responses.find((res) => res.defaultLinkType);
 };
 
 const constructResolvedLinkForResponse = (

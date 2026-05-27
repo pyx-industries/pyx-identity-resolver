@@ -182,14 +182,12 @@ describe('DefaultFlagsTransformPipe', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          hreflang: ['en'],
           context: 'au',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:certificationInfo',
-          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultMimeType: true,
@@ -202,18 +200,16 @@ describe('DefaultFlagsTransformPipe', () => {
       expect(result.responses[1].defaultMimeType).toBe(true);
     });
 
-    it('should allow different full scopes to each have their own defaultMimeType', () => {
+    it('should allow different contexts within a linkType to each have their own defaultMimeType', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          hreflang: ['en'],
           context: 'au',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:certificationInfo',
-          hreflang: ['en'],
           context: 'us',
           mimeType: 'application/json',
           defaultMimeType: true,
@@ -232,14 +228,12 @@ describe('DefaultFlagsTransformPipe', () => {
       const dto = createDto([
         createResponse({
           linkType: 'gs1:certificationInfo',
-          hreflang: ['en'],
           context: 'AU',
           mimeType: 'application/json',
           defaultMimeType: true,
         }),
         createResponse({
           linkType: 'gs1:certificationInfo',
-          hreflang: ['en'],
           context: 'au',
           mimeType: 'text/html',
           defaultMimeType: true,

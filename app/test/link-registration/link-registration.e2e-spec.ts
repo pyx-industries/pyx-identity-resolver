@@ -97,7 +97,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -131,7 +131,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -173,7 +173,7 @@ describe('LinkResolutionController (e2e)', () => {
             fwqs: false,
             active: true,
             linkType: `gs1:${linkType}`,
-            hreflang: ['en'],
+            hreflang: ['en-AU', 'en'],
             context: 'au',
             title,
             targetUrl,
@@ -270,7 +270,7 @@ describe('LinkResolutionController (e2e)', () => {
             fwqs: false,
             active: true,
             linkType: `gs1:${linkType}`,
-            hreflang: ['en'],
+            hreflang: ['en-AU', 'en'],
             context: 'au',
             title,
             targetUrl,
@@ -362,7 +362,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -400,7 +400,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -444,7 +444,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -488,7 +488,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -532,7 +532,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -602,7 +602,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -645,7 +645,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -690,7 +690,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -735,7 +735,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -779,7 +779,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -824,7 +824,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -898,7 +898,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -938,7 +938,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -978,7 +978,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: 'invalid', // invalid fwqs
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -1018,7 +1018,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: 'invalid', // invalid active
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -1058,7 +1058,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:nonExistentLinkType',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -1098,7 +1098,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:dpp',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Digital Product Passport',
               targetUrl: 'https://example.com/dpp',
@@ -1138,7 +1138,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'untp:dpp',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Digital Product Passport',
               targetUrl: 'https://example.com/dpp',
@@ -1172,7 +1172,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'untp:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -1212,7 +1212,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'custom:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -1252,7 +1252,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -1292,7 +1292,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: '', // invalid title
               targetUrl: 'https://example.com',
@@ -1335,7 +1335,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'invalid', // invalid target URL
@@ -1372,7 +1372,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Certification Information',
               targetUrl: 'https://example.com',
@@ -1394,10 +1394,7 @@ describe('LinkResolutionController (e2e)', () => {
         });
     });
 
-    // Language-aware resolver cascade is reintroduced in #108 on hreflang
-    // membership. Skipping until then; the test asserts on default-language
-    // semantics that no longer apply.
-    it.skip('should auto-unset existing defaults when new response sets same defaults', async () => {
+    it('should auto-unset existing defaults when new response sets same defaults', async () => {
       // Create a unique namespace for this test
       const namespace = `e2e-${environment}-mock-auto-unset`;
       const identifierDto = createIdentifierDto();
@@ -1431,7 +1428,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Response A - Original Default',
               targetUrl: 'https://response-a.com',
@@ -1461,7 +1458,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:epcis',
-              hreflang: ['fr'],
+              hreflang: ['fr-US', 'fr'],
               context: 'us',
               title: 'Response B - New Default LinkType',
               targetUrl: 'https://response-b.com',
@@ -1491,7 +1488,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['fr'],
+              hreflang: ['fr-CA', 'fr'],
               context: 'ca',
               title: 'Response C - New Default Language',
               targetUrl: 'https://response-c.com',
@@ -1521,7 +1518,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-GB', 'en'],
               context: 'gb',
               title: 'Response D - New Default Context',
               targetUrl: 'https://response-d.com',
@@ -1551,7 +1548,7 @@ describe('LinkResolutionController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Response E - New Default MimeType',
               targetUrl: 'https://response-e.com',
@@ -1580,27 +1577,32 @@ describe('LinkResolutionController (e2e)', () => {
         .expect(302)
         .expect('Location', 'https://response-b.com');
 
-      // 2. Verify defaultIanaLanguage: when linkType=certificationInfo but no language header,
-      // it should resolve to response C (which has defaultIanaLanguage: true for certificationInfo)
+      // 2. Verify defaultContext: when linkType=certificationInfo and no language header,
+      // the cascade picks the variant that holds defaultContext=true after auto-unset
+      // (response D was the last to claim it for certificationInfo, so C's flag was flipped).
       await request(baseUrl)
         .get(
           `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .expect(302)
-        .expect('Location', 'https://response-c.com');
+        .expect('Location', 'https://response-d.com');
 
-      // 3. Verify defaultContext: when linkType=certificationInfo and language=en (no region),
-      // it should resolve to response D (which has defaultContext: true for certificationInfo+en)
+      // 3. Verify tier 2 (linkType + hreflang + defaultMimeType): both D and E
+      // match hreflang 'en' and no specific mime was requested. E was the
+      // last registration to claim defaultMimeType=true, so per the (linkType)
+      // scope E now holds that flag and tier 2 returns E.
       await request(baseUrl)
         .get(
           `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,
         )
         .set('Accept-Language', 'en')
         .expect(302)
-        .expect('Location', 'https://response-d.com');
+        .expect('Location', 'https://response-e.com');
 
-      // 4. Verify defaultMimeType: when linkType=certificationInfo, language=en-AU (full context),
-      // but no Accept header, it should resolve to response E (which has defaultMimeType: true for certificationInfo+en+au)
+      // 4. Verify tier 2: en-AU matches E's hreflang ['en-AU', 'en'] and E
+      // carries defaultMimeType=true for the (cert + au) registration scope.
+      // Tier 2 returns E. (D would only win via tier 4 if no hreflang match
+      // existed at any earlier tier.)
       await request(baseUrl)
         .get(
           `/${namespace}/${identificationKeyType}/${identificationKey}?linkType=${encodeURIComponent('gs1:certificationInfo')}`,

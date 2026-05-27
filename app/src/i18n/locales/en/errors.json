@@ -10,8 +10,6 @@
   "nestedValidation": "{property} nested validation failed",
   "arrayNotEmpty": "{property} should not be an empty array",
   "matches": "{property} is not in a valid format",
-  "invalid_iana_language": "Invalid IANA language tag: '{tag}'",
-  "iana_language_must_be_lowercase": "IANA language tag must be lowercase, but '{tag}' is not",
   "invalid_context_code": "Invalid context code: '{context}'. The context code must be valid IETF language tag (BCP 47).",
   "invalid_key_type": "Identification key type '{key}' is not registered with the namespace '{namespace}'",
   "cannot_resolve_link": "Cannot resolve link resolver",
