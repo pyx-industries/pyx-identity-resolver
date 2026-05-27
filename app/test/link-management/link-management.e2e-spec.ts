@@ -98,7 +98,7 @@ describe('LinkManagementController (e2e)', () => {
             fwqs: false,
             active: true,
             linkType: 'gs1:certificationInfo',
-            hreflang: ['en'],
+            hreflang: ['en-AU', 'en'],
             context: 'au',
             title: 'Certification Information',
             targetUrl: 'https://example.com/cert',
@@ -111,7 +111,7 @@ describe('LinkManagementController (e2e)', () => {
             fwqs: false,
             active: true,
             linkType: 'gs1:pip',
-            hreflang: ['en'],
+            hreflang: ['en-AU', 'en'],
             context: 'au',
             title: 'Product Information',
             targetUrl: 'https://example.com/product',
@@ -301,7 +301,7 @@ describe('LinkManagementController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:epcis',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'EPCIS Information',
               targetUrl: 'https://example.com/new-link',
@@ -349,7 +349,7 @@ describe('LinkManagementController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:recipeInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Recipe Information',
               targetUrl: 'https://example.com/fetchable-link',
@@ -409,7 +409,7 @@ describe('LinkManagementController (e2e)', () => {
               linkType: 'gs1:hasRetailers',
               title: 'Original Title',
               mimeType: 'text/html',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
             },
           ],
@@ -477,7 +477,7 @@ describe('LinkManagementController (e2e)', () => {
         .send({
           title: 'Multi-field Update',
           mimeType: 'application/json',
-          hreflang: ['fr'],
+          hreflang: ['fr-CA', 'fr'],
           context: 'ca',
         })
         .expect(HttpStatus.OK);
@@ -489,7 +489,7 @@ describe('LinkManagementController (e2e)', () => {
 
       expect(getRes.body.title).toBe('Multi-field Update');
       expect(getRes.body.mimeType).toBe('application/json');
-      expect(getRes.body.hreflang).toEqual(['fr']);
+      expect(getRes.body.hreflang).toEqual(['fr-CA', 'fr']);
       expect(getRes.body.context).toBe('ca');
     });
 
@@ -528,7 +528,7 @@ describe('LinkManagementController (e2e)', () => {
               linkType: 'gs1:masterData',
               title: 'Soft Delete Target',
               mimeType: 'text/html',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
             },
           ],
@@ -613,7 +613,7 @@ describe('LinkManagementController (e2e)', () => {
               linkType: 'gs1:quickStartGuide',
               title: 'Hard Delete Target',
               mimeType: 'text/html',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
             },
           ],
@@ -680,7 +680,7 @@ describe('LinkManagementController (e2e)', () => {
               linkType: 'gs1:traceability',
               title: 'Version Track Test',
               mimeType: 'text/html',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
             },
           ],
@@ -770,7 +770,7 @@ describe('LinkManagementController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'gs1:certificationInfo',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'BC Certification Info',
               targetUrl: 'https://example.com/bc-cert',
@@ -830,7 +830,7 @@ describe('LinkManagementController (e2e)', () => {
               fwqs: false,
               active: true,
               linkType: 'untp:dpp',
-              hreflang: ['en'],
+              hreflang: ['en-AU', 'en'],
               context: 'au',
               title: 'Digital Product Passport',
               targetUrl: 'https://example.com/dpp',

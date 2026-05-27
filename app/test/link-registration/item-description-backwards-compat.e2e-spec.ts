@@ -36,7 +36,7 @@ const baseResponse = {
   fwqs: false,
   active: true,
   linkType: 'gs1:certificationInfo',
-  hreflang: ['en'],
+  hreflang: ['en-AU', 'en'],
   context: 'au',
   title: 'Certification Information',
   targetUrl: 'https://example.com',
