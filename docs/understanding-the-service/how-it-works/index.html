@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.6.3">
 <title data-rh="true">How It Works | Pyx Identity Resolver</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://pyx-industries.github.io/pyx-identity-resolver/docs/understanding-the-service/how-it-works"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="4.0.0"><meta data-rh="true" name="docusaurus_tag" content="docs-default-4.0.0"><meta data-rh="true" name="docsearch:version" content="4.0.0"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-4.0.0"><meta data-rh="true" property="og:title" content="How It Works | Pyx Identity Resolver"><meta data-rh="true" name="description" content="Using the Identity Resolver is a three-step process:"><meta data-rh="true" property="og:description" content="Using the Identity Resolver is a three-step process:"><link data-rh="true" rel="icon" href="/pyx-identity-resolver/img/favicon.png"><link data-rh="true" rel="canonical" href="https://pyx-industries.github.io/pyx-identity-resolver/docs/understanding-the-service/how-it-works"><link data-rh="true" rel="alternate" href="https://pyx-industries.github.io/pyx-identity-resolver/docs/understanding-the-service/how-it-works" hreflang="en"><link data-rh="true" rel="alternate" href="https://pyx-industries.github.io/pyx-identity-resolver/docs/understanding-the-service/how-it-works" hreflang="x-default"><link rel="stylesheet" href="/pyx-identity-resolver/assets/css/styles.7283cad6.css">
-<script src="/pyx-identity-resolver/assets/js/runtime~main.64a74b13.js" defer="defer"></script>
+<script src="/pyx-identity-resolver/assets/js/runtime~main.25783b71.js" defer="defer"></script>
 <script src="/pyx-identity-resolver/assets/js/main.6946fa11.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -49,10 +49,11 @@ and is described by:</p>
 <ul>
 <li><strong>Link type</strong> — What kind of information this is (e.g. <code>acme:sustainabilityInfo</code>)</li>
 <li><strong>Target URL</strong> — Where the information lives (e.g. <code>https://example.com/sustainability-report</code>)</li>
-<li><strong>Language</strong> — The language of the resource (e.g. <code>en</code> for English)</li>
+<li><strong>Language</strong> — BCP 47 tags the variant serves, via <code>hreflang[]</code> (e.g. <code>[&quot;en&quot;, &quot;en-AU&quot;]</code>)</li>
 <li><strong>Context</strong> — A regional or situational qualifier (e.g. <code>au</code> for Australia)</li>
-<li><strong>MIME type</strong> — The format of the resource (e.g. <code>text/html</code>)</li>
+<li><strong>MIME type</strong> — Any well-formed RFC 6838 media type (e.g. <code>text/html</code>, <code>application/vnd.acme.sbom+json</code>)</li>
 </ul>
+<p>A variant can also carry optional metadata: <code>public</code> (the URL is safe to publish in a public directory), <code>rel</code> (additional link relation types beyond the primary <code>linkType</code>), <code>accessRole</code> (UNTP variant-based-disclosure roles), <code>encryptionMethod</code>, and <code>method</code>. The full list lives in the <a href="/pyx-identity-resolver/docs/developer-guide/#variant-fields">Developer Guide</a>.</p>
 <p>You can register multiple responses for the same identifier,
 covering different link types, languages, formats, and contexts.
 This is what makes the resolver powerful:
@@ -91,7 +92,7 @@ without making any resolution requests.
 See the <a href="/pyx-identity-resolver/docs/developer-guide/">Developer Guide</a> for the resolver description endpoint details.</p>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="link-types">Link types<a href="#link-types" class="hash-link" aria-label="Direct link to Link types" title="Direct link to Link types">​</a></h3>
 <p>Link types describe the nature of the information a link points to.
-They follow a <code>prefix:key</code> format — for example, <code>gs1:certificationInfo</code> or <code>untp:traceabilityEvent</code>.</p>
+They follow a <code>prefix:key</code> format  — for example, <code>gs1:certificationInfo</code> or <code>untp:traceabilityEvent</code>.</p>
 <p>Link types come from controlled vocabularies.
 The resolver supports two built-in vocabulary prefixes: <code>gs1</code> (GS1 Digital Link vocabulary)
 and <code>untp</code> (UN Transparency Protocol vocabulary).
