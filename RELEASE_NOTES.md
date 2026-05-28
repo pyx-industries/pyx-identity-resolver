@@ -42,6 +42,16 @@ The API URL path now carries only the major version. The base path moves from `/
 
 `RESOLVER_DOMAIN` is now the externally-reachable base URL only (scheme + host, no path, no trailing slash). The service appends `/api/v4` internally. `API_BASE_URL` and `LINK_TYPE_VOC_DOMAIN` are retired; `RESOLVER_DOMAIN` is the single source of truth, and the link-type vocabulary base can be overridden per identifier by setting `namespaceURI` on the identifier record.
 
+#### Additive variant fields and MIME loosening
+
+These are additive and do not require operator action; publishers can opt in once on v4.
+
+- **`public: boolean`** on each variant. Indicates the URL itself is safe to publish in a public directory. Distinct from `accessRole` and `encryptionMethod`, which govern who may *retrieve or decrypt* the resource.
+- **`rel: string[]`** on each variant. Carries additional link relation types qualifying the variant beyond its primary `linkType`. The reserved value `predecessor-version` is silently stripped from publisher input; the server emits it itself on predecessor entries derived from version history.
+- **MIME type loosening.** The service now accepts any RFC 6838 well-formed media type (including custom and vendor-prefixed types such as `application/vnd.acme.sbom+json`); v3 rejected anything outside a curated list.
+
+The full per-variant field reference, including pre-existing fields that were under-documented in earlier versions, lives in the [Developer Guide](./documentation/docs/developer-guide/index.md#variant-fields).
+
 ### Data migration
 
 v4 ships a one-shot CLI command (`yarn migrate:v4`) that operators

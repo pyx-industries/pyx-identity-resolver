@@ -73,9 +73,11 @@ and is described by:
 
 - **Link type** — What kind of information this is (e.g. `acme:sustainabilityInfo`)
 - **Target URL** — Where the information lives (e.g. `https://example.com/sustainability-report`)
-- **Language** — The language of the resource (e.g. `en` for English)
+- **Language** — BCP 47 tags the variant serves, via `hreflang[]` (e.g. `["en", "en-AU"]`)
 - **Context** — A regional or situational qualifier (e.g. `au` for Australia)
-- **MIME type** — The format of the resource (e.g. `text/html`)
+- **MIME type** — Any well-formed RFC 6838 media type (e.g. `text/html`, `application/vnd.acme.sbom+json`)
+
+A variant can also carry optional metadata: `public` (the URL is safe to publish in a public directory), `rel` (additional link relation types beyond the primary `linkType`), `accessRole` (UNTP variant-based-disclosure roles), `encryptionMethod`, and `method`. The full list lives in the [Developer Guide](../developer-guide/#variant-fields).
 
 You can register multiple responses for the same identifier,
 covering different link types, languages, formats, and contexts.

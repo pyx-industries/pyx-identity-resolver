@@ -178,9 +178,11 @@ Each registration targets a namespace + identifier key type + identifier key
 (and optionally a qualifier path),
 and contains one or more **responses** --
 each pointing to a different URL with its own link type,
-language tag (e.g., `en`, `fr-CA`),
+language tags (BCP 47 entries in `hreflang[]` such as `en`, `en-AU`, or `fr-CA`),
 MIME type (the content format, such as `text/html` or `application/pdf`),
 and context (typically a geographic region code such as `au` or `us`).
+The full set of accepted per-variant fields is summarised under
+[Variant fields](#variant-fields) below.
 
 ### Register links
 
@@ -237,11 +239,37 @@ A successful `201` response:
 }
 ```
 
-:::note Deprecation notice
-The `description` field replaces the deprecated `itemDescription` field.
-Both are accepted for backwards compatibility, but `description` is preferred.
-`itemDescription` will be removed in v3.0.
+:::note `description` field
+The top-level `description` field replaces the legacy `itemDescription` field.
+Both are accepted for backwards compatibility, but `description` is preferred;
+`itemDescription` was deprecated in v3.0.0 and remains accepted as an alias.
 :::
+
+#### Variant fields
+
+Every entry in the `responses[]` array (a "variant") accepts the following fields. The full Swagger UI at `/api` is generated from the same DTOs and is the authoritative source for shape and validation.
+
+| Field | Type | Required | Purpose |
+|---|---|---|---|
+| `linkType` | string | yes | The link relation type (`prefix:key`, e.g. `acme:sustainabilityInfo`). Validated against the vocabulary for the namespace's prefix. |
+| `title` | string | yes | Human-readable label for the link. |
+| `targetUrl` | string (URL) | yes | The URL the link resolves to. |
+| `mimeType` | string | yes | Any RFC 6838 well-formed media type (e.g. `text/html`, `application/pdf`, `application/vnd.acme.sbom+json`). Custom and vendor-prefixed types are accepted; the value is not constrained to a registry. |
+| `context` | string | yes | Context qualifier (typically a regional code such as `au`, `us`, or `eu`). Part of the composite key. |
+| `hreflang` | string[] | no | BCP 47 language tags advertised by this variant. A single variant can serve multiple tags. Matching is case-insensitive per RFC 4647 §2.1. |
+| `defaultLinkType` | boolean | yes | Marks this variant as the default for resolution requests that omit `linkType`. Only one variant per registration may set this to `true`. |
+| `defaultContext` | boolean | yes | Marks this variant as the publisher's canonical fallback for its link type when no variant matches the requested language. Only one variant per link type may set this to `true`. |
+| `defaultMimeType` | boolean | yes | Marks this variant as the preferred MIME type within its `(linkType, context)` group. Only one variant per `(linkType, context)` may set this to `true`. |
+| `fwqs` | boolean | yes | Forward query string flag (see [`fwqs`](#forward-query-string-fwqs) above). |
+| `active` | boolean | yes | Whether the variant is served at resolution time. Set to `false` on soft delete; remains in the document but is omitted from the linkset. |
+| `accessRole` | string[] | no | UNTP access roles that may retrieve this variant under variant-based disclosure. Values follow the URI pattern `untp:accessRole#RoleName` (`Anonymous`, `Customer`, `Regulator`, `Recycler`, `Auditor`, `Owner`); shorthand forms such as `customer` are expanded at resolution time. |
+| `encryptionMethod` | string | no | Encryption applied to the target content. One of `none`, `AES-128`, `AES-256`. Documents the encryption scheme; the resolver does not perform decryption itself (see `fwqs` + `decryptionKey` for key forwarding). |
+| `method` | string | no | HTTP method the target URL expects (`GET`, `POST`, etc.). Advisory metadata for clients; the resolver itself only issues redirects, not requests. |
+| `public` | boolean | no | Indicates the URL itself is safe to publish in a public directory. Distinct from `accessRole` and `encryptionMethod`, which govern who may *retrieve or decrypt* the resource. A link may be `public: true` while still requiring an authorised role to fetch the content. An explicit `public: false` round-trips and is preserved separately from "not set". |
+| `rel` | string[] | no | Additional link relation types qualifying the link beyond its primary `linkType`. The reserved value `predecessor-version` is silently stripped from publisher input; the server emits it itself on predecessor entries derived from version history. |
+| `linkId` | string (UUID) | server-generated | Unique identifier assigned at registration time. Read-only; used to address the variant via the [Link Management](#link-management) endpoints. |
+
+The composite key uniquely identifying a variant is `(targetUrl, linkType, mimeType, context)`. `hreflang`, default flags, and the other fields are NOT part of the key. See [Append-only behaviour](#append-only-behaviour) below.
 
 :::caution Link type validation
 Every `linkType` value is validated against a namespace-specific vocabulary.
