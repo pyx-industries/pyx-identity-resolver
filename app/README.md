@@ -113,6 +113,12 @@ cp .env.development.local.example .env.development.local
 - `RESOLVER_DOMAIN`: Externally-reachable base URL for this resolver service (scheme + host, no path, no trailing slash). The service appends the API path prefix (`/api/v4`) internally based on `apiVersion` in `version.json`. The link-type vocabulary URL is derived from `RESOLVER_DOMAIN` + the API path prefix + `/voc`, and can be overridden per identifier by setting `namespaceURI` on the identifier record.
 - `API_KEY`: The API key for accessing any protected endpoints in this service.
 - `APP_NAME`: The name of this application.
+- `LOG_LEVEL`: The minimum log level to emit. One of `trace`, `debug`, `info`, `warn`, `error`, `fatal`, or `silent`. Defaults to `info`.
+- `LOG_PRETTY`: When `true`, logs are pretty-printed for humans (requires `pino-pretty`); when `false`, logs are emitted as JSON. Defaults to `true` in development and `false` otherwise.
+
+### Logging
+
+The service emits structured JSON logs via Pino (pretty-printed in development; see `LOG_PRETTY`). Request-scoped log lines carry a request id so the logs for a single request can be traced together. The `authorization` and `cookie` request headers are redacted in logs.
 
 ### MinIO Configuration
 
