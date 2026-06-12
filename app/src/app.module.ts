@@ -14,8 +14,10 @@ import { SharedModule } from './modules/shared/shared.module';
 import { AuthModule } from './auth/auth.module';
 import { CustomAuthGuard } from './common/guards/auth.guard';
 import { CommonModule } from './modules/common/common.module';
+import { LoggingModule } from './common/logging/logging.module';
 @Module({
   imports: [
+    LoggingModule,
     ConfigModule.forRoot({
       envFilePath: [
         `.env.${process.env.NODE_ENV}.local`,

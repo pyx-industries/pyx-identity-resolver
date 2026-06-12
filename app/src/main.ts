@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import serverlessExpress from '@codegenie/serverless-express';
 import { Callback, Context, Handler } from 'aws-lambda';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { validationExceptionFactory } from './common/factories/validation-exception.factory';
@@ -19,8 +20,10 @@ let server: Handler;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: true,
+    bufferLogs: true,
   });
 
+  app.useLogger(app.get(Logger));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({
