@@ -24,7 +24,7 @@ see the [Development Setup](../contributing/index.md) page.
 | `PORT` | No | `3000` | The port the HTTP server listens on. Only used when `NODE_ENV` is **not** `production`. |
 | `APP_NAME` | **Yes** | --- | A short name for your resolver instance (e.g. `IDR`). Used in API responses and health checks. The app will fail to start if this is empty. |
 | `API_KEY` | **Yes** | --- | Bearer token required for all authenticated endpoints (identifier management, link registration). Anonymous link resolution does not require a key. |
-| `LINK_HEADER_MAX_SIZE` | No | `8192` | Maximum size in bytes of the `Link` response header. Must be a positive integer. If the assembled header exceeds this limit, optional entries are dropped to stay within budget. Recommended maximum: `65536` (64 KB). |
+| `LINK_HEADER_MAX_SIZE` | No | `8192` | Maximum size in bytes of the `Link` response header. Must be a positive integer. If the assembled header exceeds this limit, every target link is dropped and only the `owl:sameAs` and `linkset` entries are sent. Clients can still read every link from the linkset. Keep it below `16384`, the default limit Node.js HTTP clients apply to all response headers combined. See [Link header size](./scaling.md#link-header-size). |
 
 ### `RESOLVER_DOMAIN` explained
 
