@@ -17,6 +17,14 @@ import {
 import { IdentifierManagementService } from '../identifier-management/identifier-management.service';
 import { ApplicationIdentifier } from '../identifier-management/dto/identifier.dto';
 
+/**
+ * Default response header limit of Node.js HTTP clients, including `fetch`
+ * (`http.maxHeaderSize`, 16 KiB). It covers every response header combined,
+ * so a `Link` header budget at or above it fails those clients with
+ * `UND_ERR_HEADERS_OVERFLOW` whenever an identifier fills the budget.
+ */
+export const COMMON_CLIENT_HEADER_LIMIT = 16384;
+
 @Injectable()
 export class LinkResolutionService {
   private readonly logger = new Logger(LinkResolutionService.name);
@@ -45,9 +53,12 @@ export class LinkResolutionService {
         `Invalid LINK_HEADER_MAX_SIZE configuration: '${rawMaxSize}'. Must be greater than 0.`,
       );
     }
-    if (parsed > 1048576) {
+    if (parsed >= COMMON_CLIENT_HEADER_LIMIT) {
       this.logger.warn(
-        `LINK_HEADER_MAX_SIZE is very large (${parsed} bytes). Recommended max: 65536 (64KB).`,
+        `LINK_HEADER_MAX_SIZE (${parsed} bytes) is at or above ${COMMON_CLIENT_HEADER_LIMIT} bytes, ` +
+          `the default limit Node.js HTTP clients (including fetch) apply to all response headers combined. ` +
+          `Resolutions for identifiers that fill the budget will fail for those clients. ` +
+          `Every link stays available from the linkset.`,
       );
     }
     this.linkHeaderMaxSize = parsed;

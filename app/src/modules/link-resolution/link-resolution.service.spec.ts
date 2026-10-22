@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LinkResolutionService } from './link-resolution.service';
+import { Logger } from '@nestjs/common';
+import {
+  COMMON_CLIENT_HEADER_LIMIT,
+  LinkResolutionService,
+} from './link-resolution.service';
 import { IRepositoryProvider } from '../../repository/providers/provider.repository.interface';
 import {
   i18nServiceMockFactory,
@@ -225,6 +229,70 @@ describe('LinkResolutionService', () => {
           ],
         }).compile(),
       ).rejects.toThrow(/digits only/);
+    });
+
+    describe('client header limit warning', () => {
+      let warnSpy: jest.SpyInstance;
+
+      const compileWithMaxSize = (value: string) =>
+        Test.createTestingModule({
+          providers: [
+            LinkResolutionService,
+            {
+              provide: 'RepositoryProvider',
+              useFactory: repositoryProviderMockFactory,
+            },
+            { provide: I18nService, useFactory: i18nServiceMockFactory },
+            {
+              provide: ConfigService,
+              useValue: {
+                get: jest.fn((key: string) => {
+                  if (key === 'LINK_HEADER_MAX_SIZE') return value;
+                  return undefined;
+                }),
+                getOrThrow: jest.fn(),
+              },
+            },
+            {
+              provide: IdentifierManagementService,
+              useValue: { getIdentifier: jest.fn() },
+            },
+          ],
+        }).compile();
+
+      beforeEach(() => {
+        warnSpy = jest
+          .spyOn(Logger.prototype, 'warn')
+          .mockImplementation(() => undefined);
+      });
+
+      afterEach(() => {
+        warnSpy.mockRestore();
+      });
+
+      it('should not warn for the default budget', async () => {
+        await compileWithMaxSize('8192');
+        expect(warnSpy).not.toHaveBeenCalled();
+      });
+
+      it('should not warn just below the limit', async () => {
+        await compileWithMaxSize(String(COMMON_CLIENT_HEADER_LIMIT - 1));
+        expect(warnSpy).not.toHaveBeenCalled();
+      });
+
+      it.each([String(COMMON_CLIENT_HEADER_LIMIT), '32768', '65536'])(
+        'should warn when the budget is %s bytes',
+        async (value) => {
+          await compileWithMaxSize(value);
+          expect(warnSpy).toHaveBeenCalledTimes(1);
+          expect(warnSpy).toHaveBeenCalledWith(
+            expect.stringContaining(`LINK_HEADER_MAX_SIZE (${value} bytes)`),
+          );
+          expect(warnSpy).toHaveBeenCalledWith(
+            expect.stringContaining('Node.js HTTP clients'),
+          );
+        },
+      );
     });
   });
 
