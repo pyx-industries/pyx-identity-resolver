@@ -18,6 +18,113 @@ for the user-facing version.
 
 ---
 
+## v4.1.0 (2026-10-23)
+
+Container image: `ghcr.io/pyx-industries/pyx-identity-resolver:4.1.0`
+(plus `:4.1.0-serverless` for AWS Lambda).
+
+No migration guide: the API is unchanged, the base path stays
+`/api/v4`, and stored data needs no migration.
+
+### What changed
+
+v4.1.0 clears the critical advisories in the service's dependencies,
+runs the standard image as a non-root user with a Docker health check,
+and moves the service to structured logging.
+
+#### Security fixes in dependencies
+
+- The open critical dependency advisories in the service and
+  documentation lockfiles are cleared. The service now resolves
+  `follow-redirects` 1.16.1, `form-data` 4.0.6 and `proxy-addr` 2.0.8,
+  and the development dependencies `handlebars` 4.7.10 and
+  `websocket-driver` 0.7.5.
+- `axios` moves from 1.7.5 to 1.20.0.
+- `minio` moves from 8.0.1 to 8.0.7, which brings `fast-xml-parser`
+  5.11.2 in place of 4.4.1 and clears the `fast-xml-parser` advisories.
+  Listings of large prefixes keep working. The patched 4.x parser
+  releases reject a MinIO listing page of 501 or more objects, so the
+  service moves to the 5.x parser that minio 8.0.7 uses.
+- The images no longer set `OBJECT_STORAGE_URL`,
+  `OBJECT_STORAGE_ROOT_USER` and `OBJECT_STORAGE_ROOT_PASSWORD`. The
+  service never read them, and the last two held MinIO's public default
+  credentials. Storage settings still come from
+  `OBJECT_STORAGE_ENDPOINT`, `OBJECT_STORAGE_ACCESS_KEY`,
+  `OBJECT_STORAGE_SECRET_KEY` and the other `OBJECT_STORAGE_*`
+  variables.
+
+#### Standard image runs as `node` with a health check
+
+- The standard image now runs the service as the unprivileged `node`
+  user instead of root. The service writes nothing to disk, so no files
+  or volumes need a change of ownership.
+- The image declares a Docker `HEALTHCHECK` that requests
+  `/api/v<major>/health-check` (currently `/api/v4/health-check`) on
+  `PORT` (default `3000`) every 30 seconds, with a 15-second start
+  period, a 10-second timeout and 3 retries. `docker ps` and Docker
+  Compose report the container as `healthy` or `unhealthy`. Kubernetes
+  does not use Docker health checks, so configure its probes against
+  the same path.
+- The serverless image does not gain the `node` user or the health
+  check. It does get the dependency, logging and retry changes in
+  these notes.
+
+#### Structured logging
+
+- The service now logs through Pino. Framework and start-up messages
+  go through the same pipeline. Each HTTP request writes a completion
+  line with its response time, at `error` for 5xx responses, `warn`
+  for 4xx and `info` otherwise. Log lines for the same request carry
+  the same request id. The `Authorization` and `Cookie` request headers
+  are redacted.
+- Two new environment variables control the output. Set them in the
+  process or container environment: the service reads them before it
+  loads `.env.*.local` files, so values there have no effect.
+  - `LOG_LEVEL`: the minimum level to emit, one of `trace`, `debug`,
+    `info`, `warn`, `error`, `fatal` or `silent`. Default `info`. Any
+    other value, including an empty one, stops the service at start-up.
+  - `LOG_PRETTY`: `true` prints human-readable lines through
+    `pino-pretty`, and any other value prints one JSON object per line.
+    When it is unset, output is pretty-printed if `NODE_ENV` is
+    `development` and JSON otherwise.
+
+#### Documentation
+
+The documentation is published as version 4.1.0. The storage
+providers page's Compose example now pulls MinIO from `pgsty/minio`,
+pinned by digest, in place of `quay.io/minio/minio`.
+
+### Known limits
+
+- A link resolution request with an odd-length qualifier path still
+  writes its parsing error with `console.error`, as plain text outside
+  the structured logs.
+- minio 8.0.7 retries a request once, after 200 to 400 ms, when the
+  object store answers 408, 429, 499, 500, 502, 503, 504 or 520. That
+  covers reads, writes and the bucket check at start-up. It writes a
+  `console.warn` line for each retry, outside the service's structured
+  logs. If the retry gets one of those statuses again, the error starts
+  with `Request failed after 1 retries` and names the HTTP status, but
+  carries no S3 error code. minio
+  does not read the failed response before retrying, so that connection
+  stays busy until it closes.
+
+### Action required for operators
+
+1. **Pull the v4.1.0 container image:**
+   `docker pull ghcr.io/pyx-industries/pyx-identity-resolver:4.1.0`,
+   then restart the service. No data migration is needed.
+2. **Check your log settings.** If you set `NODE_ENV=development`, as
+   the repository's `docker-compose.yaml` does, set `LOG_PRETTY=false`
+   to get JSON for a log collector. Anything that parses the old text
+   log format needs to read JSON lines instead.
+3. **Expect a log line per request.** At the default `LOG_LEVEL` of
+   `info`, every request writes a line, including the Docker health
+   check every 30 seconds. Raise `LOG_LEVEL` to `warn` if you only want
+   failed requests.
+
+---
+
 ## v4.0.0 (2026-05-28)
 
 Container image: `ghcr.io/pyx-industries/pyx-identity-resolver:4.0.0`

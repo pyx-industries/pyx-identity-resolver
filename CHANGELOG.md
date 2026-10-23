@@ -1,5 +1,28 @@
 # Changelog
 
+## [4.1.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/v4.0.0...v4.1.0) (2026-10-23)
+
+
+### Features
+
+* **logging:** introduce structured pino logging foundation ([#130](https://github.com/pyx-industries/pyx-identity-resolver/issues/130)) ([651ab8b](https://github.com/pyx-industries/pyx-identity-resolver/commit/651ab8b3903816be90c003c16a6849c7ff5ecd26))
+
+
+### Bug Fixes
+
+* **deps:** resolve critical advisories and move axios and minio to fixed releases ([#140](https://github.com/pyx-industries/pyx-identity-resolver/issues/140)) ([defee84](https://github.com/pyx-industries/pyx-identity-resolver/commit/defee84f079a818fa021589212f035811a82e365))
+* **docker:** run the service image as a non-root user with a health check ([#142](https://github.com/pyx-industries/pyx-identity-resolver/issues/142)) ([8c2ef27](https://github.com/pyx-industries/pyx-identity-resolver/commit/8c2ef27c141e167472d8f7d0a4d7232d73ee003a))
+
+
+### Documentation
+
+* **v4:** fill in missing variant field coverage ([#128](https://github.com/pyx-industries/pyx-identity-resolver/issues/128)) ([864771f](https://github.com/pyx-industries/pyx-identity-resolver/commit/864771f4b2e82878ecae133336a3a8a31dd3cbd4))
+
+
+### Miscellaneous
+
+* **release:** prepare release 4.1.0
+
 ## [4.0.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/v3.0.1...v4.0.0) (2026-05-28)
 
 
