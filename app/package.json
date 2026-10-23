@@ -44,7 +44,7 @@
     "country-code-lookup": "^0.1.3",
     "helmet": "^7.1.0",
     "language-tags": "^1.0.9",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "minio": "^8.0.7",
     "negotiator": "^0.6.3",
     "nestjs-i18n": "^10.4.5",
@@ -91,7 +91,9 @@
     "follow-redirects": "^1.16.1",
     "form-data": "^4.0.6",
     "handlebars": "^4.7.10",
+    "lodash": "^4.18.1",
     "proxy-addr": "~2.0.8",
+    "validator": "^13.15.22",
     "websocket-driver": "^0.7.5"
   },
   "jest": {
