@@ -4,12 +4,14 @@ name: Docker
 #  - Push to `master` (paths-based): builds and pushes `:master` and
 #    `:master-<sha>` images (plus matching `-serverless` variants).
 #    Use for tracking the trunk's latest state.
-#  - Push of a `v*` tag (e.g. `v4.0.0`, `v4.1.0-rc.1`): builds and pushes
-#    the semver-tagged image plus its `-serverless` counterpart. The
-#    `:latest` pointer (and `:latest-serverless`) moves only for
-#    non-pre-release tags.
+#  - Push of a `v*` tag (e.g. `v4.0.1`): builds and pushes the
+#    semver-tagged image plus its `-serverless` counterpart, and nothing
+#    else. This is a maintenance line behind a newer release, so it never
+#    moves `:latest` or `:latest-serverless`; the newest line owns them.
 #  - `workflow_dispatch` with a `version` input: same as a tag push but
 #    triggered manually.
+#  - A tag or `version` input that is not MAJOR.MINOR.PATCH fails the run
+#    before any image is tagged.
 #
 # See: documentation/docs/contributing/release-process.md for the full
 # release workflow.
@@ -84,15 +86,38 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Every tag this line publishes is a full MAJOR.MINOR.PATCH version.
+      # Refuse anything else before it can become an image tag, so neither a
+      # `v*` tag such as `vlatest` nor a dispatch input such as `latest` or
+      # `master` can overwrite a floating tag that the newest line owns.
+      - name: Check the release version
+        shell: bash
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          check() {
+            if [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::$2 is not a MAJOR.MINOR.PATCH version"
+              exit 1
+            fi
+          }
+          if [[ "$REF_TYPE" == "tag" ]]; then
+            check "${REF_NAME#v}" "Tag version"
+          fi
+          if [[ -n "$INPUT_VERSION" ]]; then
+            check "$INPUT_VERSION" "Input version"
+          fi
+
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
           # `suffix` is appended to every tag so the standard image
-          # gets unsuffixed tags (`4.0.0`, `latest`) and the serverless
-          # image gets `-serverless`-suffixed tags (`4.0.0-serverless`,
-          # `latest-serverless`).
+          # gets unsuffixed tags (`4.0.1`) and the serverless image gets
+          # `-serverless`-suffixed tags (`4.0.1-serverless`).
           flavor: |
             latest=false
             suffix=${{ matrix.suffix }}
@@ -100,9 +125,7 @@ jobs:
             type=raw,value=master,enable=${{ github.ref == 'refs/heads/master' }}
             type=sha,format=short,prefix=master-,enable=${{ github.ref == 'refs/heads/master' }}
             type=match,pattern=v(.*),group=1,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
-            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-rc') && !contains(github.ref_name, '-alpha') && !contains(github.ref_name, '-beta') && !contains(github.ref_name, '-pre') }}
             type=raw,value=${{ inputs.version }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.version != '' }}
-            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' && inputs.version != '' && !contains(inputs.version, '-rc') && !contains(inputs.version, '-alpha') && !contains(inputs.version, '-beta') && !contains(inputs.version, '-pre') }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
