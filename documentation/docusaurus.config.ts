@@ -35,8 +35,9 @@ const config: Config = {
         docs: {
           sidebarPath: "./sidebars.ts",
           editUrl: "https://github.com/pyx-industries/pyx-identity-resolver",
-          lastVersion: "4.0.0",
+          lastVersion: "4.1.0",
           onlyIncludeVersions: [
+            "4.1.0",
             "4.0.0",
             "3.0.0",
             "2.0.0",

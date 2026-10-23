@@ -19,7 +19,7 @@ see the [Development Setup](../contributing/index.md) page.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `NODE_ENV` | No | `development` | Set to `production` for serverless (Lambda) deployments. In non-production modes the app starts a standard HTTP server. |
+| `NODE_ENV` | No | --- | Set to `production` for serverless (Lambda) deployments. In non-production modes the app starts a standard HTTP server. When it is `development` and `LOG_PRETTY` is unset, logs are human-readable rather than JSON. |
 | `RESOLVER_DOMAIN` | **Yes** | --- | The externally-reachable **base URL** of your resolver (scheme + host, no path, no trailing slash). The IDR appends its API path prefix (e.g. `/api/v4`) itself, so the value should NOT include `/api/...`. Example: `https://resolver.example.com` |
 | `PORT` | No | `3000` | The port the HTTP server listens on. Only used when `NODE_ENV` is **not** `production`. |
 | `APP_NAME` | **Yes** | --- | A short name for your resolver instance (e.g. `IDR`). Used in API responses and health checks. The app will fail to start if this is empty. |
@@ -91,6 +91,8 @@ see [Storage Providers](./storage-providers).
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `IDENTIFIER_PATH` | No | `identifiers` | The path prefix used when storing identifier-related data in object storage. You rarely need to change this. |
+| `LOG_LEVEL` | No | `info` | The minimum level the service logs: `trace`, `debug`, `info`, `warn`, `error`, `fatal` or `silent`. Any other value, including an empty one, stops the service at start-up. Set it in the process environment, not in an `.env.*.local` file. |
+| `LOG_PRETTY` | No | --- | `true` prints human-readable log lines, and any other value prints one JSON object per line. When unset, output is human-readable if `NODE_ENV` is `development` and JSON otherwise. Set it in the process environment, not in an `.env.*.local` file. |
 
 ## Operational notes
 

@@ -55,8 +55,8 @@ Two image variants are published for every release:
 
 | Image | Tag example | Use case |
 |-------|-------------|----------|
-| Standard | `4.0.0` | Docker, Docker Compose, Kubernetes |
-| Serverless | `4.0.0-serverless` | AWS Lambda container deployments |
+| Standard | `4.1.0` | Docker, Docker Compose, Kubernetes |
+| Serverless | `4.1.0-serverless` | AWS Lambda container deployments |
 
 Both variants are built for **linux/amd64** and **linux/arm64**,
 so they work on Intel/AMD servers and ARM-based hosts (Graviton, Apple Silicon under emulation, etc.).
@@ -65,10 +65,10 @@ so they work on Intel/AMD servers and ARM-based hosts (Graviton, Apple Silicon u
 
 ```bash
 # Standard image
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:4.0.0
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:4.1.0
 
 # Serverless image (AWS Lambda)
-docker pull ghcr.io/pyx-industries/pyx-identity-resolver:4.0.0-serverless
+docker pull ghcr.io/pyx-industries/pyx-identity-resolver:4.1.0-serverless
 ```
 
 ### Tag format
@@ -81,7 +81,7 @@ docker pull ghcr.io/pyx-industries/pyx-identity-resolver:4.0.0-serverless
 | `sha-<commit>` | Build pinned to an exact commit |
 
 :::tip
-Pin to a specific version tag (e.g. `4.0.0`) in production
+Pin to a specific version tag (e.g. `4.1.0`) in production
 rather than `edge` or `latest` to avoid unexpected changes.
 :::
 
@@ -111,7 +111,7 @@ Then run the container with the env file:
 docker run -d \
   -p 3000:3000 \
   --env-file .env \
-  ghcr.io/pyx-industries/pyx-identity-resolver:4.0.0
+  ghcr.io/pyx-industries/pyx-identity-resolver:4.1.0
 ```
 
 :::warning NODE_ENV and the serverless code path
@@ -126,6 +126,8 @@ See [Serverless](./serverless) for details.
 
 You'll still need an S3-compatible object store accessible to the container.
 See [Storage Providers](./storage-providers) for setup options.
+
+The standard image runs the service as the unprivileged `node` user and declares a Docker health check on `/api/v4/health-check` at `PORT`, so `docker ps` and Docker Compose report the container as `healthy` or `unhealthy`. Kubernetes ignores Docker health checks, so point its probes at the same path.
 
 ## Verify it's running
 
