@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.0.1](https://github.com/pyx-industries/pyx-identity-resolver/compare/v4.0.0...v4.0.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* **deps:** clear critical and non-DoS high advisories in runtime dependencies
+
+
+### Miscellaneous
+
+* **docker:** publish only the version tags from the 4.0 line
+* **e2e:** pull MinIO from pgsty/minio pinned by digest
+* **release:** prepare release 4.0.1
+
 ## [4.0.0](https://github.com/pyx-industries/pyx-identity-resolver/compare/v3.0.1...v4.0.0) (2026-05-28)
 
 
