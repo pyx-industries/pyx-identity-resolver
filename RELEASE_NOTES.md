@@ -18,6 +18,62 @@ for the user-facing version.
 
 ---
 
+## v4.0.2 (2026-11-XX)
+
+Container image: `ghcr.io/pyx-industries/pyx-identity-resolver:4.0.2`
+(plus `:4.0.2-serverless`; see Known limits).
+
+No migration guide: the API is unchanged, the base path stays
+`/api/v4`, and stored data needs no migration.
+
+### What changed
+
+v4.0.2 is a security patch on the 4.0 line. It moves `body-parser` to
+1.20.9, so a compressed request can no longer stop the service.
+
+#### Security fix in dependencies
+
+- `body-parser` moves from 1.20.2 to 1.20.9 through an `overrides`
+  entry, because `@nestjs/platform-express` 10.3.10 and `express`
+  4.19.2 pin 1.20.2 exactly.
+- This clears GHSA-27r3-jxmh-p828 (high). Before 1.20.9, a request
+  whose gzip body had trailing bytes after the compressed frame stopped
+  the Node.js process. Such a request is now answered like any other,
+  and the service keeps running.
+- It also clears GHSA-qwcr-r2fm-qrc7 (high).
+
+#### Behaviour that changes with the update
+
+These changes affect only clients that send URL-encoded (form) bodies.
+The resolver's API takes JSON.
+
+- **Deeply nested form bodies.** A form body nested more than 32 levels
+  deep is now rejected, and the resolver answers it with HTTP 500.
+- **Form parsing.** Form bodies are now parsed with `qs` 6.16.2 instead
+  of 6.11.0, which changes how some array fields are parsed. A
+  registration sent as a form with array fields can now be answered with
+  a 400. Sending JSON avoids it.
+
+#### Node.js runtime
+
+Both images are rebuilt on their Node.js 22 base images, `node:22-alpine`
+for the standard image and `public.ecr.aws/lambda/nodejs:22` for the
+serverless image.
+
+### Known limits
+
+- The serverless image does not start under the AWS Lambda Node.js 22
+  runtime, as stated for 4.0.1. This release does not change that.
+
+### Action required for operators
+
+1. **Pull the v4.0.2 standard image:**
+   `docker pull ghcr.io/pyx-industries/pyx-identity-resolver:4.0.2`,
+   then restart the service. No configuration change or data migration
+   is needed.
+
+---
+
 ## v4.0.1 (2026-10-23)
 
 Container image: `ghcr.io/pyx-industries/pyx-identity-resolver:4.0.1`
