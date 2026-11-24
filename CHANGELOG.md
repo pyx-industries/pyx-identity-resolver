@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.0.2](https://github.com/pyx-industries/pyx-identity-resolver/compare/v4.0.1...v4.0.2) (2026-11-XX)
+
+
+### Bug Fixes
+
+* **deps:** move body-parser to 1.20.9 so a compressed request cannot stop the service
+
+
+### Miscellaneous
+
+* **release:** prepare release 4.0.2
+
 ## [4.0.1](https://github.com/pyx-industries/pyx-identity-resolver/compare/v4.0.0...v4.0.1) (2026-10-23)
 
 
